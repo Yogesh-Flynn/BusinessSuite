@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BusinessSuite.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessSuite.Controllers
 {
     [Authorize(Roles = "SuperAdmin") ]
-    public class AppRolesController : Controller
+    public class UserRolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
-        public AppRolesController(RoleManager<IdentityRole> roleManager)
+        public UserRolesController(RoleManager<IdentityRole> roleManager)
         {
             _roleManager = roleManager;
         }
