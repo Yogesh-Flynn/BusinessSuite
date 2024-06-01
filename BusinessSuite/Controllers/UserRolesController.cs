@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BusinessSuite.Controllers
 {
-    [Authorize(Roles = "SuperAdmin") ]
+    //[Authorize(Roles = "SuperAdmin") ]
     public class UserRolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
