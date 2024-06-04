@@ -82,6 +82,12 @@
     background: var(--dark);
     transition: 0.5s;
 }
+.contentLogin {
+    margin-left: 250px;
+    min-height: 100vh;
+    background: var(--dark);
+    transition: 0.5s;
+}
 .contentspace {
     margin-left: 200px;
     min-height: 100vh;
