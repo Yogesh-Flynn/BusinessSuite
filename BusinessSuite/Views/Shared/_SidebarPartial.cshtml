@@ -1,7 +1,23 @@
 ﻿@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@{
+    // Get the currently authenticated user
+    var user = await UserManager.GetUserAsync(User);
+    IList<string> roles = null;
+    // Check if the user is authenticated
+    if (user != null)
+    {
+       
 
+        // Get the user's roles
+         roles = await UserManager.GetRolesAsync(user);
+
+    }
+    else
+    {
+    }
+ }
 @if (SignInManager.IsSignedIn(User))
 {
 
@@ -17,8 +33,12 @@
                     <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
                 </div>
                 <div class="ms-3">
-                    <h6 class="mb-0">Jhon Doe</h6>
-                    <span>Admin</span>
+                    <h6 class="mb-0">@user.UserName</h6>
+                    @foreach (var role in @roles)
+                    {
+
+                        <span>@role</span>
+                    }
                 </div>
             </div>
             <div class="navbar-nav w-100">
