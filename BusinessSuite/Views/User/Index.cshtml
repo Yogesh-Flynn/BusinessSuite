@@ -3,21 +3,25 @@
 @{
     ViewData["Title"] = "Applications Users";
 }
+<style>
+    .table-red td,
+    .table-red th {
+        color: #6C7293;
+    }
+</style>
 
     <div class="col-12">
         <div class="bg-secondary rounded h-100 p-4">
-            <h6 class="mb-4">Responsive Table</h6>
+        <h6 class="mb-4" style="color:#6C7293">Application Users</h6>
             <div class="table-responsive">
-                <table class="table table-borderless table-hover">
+            <table class="table table-borderless table-hover table-dark table-red">
                     <thead>
                         <tr>
                             <th scope="col">#</th>
                             <th>@Html.DisplayNameFor(model => model.Id)</th>
                             <th>@Html.DisplayNameFor(model => model.UserName)</th>
                             <th>@Html.DisplayNameFor(model => model.Email)</th>
-                            <th>@Html.DisplayNameFor(model => model.Id)</th>
-                            <th>@Html.DisplayNameFor(model => model.UserName)</th>
-                            <th>@Html.DisplayNameFor(model => model.Email)</th>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -28,38 +32,11 @@
                                 <td>@item.Id</td>
                                 <td>@item.UserName</td>
                                 <td>@item.Email</td>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
+                               
                             </tr>
 
                         }
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
-                            </tr>
-
-                        }
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
-                            </tr>
-
-                        }
+                    
                     </tbody>
                 </table>
             </div>
