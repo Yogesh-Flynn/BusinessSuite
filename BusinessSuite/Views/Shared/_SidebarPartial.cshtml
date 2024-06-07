@@ -30,11 +30,27 @@
 
 
 
+ 
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/chart/chart.min.js"></script>
+    <script src="~/lib/easing/easing.min.js"></script>
+    <script src="~/lib/waypoints/waypoints.min.js"></script>
+    <script src="~/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="~/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="~/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="~/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="~/js/main.js"></script>
+
+
 @if (SignInManager.IsSignedIn(User))
 {
 
     <!-- Sidebar Start -->
-    <div class="sidebar pe-2 pb-2">
+    <div class="sidebar pe-1 pb-1">
         <nav class="navbar bg-secondary navbar-dark">
             <a href="index.html" class="navbar-brand mx-4 mb-3">
                 <h3 class="text-primary"><i class="fa fa-user-edit me-2"></i>BusinessSuite</h3>
@@ -58,15 +74,16 @@
                     <i class="fa fa-tachometer-alt me-2"></i>Dashboard
                 </a>
 
-                <a asp-area="" asp-controller="User" asp-action="Index" class="nav-item nav-link @(IsActive("User", "Index") ? "active" : "")">
-                    <i class="fa fa-tachometer-alt me-2"></i>Users
-                </a>
+                
                 <div class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Elements</a>
+                    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Administration</a>
                     <div class="dropdown-menu bg-transparent border-0">
-                        <a href="button.html" class="dropdown-item">Buttons</a>
-                        <a href="typography.html" class="dropdown-item">Typography</a>
-                        <a href="element.html" class="dropdown-item">Other Elements</a>
+                        <a asp-area="" asp-controller="User" asp-action="Index" class="dropdown-item @(IsActive("Home", "Button") ? "active" : "")">Users</a>
+                        <a asp-area="" asp-controller="UserRoles" asp-action="Index" class="dropdown-item @(IsActive("Home", "Typography") ? "active" : "")">Roles</a>
+                        <a asp-area="" asp-controller="User" asp-action="Index" class="dropdown-item @(IsActive("Home", "Element") ? "active" : "")">Other Elements</a>
+                      @*   <a asp-area="" asp-controller="User" asp-action="Index" class="nav-item nav-link @(IsActive("User", "Index") ? "active" : "")">
+                            <i class="fa fa-tachometer-alt me-2"></i>Users
+                        </a> *@
                     </div>
                 </div>
                
