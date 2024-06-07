@@ -2,6 +2,12 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 @{
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    bool IsActive(string controller, string action)
+    {
+        return currentController == controller && currentAction == action;
+    }
     // Get the currently authenticated user
     var user = await UserManager.GetUserAsync(User);
     IList<string> roles = null;
@@ -18,6 +24,12 @@
     {
     }
  }
+@{
+  
+}
+
+
+
 @if (SignInManager.IsSignedIn(User))
 {
 
@@ -42,10 +54,13 @@
                 </div>
             </div>
             <div class="navbar-nav w-100">
-                <a href="index.html" class="nav-item nav-link active"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-item nav-link @(IsActive("Home", "Index") ? "active" : "")">
+                    <i class="fa fa-tachometer-alt me-2"></i>Dashboard
+                </a>
 
-                <a asp-area="" asp-controller="User" asp-action="Index" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Users</a>
-
+                <a asp-area="" asp-controller="User" asp-action="Index" class="nav-item nav-link @(IsActive("User", "Index") ? "active" : "")">
+                    <i class="fa fa-tachometer-alt me-2"></i>Users
+                </a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"><i class="fa fa-laptop me-2"></i>Elements</a>
                     <div class="dropdown-menu bg-transparent border-0">
