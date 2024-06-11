@@ -1,49 +1,122 @@
-﻿@using Microsoft.AspNetCore.Identity
-@model IEnumerable<IdentityUser>
+﻿@model IPagedList<BusinessSuite.Models.ViewModels.UserRoleCompanyViewModel>
+@using X.PagedList
+@using X.PagedList.Mvc.Core; 
+
 @{
     ViewData["Title"] = "Applications Users";
 }
+@{
+    int x = 0;
+}
 <style>
-  
+    .table td,
+    .table th {
+        color: #6C7293;
+    }
+
+    .custom-table {
+        border: 2px solid black;
+    }
+
+        .custom-table th, .custom-table td {
+            border: 1px solid black;
+        }
+
+        .custom-table th {
+            background-color: #6C7293;
+            color: #fff; /* Optional: Set text color to white for contrast */
+        }
+
+    .table-hover tbody tr:hover {
+        background-color: #f5f5f5; /* Optional: Add a hover effect */
+    }
+
+    .pagination {
+        background-color: #191C24;
+    }
+
+    .page-item.active .page-link {
+        background-color: #191C24;
+        border-color: #191C24;
+    }
+
+    .page-link {
+        color: #2C303C; /* Set text color to white */
+    }
+
+        .page-link:hover {
+            background-color: #2C303C;
+            border-color: #191C24;
+        }
 </style>
 
-    <div class="col-12">
-        <div class="bg-secondary rounded h-100 p-4">
+<div class="col-12 row-12" style="height: 375PX;">
+    <div class="bg-secondary rounded h-100 p-4">
         <h6 class="mb-4" style="color:#6C7293">Application Users</h6>
-            <div class="table-responsive">
-            <table class="table table-borderless table-hover table-dark table-red">
-                    <thead>
+        <div class="table-responsive">
+            <table class="table table-border table-hover custom-table">
+                <thead>
+                    <tr>@* 
+                        <th>Index</th> *@
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().FirstName)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().LastName)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().UserName)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Email)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Phone)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Role)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Company)</th>
+                        <th>@Html.DisplayNameFor(model => model.FirstOrDefault().Group)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    { 
+
                         <tr>
-                            <th scope="col">#</th>
-                            <th>@Html.DisplayNameFor(model => model.Id)</th>
-                            <th>@Html.DisplayNameFor(model => model.UserName)</th>
-                            <th>@Html.DisplayNameFor(model => model.Email)</th>
-                            
+                            @* 
+                            <td>@(x++)</td> *@
+                            <td>@item.FirstName</td>
+                            <td>@item.LastName</td>
+                            <td>@item.UserName</td>
+                            <td>@item.Email</td>
+                            <td>@item.Phone</td>
+                            <td>@item.Role</td>
+                            <td>@item.Company</td>
+                            <td>@item.Group</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model)
-                        {
-                            <tr>
-                                <th scope="row">1</th>
-                                <td>@item.Id</td>
-                                <td>@item.UserName</td>
-                                <td>@item.Email</td>
-                               
-                            </tr>
-
-                        }
-                    
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
+    <div class="d-flex justify-content-center">@* 
+        @Html.PagedListPager(Model, page => Url.Action("Index", new { page })) *@
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.HasPreviousPage ? string.Empty : "disabled")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber - 1 })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    @for (var i = 1; i <= 10; i++)
+                    {
+                        <li class="page-item @(i == Model.PageNumber ? "active" : string.Empty)">
+                            <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.HasNextPage ? string.Empty : "disabled")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = Model.PageNumber + 1 })" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+       
     </div>
+</div>
 
-
-
-<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
-
-
+<a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top">
+    <i class="bi bi-arrow-up"></i>
+</a>
 
 <script src="~/js/main.js"></script>

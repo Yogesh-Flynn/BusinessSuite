@@ -1,6 +1,6 @@
 /********** Template CSS **********/
-.table-red td,
-.table-red th {
+.table td,
+.table th {
     color: #6C7293;
 }
 :root {
