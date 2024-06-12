@@ -16,28 +16,31 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().FirstName)</th>
-                                <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().LastName)</th>
+                                <th>Name</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().UserName)</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().Email)</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().Phone)</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().Role)</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().Company)</th>
                                 <th>@Html.DisplayNameFor(model => model.userRoleCompanyViewModels.FirstOrDefault().Group)</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach (var item in Model.userRoleCompanyViewModels)
                             {
                                 <tr>
-                                    <td>@item.FirstName</td>
-                                    <td>@item.LastName</td>
+                                    <td>@item.FirstName @item.LastName</td>
                                     <td>@item.UserName</td>
                                     <td>@item.Email</td>
                                     <td>@item.Phone</td>
                                     <td>@item.Role</td>
                                     <td>@item.Company</td>
                                     <td>@item.Group</td>
+                                    <td>
+                                        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-tooltip-edit text-primary me-2"></i></a>
+                                        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-delete text-primary me-2"></i></a>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
