@@ -20,11 +20,11 @@ namespace BusinessSuite.Controllers
         }
         public async Task<IActionResult> Index(int? page)
         {
-            int pageSize = 5; // Number of items per page
+            int pageSize = 20; // Number of items per page
             int pageNumber = (page ?? 1);
             var users = await _userManager.Users.ToListAsync();
             var appusers = await _dbcontext.ApplicationUsers.ToListAsync();
-            
+            UserTableViewModel userTableViewModel = new UserTableViewModel();
             List<UserRoleCompanyViewModel> userRoleCompanyViewModel = new List<UserRoleCompanyViewModel>();
             for (int i = 0; i < 100; i++)
             {
@@ -51,8 +51,9 @@ namespace BusinessSuite.Controllers
 
             }
             var pagedUsers = userRoleCompanyViewModel.ToPagedList(pageNumber, pageSize);
-
-            return View(pagedUsers);
+            userTableViewModel.totalpages = userRoleCompanyViewModel.Count/ pageSize;
+            userTableViewModel.userRoleCompanyViewModels=pagedUsers;
+            return View(userTableViewModel);
            // return View(userRoleCompanyViewModel);
         }
     }
