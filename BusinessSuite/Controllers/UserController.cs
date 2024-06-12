@@ -18,7 +18,7 @@ namespace BusinessSuite.Controllers
             _dbcontext = dbcontext;
             _userManager = userManager;
         }
-        public async Task<IActionResult> Index(int? page)
+        public async Task<IActionResult> GetUsers(int? page)
         {
             int pageSize = 1000; // Number of items per page
             int pageNumber = (page ?? 1);
@@ -53,7 +53,20 @@ namespace BusinessSuite.Controllers
             userTableViewModel.totalpages = userRoleCompanyViewModel.Count/ pageSize;
             userTableViewModel.userRoleCompanyViewModels=pagedUsers;
             return View(userTableViewModel);
-           // return View(userRoleCompanyViewModel);
+           
+        }
+        public async Task<IActionResult> GetCompanies(int? page)
+        {
+            int pageSize = 10; // Number of items per page
+            int pageNumber = (page ?? 1);
+            var appusers = await _dbcontext.Companies.ToListAsync();
+            CompanyViewModel companyView = new CompanyViewModel();
+            
+            var pagedUsers = appusers.ToPagedList(pageNumber, pageSize);
+            companyView.totalpages = appusers.Count/ pageSize;
+            companyView.companies = pagedUsers;
+            return View(companyView);
+          
         }
     }
 }
