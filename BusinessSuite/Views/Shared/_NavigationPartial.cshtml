@@ -1,6 +1,54 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using BusinessSuite.Data
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext _dbcontext
+@{
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    bool IsActive(string controller, string action)
+    {
+        return currentController == controller && currentAction == action;
+    }
+    // Get the currently authenticated user
+    var user = await UserManager.GetUserAsync(User);
+    ApplicationUser applicationUser = null;
+    // Check if the user is authenticated
+    IList<string> roles = null;
+    if (user != null)
+    {
+
+        applicationUser = _dbcontext.ApplicationUsers.Where(x => x.Id == user.Id).FirstOrDefault();
+
+
+        // Get the user's roles
+        roles = await UserManager.GetRolesAsync(user);
+
+    }
+    else
+    {
+    }
+    DateTime dateTime = DateTime.Now;
+
+    int hour = dateTime.Hour;
+    string greetings = "";
+    if(hour>3 && hour<12)
+    {
+        greetings = "Good Morning";
+    }
+    else if(hour>=12 && hour<4)
+    {
+        greetings = "Good Afternoon";
+    }
+    else if(hour>=4 && hour<=7)
+    {
+        greetings = "Good Evening";
+    }
+    else 
+    {
+        greetings = "Hello";
+    }
+}
 
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User)) 
@@ -57,9 +105,13 @@
             <div class="navbar-menu-wrapper d-flex align-items-top">
                 <ul class="navbar-nav">
                     <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
-                        <h1 class="welcome-text">Good Morning, <span class="text-black fw-bold">John Doe</span></h1>
-                        <h3 class="welcome-sub-text">Your performance summary this week </h3>
-                    </li>
+                        <h1 class="welcome-text">@greetings, <span class="text-black fw-bold">@applicationUser.FirstName @applicationUser.LastName</span></h1>
+
+                        @foreach(var role in roles)
+                        {
+                            <h3 class="welcome-sub-text">@role </h3>
+                        }
+                        </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown d-none d-lg-block">
@@ -194,14 +246,18 @@
                         <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
                             <div class="dropdown-header text-center">
                                 <img class="img-md rounded-circle" src="images/faces/face8.jpg" alt="Profile image">
-                                <p class="mb-1 mt-3 font-weight-semibold">Allen Moreno</p>
-                                <p class="fw-light text-muted mb-0">allenmoreno@gmail.com</p>
+                                <p class="mb-1 mt-3 font-weight-semibold">@applicationUser.FirstName @applicationUser.LastName</p>
+                                <p class="fw-light text-muted mb-0">@applicationUser.UserName</p>
                             </div>
                             <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
                             <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-message-text-outline text-primary me-2"></i> Messages</a>
                             <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-calendar-check-outline text-primary me-2"></i> Activity</a>
                             <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-help-circle-outline text-primary me-2"></i> FAQ</a>
-                            <a class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                           @*  <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                             *@
+                             <form class="dropdown-item" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                <i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i> <button type="submit" class="nav-link btn btn-link text-dark">Logout</button>
+                            </form>
                         </div>
                     </li>
                 </ul>

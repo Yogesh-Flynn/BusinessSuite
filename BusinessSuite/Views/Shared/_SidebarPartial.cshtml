@@ -1,21 +1,21 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using BusinessSuite.Data
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@inject ApplicationDbContext _dbcontext
 @{
-    string currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    string currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    bool IsActive(string controller, string action)
-    {
-        return currentController == controller && currentAction == action;
-    }
+
     // Get the currently authenticated user
     var user = await UserManager.GetUserAsync(User);
+
+
     IList<string> roles = null;
+    ApplicationUser applicationUser = null;
     // Check if the user is authenticated
     if (user != null)
     {
        
-
+        applicationUser = _dbcontext.ApplicationUsers.Where(x => x.Id == user.Id).FirstOrDefault();
         // Get the user's roles
          roles = await UserManager.GetRolesAsync(user);
 
