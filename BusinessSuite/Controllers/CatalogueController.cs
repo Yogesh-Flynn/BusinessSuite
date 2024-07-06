@@ -161,9 +161,9 @@ namespace BusinessSuite.Controllers
 
                 using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
                 {
-                   // await _connection.OpenAsync();
+                   
                     await command.ExecuteNonQueryAsync();
-                   // await _connection.CloseAsync();
+                   
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after creating the table
@@ -194,9 +194,9 @@ namespace BusinessSuite.Controllers
 
                 using (SqlCommand command = new SqlCommand(renameTableQuery, _connection))
                 {
-                    //await _connection.OpenAsync();
+                    
                     await command.ExecuteNonQueryAsync();
-                   // await _connection.CloseAsync();
+                 
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after renaming the table
@@ -224,9 +224,9 @@ namespace BusinessSuite.Controllers
 
                 using (SqlCommand command = new SqlCommand(dropTableQuery, _connection))
                 {
-                    //await _connection.OpenAsync();
+                    
                     await command.ExecuteNonQueryAsync();
-                   // await _connection.CloseAsync();
+                   
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after deleting the table
@@ -235,6 +235,124 @@ namespace BusinessSuite.Controllers
             {
                 _logger.LogError(ex, "An error occurred while deleting the table.");
                 return View();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddColumn(string tableName, string columnName, string columnType)
+        {
+            try
+            {
+                string addColumnQuery = $"ALTER TABLE {tableName} ADD {columnName} {columnType}";
+
+                using (SqlCommand command = new SqlCommand(addColumnQuery, _connection))
+                {
+                   
+                    await command.ExecuteNonQueryAsync();
+                    
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while adding the column.");
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteColumn(string tableName, string columnName)
+        {
+            try
+            {
+                string deleteColumnQuery = $"ALTER TABLE {tableName} DROP COLUMN {columnName}";
+
+                using (SqlCommand command = new SqlCommand(deleteColumnQuery, _connection))
+                {
+                   
+                    await command.ExecuteNonQueryAsync();
+                    
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the column.");
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddData(string tableName, Dictionary<string, string> data)
+        {
+            try
+            {
+                string columns = string.Join(", ", data.Keys);
+                string values = string.Join(", ", data.Values.Select(v => $"'{v}'"));
+                string insertDataQuery = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
+
+                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                {
+                   
+                    await command.ExecuteNonQueryAsync();
+                    
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while adding the data.");
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteData(string tableName, int id)
+        {
+            try
+            {
+                string deleteDataQuery = $"DELETE FROM {tableName} WHERE Id = {id}";
+
+                using (SqlCommand command = new SqlCommand(deleteDataQuery, _connection))
+                {
+                   
+                    await command.ExecuteNonQueryAsync();
+                    
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the data.");
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateData(string tableName, int id, Dictionary<string, string> data)
+        {
+            try
+            {
+                string setClause = string.Join(", ", data.Select(kvp => $"{kvp.Key} = '{kvp.Value}'"));
+                string updateDataQuery = $"UPDATE {tableName} SET {setClause} WHERE Id = {id}";
+
+                using (SqlCommand command = new SqlCommand(updateDataQuery, _connection))
+                {
+                   
+                    await command.ExecuteNonQueryAsync();
+                    
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating the data.");
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
             }
         }
     }
