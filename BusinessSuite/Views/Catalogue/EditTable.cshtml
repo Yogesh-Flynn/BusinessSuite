@@ -1,0 +1,15 @@
+﻿@{
+    ViewData["Title"] = "Edit Table";
+    var tableName = ViewBag.TableName as string;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-controller="Catalogue" asp-action="EditTable" method="post">
+    <input type="hidden" name="oldTableName" value="@tableName" />
+    <div class="form-group">
+        <label for="newTableName">New Table Name</label>
+        <input type="text" class="form-control" id="newTableName" name="newTableName" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

@@ -38,8 +38,10 @@ namespace BusinessSuite.Controllers
                         {
                             // Use reader.GetString to get the table name directly
                             string tableName = reader.GetString(0);
+                            DateTime datecreated = reader.GetDateTime(7);
                             Catalogues catalogues = new Catalogues();
                             catalogues.Name = tableName;
+                            catalogues.CreatedDate= datecreated;
                             tableNames.Add(catalogues);
                         }
                     }
@@ -140,6 +142,98 @@ namespace BusinessSuite.Controllers
                 return RedirectToAction("Error");
             }
 
+        }
+
+        [HttpGet]
+        public IActionResult CreateTable()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTable(string tableName)
+        {
+            try
+            {
+                string createTableQuery = $"CREATE TABLE {tableName} (Id INT PRIMARY KEY IDENTITY, Name NVARCHAR(100), CreatedDate DATETIME)";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
+                   // await _connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                   // await _connection.CloseAsync();
+                }
+
+                return RedirectToAction("Index"); // Redirect to the catalogues list after creating the table
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the table.");
+                return View();
+            }
+
+
+
+        }
+
+        [HttpGet]
+        public IActionResult EditTable(string tableName)
+        {
+            ViewBag.TableName = tableName;
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditTable(string oldTableName, string newTableName)
+        {
+            try
+            {
+                string renameTableQuery = $"EXEC sp_rename '{oldTableName}', '{newTableName}'";
+
+                using (SqlCommand command = new SqlCommand(renameTableQuery, _connection))
+                {
+                    //await _connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                   // await _connection.CloseAsync();
+                }
+
+                return RedirectToAction("Index"); // Redirect to the catalogues list after renaming the table
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while renaming the table.");
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult DeleteTable(string tableName)
+        {
+            ViewBag.TableName = tableName;
+            return View();
+        }
+
+        [HttpPost, ActionName("DeleteTable")]
+        public async Task<IActionResult> DeleteTableConfirmed(string tableName)
+        {
+            try
+            {
+                string dropTableQuery = $"DROP TABLE {tableName}";
+
+                using (SqlCommand command = new SqlCommand(dropTableQuery, _connection))
+                {
+                    //await _connection.OpenAsync();
+                    await command.ExecuteNonQueryAsync();
+                   // await _connection.CloseAsync();
+                }
+
+                return RedirectToAction("Index"); // Redirect to the catalogues list after deleting the table
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the table.");
+                return View();
+            }
         }
     }
 }

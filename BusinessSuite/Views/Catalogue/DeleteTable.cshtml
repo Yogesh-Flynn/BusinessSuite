@@ -1,0 +1,14 @@
+﻿@{
+    ViewData["Title"] = "Delete Table";
+    var tableName = ViewBag.TableName as string;
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>Are you sure you want to delete the table <strong>@tableName</strong>?</p>
+
+<form asp-controller="Catalogue" asp-action="DeleteTable" method="post">
+    <input type="hidden" name="tableName" value="@tableName" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
