@@ -1,9 +1,11 @@
 ﻿using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
+using System.Globalization;
 
 namespace BusinessSuite.Controllers
 {
@@ -358,6 +360,86 @@ namespace BusinessSuite.Controllers
                 _logger.LogError(ex, "An error occurred while updating the data.");
                 return RedirectToAction("GetTableData", new { szTableName = tableName });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(IFormFile file,string tablename)
+        {
+            if (file == null || (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && file.ContentType != "text/csv"))
+            {
+                ModelState.AddModelError("", "Invalid file type. Please upload an Excel or CSV file.");
+                return View("UploadFile", new DataTable());
+            }
+
+            var dataTable = new DataTable();
+            try
+            {
+                using (var stream = new MemoryStream())
+                {
+                    await file.CopyToAsync(stream);
+                    stream.Position = 0;
+
+                    if (file.FileName.EndsWith(".xlsx"))
+                    {
+                        using (var workbook = new XLWorkbook(stream))
+                        {
+                            var worksheet = workbook.Worksheet(1);
+                            foreach (var cell in worksheet.Row(1).CellsUsed())
+                            {
+                                dataTable.Columns.Add(cell.Value.ToString());
+                            }
+
+                            foreach (var row in worksheet.RowsUsed().Skip(1))
+                            {
+                                var dataRow = dataTable.NewRow();
+                                for (int i = 0; i < dataTable.Columns.Count; i++)
+                                {
+                                    dataRow[i] = row.Cell(i + 1).Value;
+                                }
+                                dataTable.Rows.Add(dataRow);
+                            }
+                        }
+                    }
+
+                    foreach (DataRow row in dataTable.Rows)
+                    {
+                        var columnNames = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                        var parameters = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"@{c.ColumnName}"));
+                        
+                        var insertCommandText = $"INSERT INTO {tablename} ({columnNames},CreatedDate) VALUES ({parameters},'{DateTime.Now}')";
+                        using (var command = new SqlCommand(insertCommandText, _connection))
+                        {
+                            foreach (DataColumn column in dataTable.Columns)
+                            {
+                                command.Parameters.AddWithValue($"@{column.ColumnName}", row[column.ColumnName]);
+                            }
+
+                            // Using SqlDataAdapter to execute the command
+                            using (var adapter = new SqlDataAdapter())
+                            {
+                                adapter.InsertCommand = command;
+                                await command.ExecuteNonQueryAsync();
+                            }
+                        }
+                    }
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while processing the file.");
+                ModelState.AddModelError("", "An error occurred while processing the file.");
+                return View("UploadFile", new DataTable());
+            }
+
+            return View("UploadFile", dataTable);
+        }
+
+        [HttpGet]
+        public IActionResult UploadFile()
+        {
+            return View(new DataTable());
         }
     }
 }
