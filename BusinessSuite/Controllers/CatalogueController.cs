@@ -78,11 +78,7 @@ namespace BusinessSuite.Controllers
             {
                 DataTable tableSchema = new DataTable();
                 // string createTableQuery = $"SELECT * FROM {szTableName} where ";
-                string createTableQuery = @$"SELECT * FROM (
-                                               SELECT *,
-                                                ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
-                                                FROM {szTableName}) AS SubQuery WHERE RowNum > 
-                                                (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
+                string createTableQuery = @$"SELECT * FROM {szTableName}";
 
                 using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
                 {
@@ -94,6 +90,14 @@ namespace BusinessSuite.Controllers
                         adapter.Fill(tableSchema);
                     }
                 }
+                if (tableSchema.Columns.Contains("Id"))
+                {
+                    tableSchema.Columns.Remove("Id");
+                }
+                //if (tableSchema.Columns.Contains("CreatedDate"))
+                //{
+                //    tableSchema.Columns.Remove("CreatedDate");
+                //}
                 ViewBag.TableName = szTableName;
                 return View(tableSchema);
             }
@@ -291,7 +295,7 @@ namespace BusinessSuite.Controllers
             {
                 string columns = string.Join(", ", data.Keys);
                 string values = string.Join(", ", data.Values.Select(v => $"'{v}'"));
-                string insertDataQuery = $"INSERT INTO {tableName} ({columns}) VALUES ({values})";
+                string insertDataQuery = $"INSERT INTO {tableName} ({columns},CreatedDate) VALUES ({values},'{DateTime.Now}')";
 
                 using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
                 {

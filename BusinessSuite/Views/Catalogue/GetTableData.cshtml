@@ -60,7 +60,14 @@
                     <input type="hidden" name="tableName" value="@tableName" />
                     @foreach (DataColumn column in Model.Columns)
                     {
-                        <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" required />
+                        if (@column.ColumnName.Contains("CreatedDate"))
+                        {
+
+                        }
+                        else
+                        {
+                            <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" required />
+                        }
                     }
                     <button type="submit" class="btn btn-primary">Add Data</button>
                 </form>
