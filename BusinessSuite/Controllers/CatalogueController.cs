@@ -441,5 +441,48 @@ namespace BusinessSuite.Controllers
         {
             return View(new DataTable());
         }
+        [HttpGet]
+        public async Task<IActionResult> DownloadTemplate(string tableName)
+        {
+            var dataTable = new DataTable();
+            try
+            {
+               
+                    var query = $"SELECT TOP 0 * FROM {tableName}";
+                    using (var command = new SqlCommand(query, _connection))
+                    {
+                        using (var adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(dataTable);
+                        }
+                    }
+                
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Template");
+
+                    // Add columns to the worksheet
+                    for (int i = 0; i < dataTable.Columns.Count; i++)
+                    {
+                        worksheet.Cell(1, i + 1).Value = dataTable.Columns[i].ColumnName;
+                    }
+
+                    using (var stream = new MemoryStream())
+                    {
+                        workbook.SaveAs(stream);
+                        var content = stream.ToArray();
+                        var contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+                        var fileName = $"{tableName}_Template.xlsx";
+
+                        return File(content, contentType, fileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while creating the template.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
     }
 }

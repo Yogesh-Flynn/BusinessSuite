@@ -10,6 +10,18 @@
         <div class="card-body">
             <h4 class="card-title">@tableName</h4>
             <div class="container">
+              
+                <div class="container">
+                    <h2>Download Table Template</h2>
+                    <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                        <div class="form-group">
+                            <label for="tableName">@tableName</label>
+                            <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Download Template</button>
+                    </form>
+                </div>
+
                 <h2>Upload File</h2>
                 <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
                     <div class="form-group">
