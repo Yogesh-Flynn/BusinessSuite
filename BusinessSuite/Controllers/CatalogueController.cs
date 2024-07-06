@@ -2,6 +2,7 @@
 using BusinessSuite.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
 
 namespace BusinessSuite.Controllers
@@ -93,6 +94,7 @@ namespace BusinessSuite.Controllers
                         adapter.Fill(tableSchema);
                     }
                 }
+                ViewBag.TableName = szTableName;
                 return View(tableSchema);
             }
             catch (Exception ex)
