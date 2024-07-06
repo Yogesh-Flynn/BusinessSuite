@@ -1,0 +1,91 @@
+﻿@model System.Data.DataTable
+@using System.Data
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+  @if (Model != null && Model.Rows.Count > 0)
+    {
+        <h1>Data Table Display</h1>
+        <table id="example" class="table table-striped" style="width:100%">
+            <thead>
+                <tr>
+                    @foreach (DataColumn column in Model.Columns)
+                    {
+                        <th>@column.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow row in Model.Rows)
+                {
+                    <tr>
+                        @foreach (DataColumn column in Model.Columns)
+                        {
+                            <td>@row[column.ColumnName]</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No data available.</p>
+    }
+
+
+<div id="scrollContainer">
+    <table id="dataTable">
+        <thead>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var pageIndex = 0;
+            var pageSize = 10;
+            var tableName = '@ViewData["TableName"]';
+            debugger
+            fetchData();
+            debugger
+            $(window).scroll(function () {
+                if ($(window).scrollTop() == $(document).height()) {
+                    pageIndex++;
+                    fetchData();
+                }
+            });
+            function fetchData() {
+                $.ajax({
+                    url: '@Url.Action("GetTableDataScroll", "Catalogue")',
+                    type: 'GET',
+                    data: { szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+                    success: function (data) {
+                        debugger
+                        if (data.length > 0) {
+                        debugger
+                            var tableHeader = $('<tr>');
+                            $.each(data[0], function (key, value) {
+                                $('<th>').text(key).appendTo(tableHeader);
+                            });
+
+                            $('#dataTable thead').empty().append(tableHeader);
+
+                            var tableBody = $('#dataTable tbody');
+                            $.each(data, function (index, item) {
+                                var row = $('<tr>').appendTo(tableBody);
+                                $.each(item, function (key, value) {
+                                    $('<td>').text(value).appendTo(row);
+                                });
+                            });
+
+
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

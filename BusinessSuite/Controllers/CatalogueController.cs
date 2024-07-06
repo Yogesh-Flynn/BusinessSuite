@@ -2,6 +2,7 @@
 using BusinessSuite.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace BusinessSuite.Controllers
 {
@@ -63,6 +64,82 @@ namespace BusinessSuite.Controllers
                 return RedirectToAction("Error");
             }
             return View();
+        }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetTableData(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
+        {
+            try
+            {
+                DataTable tableSchema = new DataTable();
+                // string createTableQuery = $"SELECT * FROM {szTableName} where ";
+                string createTableQuery = @$"SELECT * FROM (
+                                               SELECT *,
+                                                ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
+                                                FROM {szTableName}) AS SubQuery WHERE RowNum > 
+                                                (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@PageIndex", szPageIndex);
+                    command.Parameters.AddWithValue("@PageSize", szPageSize);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(tableSchema);
+                    }
+                }
+                return View(tableSchema);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                _logger.LogError(ex, "An error occurred while fetching table names.");
+
+                // Handle the exception gracefully, show an error message, or redirect to an error page
+                // You can customize this based on your application's needs.
+                return RedirectToAction("Error");
+            }
+
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetTableDataScroll(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
+        {
+            try
+            {
+                DataTable tableSchema = new DataTable();
+                // string createTableQuery = $"SELECT * FROM {szTableName} where ";
+                string createTableQuery = @$"SELECT * FROM (
+                                               SELECT *,
+                                                ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
+                                                FROM {szTableName}) AS SubQuery WHERE RowNum > 
+                                                (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@PageIndex", szPageIndex);
+                    command.Parameters.AddWithValue("@PageSize", szPageSize);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(tableSchema);
+                    }
+                }
+                return Json(tableSchema);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging purposes
+                _logger.LogError(ex, "An error occurred while fetching table names.");
+
+                // Handle the exception gracefully, show an error message, or redirect to an error page
+                // You can customize this based on your application's needs.
+                return RedirectToAction("Error");
+            }
+
         }
     }
 }

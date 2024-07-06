@@ -24,11 +24,12 @@
                             @foreach (var item in Model.Catalogues)
                             {
                                 <tr>
-                                    <td>@item.Name</td>
-                                    
                                     <td>
-                                        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-tooltip-edit text-primary me-2"></i></a>
-                                        <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-delete text-primary me-2"></i></a>
+                                        <a asp-controller="Catalogue" asp-action="GetTableData" asp-route-szTableName="@item.Name">@item.Name</a>
+                                    </td>
+                                    <td>
+                                        <a class="dropdown-item d-inline" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-tooltip-edit text-primary me-2"></i></a>
+                                        <a class="dropdown-item d-inline" asp-area="Identity" asp-page="/Account/Manage/Index"><i class="mdi mdi-delete text-primary me-2"></i></a>
                                     </td>
                                 </tr>
                             }
