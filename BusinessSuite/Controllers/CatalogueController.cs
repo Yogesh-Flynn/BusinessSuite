@@ -6,6 +6,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
 using System.Globalization;
+using System.Text;
 
 namespace BusinessSuite.Controllers
 {
@@ -92,10 +93,10 @@ namespace BusinessSuite.Controllers
                         adapter.Fill(tableSchema);
                     }
                 }
-                if (tableSchema.Columns.Contains("Id"))
-                {
-                    tableSchema.Columns.Remove("Id");
-                }
+                //if (tableSchema.Columns.Contains("Id"))
+                //{
+                //    tableSchema.Columns.Remove("Id");
+                //}
                 //if (tableSchema.Columns.Contains("CreatedDate"))
                 //{
                 //    tableSchema.Columns.Remove("CreatedDate");
@@ -315,52 +316,52 @@ namespace BusinessSuite.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteData(string tableName, int id)
-        {
-            try
-            {
-                string deleteDataQuery = $"DELETE FROM {tableName} WHERE Id = {id}";
+        //[HttpPost]
+        //public async Task<IActionResult> DeleteData(string tableName, int id)
+        //{
+        //    try
+        //    {
+        //        string deleteDataQuery = $"DELETE FROM {tableName} WHERE Id = {id}";
 
-                using (SqlCommand command = new SqlCommand(deleteDataQuery, _connection))
-                {
+        //        using (SqlCommand command = new SqlCommand(deleteDataQuery, _connection))
+        //        {
                    
-                    await command.ExecuteNonQueryAsync();
+        //            await command.ExecuteNonQueryAsync();
                     
-                }
+        //        }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting the data.");
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
-            }
-        }
+        //        return RedirectToAction("GetTableData", new { szTableName = tableName });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while deleting the data.");
+        //        return RedirectToAction("GetTableData", new { szTableName = tableName });
+        //    }
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> UpdateData(string tableName, int id, Dictionary<string, string> data)
-        {
-            try
-            {
-                string setClause = string.Join(", ", data.Select(kvp => $"{kvp.Key} = '{kvp.Value}'"));
-                string updateDataQuery = $"UPDATE {tableName} SET {setClause} WHERE Id = {id}";
+        //[HttpPost]
+        //public async Task<IActionResult> UpdateData(string tableName, int id, Dictionary<string, string> data)
+        //{
+        //    try
+        //    {
+        //        string setClause = string.Join(", ", data.Select(kvp => $"{kvp.Key} = '{kvp.Value}'"));
+        //        string updateDataQuery = $"UPDATE {tableName} SET {setClause} WHERE Id = {id}";
 
-                using (SqlCommand command = new SqlCommand(updateDataQuery, _connection))
-                {
+        //        using (SqlCommand command = new SqlCommand(updateDataQuery, _connection))
+        //        {
                    
-                    await command.ExecuteNonQueryAsync();
+        //            await command.ExecuteNonQueryAsync();
                     
-                }
+        //        }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating the data.");
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
-            }
-        }
+        //        return RedirectToAction("GetTableData", new { szTableName = tableName });
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An error occurred while updating the data.");
+        //        return RedirectToAction("GetTableData", new { szTableName = tableName });
+        //    }
+        //}
 
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file,string tablename)
@@ -484,5 +485,70 @@ namespace BusinessSuite.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> EditData(string tableName, int rowId, Dictionary<string, string> data)
+        {
+            try
+            {
+                var updateQuery = new StringBuilder($"UPDATE {tableName} SET ");
+
+                foreach (var column in data)
+                {
+                    updateQuery.Append($"{column.Key} = @{column.Key}, ");
+                }
+                updateQuery.Length -= 2; // Remove the last comma
+                updateQuery.Append($" WHERE Id = @Id");
+
+                using (var command = new SqlCommand(updateQuery.ToString(), _connection))
+                {
+                    foreach (var column in data)
+                    {
+                        command.Parameters.AddWithValue($"@{column.Key}", column.Value);
+                    }
+                    command.Parameters.AddWithValue("@Id", rowId);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while editing data.");
+                return RedirectToAction("Error");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteData(string tableName, int rowId)
+        {
+            try
+            {
+                var deleteQuery = $"DELETE FROM {tableName} WHERE Id = @Id";
+
+                using (var command = new SqlCommand(deleteQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@Id", rowId);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                return RedirectToAction("GetTableData", new { szTableName = tableName });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting data.");
+                return RedirectToAction("Error");
+            }
+        }
+        [HttpPost]
+        public IActionResult DeleteDataBulk(string tableName, List<int> selectedRows)
+        {
+            // Implement your logic to delete rows based on selectedRows IDs from the database.
+            // ...
+
+            return RedirectToAction("GetTableData", new { szTableName = tableName });
+        }
+
     }
 }
