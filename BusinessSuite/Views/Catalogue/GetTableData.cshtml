@@ -1,4 +1,4 @@
-﻿@model System.Data.DataTable
+﻿<!--@model System.Data.DataTable
 @using System.Data
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -40,9 +40,9 @@
                     <select name="columnType" class="form-control d-inline-block w-auto" required>
                         <option value="int">INT</option>
                         <option value="nvarchar(100)">NVARCHAR(100)</option>
-                        <option value="datetime">DATETIME</option>
+                        <option value="datetime">DATETIME</option>-->
                         <!-- Add more types as needed -->
-                    </select>
+                    <!--</select>
                     <button type="submit" class="btn btn-primary">Add Column</button>
                 </form>
                 <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
@@ -113,9 +113,9 @@
                     @foreach (DataColumn column in Model.Columns)
                     {
                         if (@column.ColumnName.Contains("CreatedDate") || @column.ColumnName.Contains("Id"))
-                        {
+                        {-->
                             <!-- Skip specific columns -->
-                        }
+                        <!--}
                         else
                         {
                             <div class="form-group d-inline-block w-auto">
@@ -155,9 +155,8 @@
     function hideEditForm(rowId) {
         document.getElementById('edit-form-' + rowId).style.display = 'none';
     }
-</script>
-
-@*  @model System.Data.DataTable
+</script>-->
+ @model System.Data.DataTable
 @using System.Data
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -293,6 +292,7 @@
 </div>
 
 <style>
+
     .table-responsive {
         overflow-x: auto;
     }
@@ -304,7 +304,7 @@
     }
 
     .thead-dark th {
-        color: #fff;
+        color: black;
         background-color: #343a40;
     }
 </style>
@@ -349,4 +349,4 @@
         document.getElementById('edit-form-' + rowId).style.display = 'none';
     }
 </script>
- *@
+ 

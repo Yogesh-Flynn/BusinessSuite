@@ -103,38 +103,68 @@ namespace BusinessSuite.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
-
-            ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            if (ModelState.IsValid)
+            try
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
+                returnUrl ??= Url.Content("~/");
+
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+                if (ModelState.IsValid)
                 {
-                    _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+                    if (result.Succeeded)
+                    {
+                        LogToFile("User logged in.");
+                        return LocalRedirect(returnUrl);
+                    }
+                    if (result.RequiresTwoFactor)
+                    {
+                        return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    }
+                    if (result.IsLockedOut)
+                    {
+                        LogToFile("User account locked out.");
+                        return RedirectToPage("./Lockout");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return Page();
+                    }
                 }
-                if (result.RequiresTwoFactor)
+
+                // If we got this far, something failed, redisplay form
+                return Page();
+            }
+            catch (Exception ex)
+            {
+                LogToFile($"An error occurred: {ex.Message}");
+                throw; // Rethrow the exception after logging it
+            }
+        }
+
+        private void LogToFile(string message)
+        {
+            string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            string logFilePath = Path.Combine(documentsPath, "Logs", "log.txt");
+
+            try
+            {
+                if (!Directory.Exists(Path.GetDirectoryName(logFilePath)))
                 {
-                    return RedirectToPage("./LoginWith2fa", new { ReturnUrl = returnUrl, RememberMe = Input.RememberMe });
+                    Directory.CreateDirectory(Path.GetDirectoryName(logFilePath));
                 }
-                if (result.IsLockedOut)
+
+                using (StreamWriter writer = new StreamWriter(logFilePath, true))
                 {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToPage("./Lockout");
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return Page();
+                    writer.WriteLine($"{DateTime.Now}: {message}");
                 }
             }
-
-            // If we got this far, something failed, redisplay form
-            return Page();
+            catch (Exception ex)
+            {
+                // Handle exception if needed
+                Console.WriteLine($"An error occurred while writing to the log file: {ex.Message}");
+            }
         }
     }
 }
