@@ -75,13 +75,32 @@ namespace BusinessSuite.Controllers
 
 
         [HttpGet]
+        public async Task<IActionResult> DisplayTable(string szTableName)
+        {
+            try
+            {
+                ViewBag.TableName = szTableName;
+                ViewData["TableName"] = szTableName;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching table data.");
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetTableData(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
         {
             try
             {
                 DataTable tableSchema = new DataTable();
-                // string createTableQuery = $"SELECT * FROM {szTableName} where ";
-                string createTableQuery = @$"SELECT * FROM {szTableName}";
+                string createTableQuery = @$"SELECT * FROM (
+                                       SELECT *,
+                                       ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
+                                       FROM {szTableName}) AS SubQuery WHERE RowNum > 
+                                       (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
 
                 using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
                 {
@@ -93,29 +112,34 @@ namespace BusinessSuite.Controllers
                         adapter.Fill(tableSchema);
                     }
                 }
-                //if (tableSchema.Columns.Contains("Id"))
-                //{
-                //    tableSchema.Columns.Remove("Id");
-                //}
-                //if (tableSchema.Columns.Contains("CreatedDate"))
-                //{
-                //    tableSchema.Columns.Remove("CreatedDate");
-                //}
-                ViewBag.TableName = szTableName;
-                return View(tableSchema);
+
+                var jsonData = DataTableToJson(tableSchema);
+                return Json(jsonData);
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging purposes
-                _logger.LogError(ex, "An error occurred while fetching table names.");
-
-                // Handle the exception gracefully, show an error message, or redirect to an error page
-                // You can customize this based on your application's needs.
+                _logger.LogError(ex, "An error occurred while fetching table data.");
                 return RedirectToAction("Error");
             }
-
         }
-        
+
+        private List<Dictionary<string, object>> DataTableToJson(DataTable table)
+        {
+            var list = new List<Dictionary<string, object>>();
+            foreach (DataRow row in table.Rows)
+            {
+                var dict = new Dictionary<string, object>();
+                foreach (DataColumn col in table.Columns)
+                {
+                    dict[col.ColumnName] = row[col];
+                }
+                list.Add(dict);
+            }
+            return list;
+        }
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetTableDataScroll(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
         {
