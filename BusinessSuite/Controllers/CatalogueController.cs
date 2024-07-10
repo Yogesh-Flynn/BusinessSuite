@@ -1,6 +1,7 @@
 ﻿using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -79,9 +80,28 @@ namespace BusinessSuite.Controllers
         {
             try
             {
+                DataTable tableSchema = new DataTable();
+                // string createTableQuery = $"SELECT * FROM {szTableName} where ";
+                string createTableQuery = @$"SELECT * FROM {szTableName}";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(tableSchema);
+                    }
+                }
+                //if (tableSchema.Columns.Contains("Id"))
+                //{
+                //    tableSchema.Columns.Remove("Id");
+                //}
+                //if (tableSchema.Columns.Contains("CreatedDate"))
+                //{
+                //    tableSchema.Columns.Remove("CreatedDate");
+                //}
                 ViewBag.TableName = szTableName;
                 ViewData["TableName"] = szTableName;
-                return View();
+                return View(tableSchema);
             }
             catch (Exception ex)
             {
@@ -283,12 +303,12 @@ namespace BusinessSuite.Controllers
                     
                 }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the column.");
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
         }
 
@@ -306,12 +326,12 @@ namespace BusinessSuite.Controllers
                     
                 }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting the column.");
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
         }
 
@@ -331,12 +351,12 @@ namespace BusinessSuite.Controllers
                     
                 }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the data.");
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
         }
 
@@ -534,7 +554,7 @@ namespace BusinessSuite.Controllers
                     await command.ExecuteNonQueryAsync();
                 }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
             {
@@ -557,7 +577,7 @@ namespace BusinessSuite.Controllers
                     await command.ExecuteNonQueryAsync();
                 }
 
-                return RedirectToAction("GetTableData", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
             {
@@ -571,7 +591,7 @@ namespace BusinessSuite.Controllers
             // Implement your logic to delete rows based on selectedRows IDs from the database.
             // ...
 
-            return RedirectToAction("GetTableData", new { szTableName = tableName });
+            return RedirectToAction("DisplayTable", new { szTableName = tableName });
         }
 
     }
