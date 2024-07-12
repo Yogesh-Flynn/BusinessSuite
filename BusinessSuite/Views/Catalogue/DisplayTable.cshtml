@@ -79,7 +79,7 @@
     .table-body {
         overflow-y: auto;
         overflow-x: auto;
-        max-height: 500px; /* Adjust this value as needed */
+        max-height: 420px; /* Adjust this value as needed */
     }
 
         .table-header table,
@@ -121,7 +121,6 @@
     }
 
 </style>
-<div class="content-wrapper  border-bottom">
     <div class="row">
         <div class="col-sm-12">
             <div class="home-tab">
@@ -148,39 +147,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <div class="scroll-container table-responsive">
-                        <div class="table-header">
-                            <table id="dataTableHeader" class="table table-hover table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <!-- Table headers will be populated by jQuery -->
-                                    </tr>
-                                </thead>
-                            </table>
-                        </div>
-                        <div class="table-body">
-                            <table id="dataTableBody" class="table table-hover table-striped">
-                                <tbody>
-                                    <!-- Table data will be populated by jQuery -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-content tab-content-basic">
-                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">    
-                        <div class="row">
-                          
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
+
+<div class="scroll-container table-responsive">
+    <div class="table-header">
+        <table id="dataTableHeader" class="table table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <!-- Table headers will be populated by jQuery -->
+                </tr>
+            </thead>
+        </table>
+    </div>
+    <div class="table-body">
+        <table id="dataTableBody" class="table table-hover table-striped">
+            <tbody>
+                <!-- Table data will be populated by jQuery -->
+            </tbody>
+        </table>
+    </div>
 </div>
-
-
 
 
 @* @model System.Data.DataTable
