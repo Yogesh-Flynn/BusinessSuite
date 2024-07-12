@@ -4,109 +4,192 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var tableName = ViewBag.TableName as string;
 }
-<div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">@tableName</h4>
-            <div class="container mb-4">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <h2>Upload File</h2>
-                        <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
-                            <div class="form-group">
-                                <label for="file">Select file to upload (xlsx or csv):</label>
-                                <input type="file" name="file" class="form-control" required />
-                                <input type="text" class="form-control file-upload-info" disabled="" placeholder="Upload Image">
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-danger btn-icon-text">
-                                    <i class="ti-upload btn-icon-prepend"></i>
-                                    Upload
-                                </button>
-                                <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
-                                    <div class="form-group">
-                                        <label hidden for="tableName">Table Name</label>
-                                        <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">Download Template</button>
-                                </form>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-6">
-                        <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
-                            <input type="hidden" name="tableName" value="@tableName" />
-                            <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
-                            <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
-                                <option value="int">INT</option>
-                                <option value="nvarchar(100)">NVARCHAR(100)</option>
-                                <option value="datetime">DATETIME</option>
-                                <!-- Add more types as needed -->
-                            </select>
-                            <button type="submit" class="btn btn-primary mb-2">Add Column</button>
-                        </form>
-                        <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
-                            <input type="hidden" name="tableName" value="@tableName" />
-                            <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                                @foreach (DataColumn column in Model.Columns)
-                                {
-                                    <option value="@column.ColumnName">@column.ColumnName</option>
-                                }
-                            </select>
-                            <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-            <div class="mb-3">
-                <button class="btn btn-warning" onclick="editSelected()">Edit Selected</button>
-                <button class="btn btn-danger" onclick="deleteSelected()">Delete Selected</button>
-            </div>
-            <div class="mt-3">
-                <form asp-controller="Catalogue" asp-action="AddData" method="post">
-                    <input type="hidden" name="tableName" value="@tableName" />
-                    @foreach (DataColumn column in Model.Columns)
-                    {
-                        if (@column.ColumnName.Contains("CreatedDate") || @column.ColumnName.Contains("Id") || @column.ColumnName.Contains("id"))
-                        {
-                            <!-- Skip specific columns -->
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var pageIndex = 0;
+            var pageSize = 10;
+            var tableName = '@ViewData["TableName"]';
+
+            fetchData();
+
+            $('.table-body').on('scroll', function () {
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    pageIndex++;
+                    fetchData();
+                }
+                $('.table-header').scrollLeft($(this).scrollLeft());
+            });
+
+            function fetchData() {
+                $.ajax({
+                    url: '@Url.Action("GetTableData", "Catalogue")',
+                    type: 'GET',
+                    data: { szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+                    success: function (data) {
+                        if (data.length > 0) {
+                            var tableHeader = $('#dataTableHeader thead');
+                            if (tableHeader.find('tr').length === 1) {
+                                var headerRow = $('<tr>');
+                                $('<th><input type="checkbox" id="selectAll" /></th>').appendTo(headerRow);
+                                $.each(data[0], function (key, value) {
+                                    $('<th>').text(key).appendTo(headerRow);
+                                });
+                                tableHeader.append(headerRow);
+                            }
+
+                            var tableBody = $('#dataTableBody tbody');
+                            $.each(data, function (index, item) {
+                                var row = $('<tr>');
+                                $('<td><input type="checkbox" name="selectedRows" value="' + item.Id + '" /></td>').appendTo(row);
+                                $.each(item, function (key, value) {
+                                    $('<td>').text(value).appendTo(row);
+                                });
+                                tableBody.append(row);
+                            });
                         }
-                        else if (@column.ColumnName.Contains("scheduleTime"))
-                        {
-                            <input type="hidden" name="data[@column.ColumnName]" value="@DateTime.Now" />
-                        }
-                        else
-                        {
-                            <div class="form-group d-inline-block w-auto">
-                                <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" class="form-control" required />
-                            </div>
-                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error fetching data:", status, error);
+                        console.log("Response Text:", xhr.responseText);
                     }
-                    <button type="submit" class="btn btn-primary">Add Data</button>
-                </form>
-            </div>
-            <div class="scroll-container table-responsive">
-                <div class="table-header">
-                    <table id="dataTableHeader" class="table table-hover table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th><input type="checkbox" id="selectAll" /></th>
-                                <!-- Table headers will be populated by jQuery -->
-                            </tr>
-                        </thead>
-                    </table>
+                });
+            }
+
+            $('#selectAll').click(function () {
+                $('input[name="selectedRows"]').prop('checked', this.checked);
+            });
+        });
+    </script>
+}
+
+<style>
+    .scroll-container {
+        display: flex;
+        flex-direction: column;
+        overflow-x: auto;
+    }
+
+    .table-header {
+        overflow: hidden;
+    }
+
+    .table-body {
+        overflow-y: auto;
+        overflow-x: auto;
+        max-height: 500px; /* Adjust this value as needed */
+    }
+
+        .table-header table,
+        .table-body table {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+    .table-header th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: #F4F5F7;
+    }
+
+    .thead-dark th {
+        color: black;
+        background-color: #F4F5F7;
+    }
+
+    .card {
+        background-color: #F4F5F7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white; /* Adjust text color for contrast */
+    }
+
+    .card-title {
+        color: white; /* Ensure the title is readable */
+    }
+
+    .btn-danger, .btn-primary, .btn-warning {
+        border-color: white; /* Ensure buttons are visible against the background */
+    }
+
+    .form-control {
+        color: black; /* Input text color */
+    }
+
+</style>
+<div class="content-wrapper  border-bottom">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="home-tab">
+                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
+                        </li>
+                    </ul>
+                    <div>
+                        <div class="btn-wrapper">
+                            <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                            <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                            <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+                        </div>
+                    </div>
                 </div>
-                <div class="table-body">
-                    <table id="dataTableBody" class="table table-hover table-striped">
-                        <tbody>
-                            <!-- Table data will be populated by jQuery -->
-                        </tbody>
-                    </table>
+                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                    <div class="scroll-container table-responsive">
+                        <div class="table-header">
+                            <table id="dataTableHeader" class="table table-hover table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <!-- Table headers will be populated by jQuery -->
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                        <div class="table-body">
+                            <table id="dataTableBody" class="table table-hover table-striped">
+                                <tbody>
+                                    <!-- Table data will be populated by jQuery -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content tab-content-basic">
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">    
+                        <div class="row">
+                          
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+
+
+@* @model System.Data.DataTable
+@using System.Data
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var tableName = ViewBag.TableName as string;
+}
+
 
 @section Scripts {
     <script>
@@ -198,7 +281,249 @@
     }
 
     .thead-dark th {
-        color: white;
+        color: black;
         background-color: #343a40;
     }
+
+    .card {
+        background-color: #F4F5F7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white; /* Adjust text color for contrast */
+    }
+
+    .card-title {
+        color: white; /* Ensure the title is readable */
+    }
+
+    .btn-danger, .btn-primary, .btn-warning {
+        border-color: white; /* Ensure buttons are visible against the background */
+    }
+
+    .form-control {
+        color: black; /* Input text color */
+    }
+
 </style>
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="home-tab">
+                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
+                        </li>
+                    </ul>
+                    <div>
+                        <div class="btn-wrapper">
+                            <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                            <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                            <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-content tab-content-basic">
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="statistics-details d-flex align-items-center justify-content-between">
+                                    <div>
+                                        <p class="statistics-title">Bounce Rate</p>
+                                        <h3 class="rate-percentage">32.53%</h3>
+                                        <p class="text-danger d-flex"><i class="mdi mdi-menu-down"></i><span>-0.5%</span></p>
+                                    </div>
+                                    <div>
+                                        <p class="statistics-title">Page Views</p>
+                                        <h3 class="rate-percentage">7,682</h3>
+                                        <p class="text-success d-flex"><i class="mdi mdi-menu-up"></i><span>+0.1%</span></p>
+                                    </div>
+                                    <div>
+                                        <p class="statistics-title">New Sessions</p>
+                                        <h3 class="rate-percentage">68.8</h3>
+                                        <p class="text-danger d-flex"><i class="mdi mdi-menu-down"></i><span>68.8</span></p>
+                                    </div>
+                                    <div class="d-none d-md-block">
+                                        <p class="statistics-title">Avg. Time on Site</p>
+                                        <h3 class="rate-percentage">2m:35s</h3>
+                                        <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p>
+                                    </div>
+                                    <div class="d-none d-md-block">
+                                        <p class="statistics-title">New Sessions</p>
+                                        <h3 class="rate-percentage">68.8</h3>
+                                        <p class="text-danger d-flex"><i class="mdi mdi-menu-down"></i><span>68.8</span></p>
+                                    </div>
+                                    <div class="d-none d-md-block">
+                                        <p class="statistics-title">Avg. Time on Site</p>
+                                        <h3 class="rate-percentage">2m:35s</h3>
+                                        <p class="text-success d-flex"><i class="mdi mdi-menu-down"></i><span>+0.8%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <h4 class="card-title">@tableName</h4>
+                        <div class="container mb-4">
+                            <div class="row">
+                                <div class="col-md-6 grid-margin stretch-card">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Upload File/Download Template</h4>
+                                            <div class="form-group">
+                                                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
+                                                    <div class="form-group">
+                                                        <label for="file">Select file to upload (xlsx or csv):</label>
+                                                        <input type="file" name="file" class="form-control" required />
+                                                    </div>
+                                                    <div class="d-flex justify-content-between">
+                                                        <button type="submit" class="btn btn-danger btn-icon-text">
+                                                            <i class="ti-upload btn-icon-prepend"></i>
+                                                            Upload
+                                                        </button>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="form-group">
+                                                <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                                                    <div class="form-group">
+                                                        <label hidden for="tableName">Table Name</label>
+                                                        <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
+                                                    </div>
+                                                    <button type="submit" class="btn btn-primary">Download Template</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 grid-margin stretch-card">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title">Column : Add/Delete</h4>
+                                            <p class="card-description">
+                                                Column Add and Delete
+                                            </p>
+                                            <div class="form-group row">
+                                                <div class="col">
+                                                    <label>
+                                                        <p class="card-description">
+                                                            Column Add
+                                                        </p>
+                                                    </label>
+                                                    <div id="the-basics">
+                                                        <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
+                                                            <input type="hidden" name="tableName" value="@tableName" />
+                                                            <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
+                                                            <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
+                                                                <option value="int">INT</option>
+                                                                <option value="nvarchar(100)">NVARCHAR(100)</option>
+                                                                <option value="datetime">DATETIME</option>
+                                                                <!-- Add more types as needed -->
+                                                            </select>
+                                                            <button type="submit" class="btn btn-primary mb-2">Add Column</button>
+                                                        </form>
+
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <label>
+                                                        <p class="card-description">
+                                                            Column Delete
+                                                        </p>
+                                                    </label>
+                                                    <div id="bloodhound">
+                                                        <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
+                                                            <input type="hidden" name="tableName" value="@tableName" />
+                                                            <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
+                                                                @foreach (DataColumn column in Model.Columns)
+                                                                {
+                                                                    <option value="@column.ColumnName">@column.ColumnName</option>
+                                                                }
+                                                            </select>
+                                                            <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <button class="btn btn-warning" onclick="editSelected()">Edit Selected</button>
+                            <button class="btn btn-danger" onclick="deleteSelected()">Delete Selected</button>
+                        </div>
+                        <div class="mt-3">
+                            <form asp-controller="Catalogue" asp-action="AddData" method="post">
+                                <input type="hidden" name="tableName" value="@tableName" />
+                                @foreach (DataColumn column in Model.Columns)
+                                {
+                                    if (@column.ColumnName.Contains("CreatedDate") || @column.ColumnName.Contains("Id") || @column.ColumnName.Contains("id"))
+                                    {
+                                        <!-- Skip specific columns -->
+                                    }
+                                    else if (@column.ColumnName.Contains("scheduleTime"))
+                                    {
+                                        <input type="hidden" name="data[@column.ColumnName]" value="@DateTime.Now" />
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group d-inline-block w-auto">
+                                            <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" class="form-control" required />
+                                        </div>
+                                    }
+                                }
+                                <button type="submit" class="btn btn-primary">Add Data</button>
+                            </form>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 d-flex flex-column">
+                                <div class="row flex-grow">
+                                    <div class="col-12 col-lg-4 col-lg-12 grid-margin stretch-card">
+                                        <div class="card card-rounded">
+                                            <div class="card-body">
+                                                <div class="scroll-container table-responsive">
+                                                    <div class="table-header">
+                                                        <table id="dataTableHeader" class="table table-hover table-striped">
+                                                            <thead class="thead-dark">
+                                                                <tr>
+                                                                    <th><input type="checkbox" id="selectAll" /></th>
+                                                                    <!-- Table headers will be populated by jQuery -->
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                    <div class="table-body">
+                                                        <table id="dataTableBody" class="table table-hover table-striped">
+                                                            <tbody>
+                                                                <!-- Table data will be populated by jQuery -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+ *@
