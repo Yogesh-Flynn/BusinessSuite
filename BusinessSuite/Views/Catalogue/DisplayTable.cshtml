@@ -5,65 +5,57 @@
     var tableName = ViewBag.TableName as string;
 }
 
-
 @section Scripts {
     <script>
         $(document).ready(function () {
             var pageIndex = 0;
             var pageSize = 10;
             var tableName = '@ViewData["TableName"]';
-
+            debugger
             fetchData();
-
-            $('.table-body').on('scroll', function () {
-                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+            debugger
+            $(window).scroll(function () {
+                if ($(window).scrollTop() == $(document).height()) {
                     pageIndex++;
                     fetchData();
                 }
-                $('.table-header').scrollLeft($(this).scrollLeft());
             });
-
             function fetchData() {
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
                     type: 'GET',
                     data: { szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
+                        debugger
                         if (data.length > 0) {
-                            var tableHeader = $('#dataTableHeader thead');
-                            if (tableHeader.find('tr').length === 1) {
-                                var headerRow = $('<tr>');
-                                $('<th><input type="checkbox" id="selectAll" /></th>').appendTo(headerRow);
-                                $.each(data[0], function (key, value) {
-                                    $('<th>').text(key).appendTo(headerRow);
-                                });
-                                tableHeader.append(headerRow);
-                            }
+                            debugger
+                            var tableHeader = $('<tr>');
+                            $.each(data[0], function (key, value) {
+                                $('<th>').text(key).appendTo(tableHeader);
+                            });
 
-                            var tableBody = $('#dataTableBody tbody');
+                            $('#dataTable thead').empty().append(tableHeader);
+
+                            var tableBody = $('#dataTable tbody');
                             $.each(data, function (index, item) {
-                                var row = $('<tr>');
-                                $('<td><input type="checkbox" name="selectedRows" value="' + item.Id + '" /></td>').appendTo(row);
+                                var row = $('<tr>').appendTo(tableBody);
                                 $.each(item, function (key, value) {
                                     $('<td>').text(value).appendTo(row);
                                 });
-                                tableBody.append(row);
                             });
+
+
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data:", status, error);
-                        console.log("Response Text:", xhr.responseText);
                     }
                 });
             }
-
-            $('#selectAll').click(function () {
-                $('input[name="selectedRows"]').prop('checked', this.checked);
-            });
         });
     </script>
 }
+
+
+
+
 
 <style>
     .scroll-container {
@@ -78,8 +70,8 @@
 
     .table-body {
         overflow-y: auto;
-        overflow-x: hidden; /* Adjust as per your layout */
-        height: 405px; /* Fixed height for the table body */
+        overflow-x: auto;
+        max-height: 500px; /* Adjust this value as needed */
     }
 
         .table-header table,
@@ -92,150 +84,73 @@
         position: sticky;
         top: 0;
         z-index: 1;
-        background-color: #F4F5F7; /* Adjust background color */
+        background-color: #343a40;
     }
 
     .thead-dark th {
-        color: black; /* Adjust text color */
-        background-color: #F4F5F7; /* Adjust background color */
+        color: #343a40;
+        background-color: #343a40;
     }
 
     .card {
-        background-color: #F4F5F7; /* Adjust background color */
+        background-color: #F4F5F7;
         padding: 20px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        color: white; /* Adjust text color */
+        color: white; /* Adjust text color for contrast */
     }
 
     .card-title {
-        color: white; /* Adjust text color */
+        color: white; /* Ensure the title is readable */
     }
 
     .btn-danger, .btn-primary, .btn-warning {
-        border-color: white; /* Adjust button border color */
+        border-color: white; /* Ensure buttons are visible against the background */
     }
 
     .form-control {
-        color: black; /* Adjust input text color */
+        color: black; /* Input text color */
     }
+
 </style>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="home-tab">
-                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
-                        </li>
-                    </ul>
-                    <div>
-                        <div class="btn-wrapper">
-                            <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
-                            <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
-                            <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
-                        </div>
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="home-tab">
+            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab" aria-controls="overview" aria-selected="true">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#audiences" role="tab" aria-selected="false">Audiences</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#demographics" role="tab" aria-selected="false">Demographics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link border-0" id="more-tab" data-bs-toggle="tab" href="#more" role="tab" aria-selected="false">More</a>
+                    </li>
+                </ul>
+                <div>
+                    <div class="btn-wrapper">
+                        <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                        <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                        <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-<div class="scroll-container table-responsive">
-    <div class="table-header">
-        <table id="dataTableHeader" class="table table-hover table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <!-- Table headers will be populated by jQuery -->
-                </tr>
-            </thead>
-        </table>
-    </div>
-    <div class="table-body">
-        <table id="dataTableBody" class="table table-hover table-striped">
-            <tbody>
-                <!-- Table data will be populated by jQuery -->
-            </tbody>
-        </table>
-    </div>
 </div>
 
 
-@* @model System.Data.DataTable
-@using System.Data
-@{
-    Layout = "~/Views/Shared/_Layout.cshtml";
-    var tableName = ViewBag.TableName as string;
-}
 
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            var pageIndex = 0;
-            var pageSize = 10;
-            var tableName = '@ViewData["TableName"]';
-
-            fetchData();
-
-            $('.table-body').on('scroll', function () {
-                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
-                    pageIndex++;
-                    fetchData();
-                }
-                $('.table-header').scrollLeft($(this).scrollLeft());
-            });
-
-            function fetchData() {
-                $.ajax({
-                    url: '@Url.Action("GetTableData", "Catalogue")',
-                    type: 'GET',
-                    data: { szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
-                    success: function (data) {
-                        if (data.length > 0) {
-                            var tableHeader = $('#dataTableHeader thead');
-                            if (tableHeader.find('tr').length === 1) {
-                                var headerRow = $('<tr>');
-                                $('<th><input type="checkbox" id="selectAll" /></th>').appendTo(headerRow);
-                                $.each(data[0], function (key, value) {
-                                    $('<th>').text(key).appendTo(headerRow);
-                                });
-                                tableHeader.append(headerRow);
-                            }
-
-                            var tableBody = $('#dataTableBody tbody');
-                            $.each(data, function (index, item) {
-                                var row = $('<tr>');
-                                $('<td><input type="checkbox" name="selectedRows" value="' + item.Id + '" /></td>').appendTo(row);
-                                $.each(item, function (key, value) {
-                                    $('<td>').text(value).appendTo(row);
-                                });
-                                tableBody.append(row);
-                            });
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Error fetching data:", status, error);
-                        console.log("Response Text:", xhr.responseText);
-                    }
-                });
-            }
-
-            $('#selectAll').click(function () {
-                $('input[name="selectedRows"]').prop('checked', this.checked);
-            });
-        });
-    </script>
-}
+<!-- Include Bootstrap CSS and JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Custom CSS -->
 
 <style>
     .scroll-container {
@@ -293,6 +208,258 @@
     }
 
 </style>
+
+
+   
+
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="home-tab">
+
+                <h1 style="color: #04264b;">@tableName</h1>
+                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-success btn-rounded btn-fw" data-toggle="modal" data-target="#addPlanModal">Add New</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-danger btn-rounded btn-fw" data-toggle="modal" data-target="#addColumnModal">Add Column</button>
+                        </li>
+                        <li class="nav-item">
+                            <button type="button" class="btn btn-warning btn-rounded btn-fw" data-toggle="modal" data-target="#addFileModal">Upload File</button>
+                        </li>
+                       
+                    </ul>
+                    <div>
+                        <div class="btn-wrapper">
+                            <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                            <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                            <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="scroll-container table-responsive">
+
+            <div id="scrollContainer">
+                <table id="dataTable" class="table table-hover table-striped">
+                    <thead>
+                    </thead>
+                    <tbody class="table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+       
+
+      @*   <a class="btn btn-success btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" data-planid="@plan.PlanId" data-planname="@plan.PlanName" data-plandescription="@plan.PlanDescription" data-planprice="@plan.PlanPrice" data-isactive="@plan.IsActive" data-plantype="@plan.PlanType" data-planduration="@plan.PlanDuration">Edit</a>
+
+        <a class="btn btn-danger btn-sm delete-plan" data-plan-id="@plan.PlanId" href="#">Delete</a>
+     *@<div id="partialContainer"></div>
+
+
+        <!-- Add Plan Modal -->
+        <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                    
+                <div class="card">
+                    <div class="card-body">
+                        <form asp-controller="Catalogue" asp-action="AddData" method="post">
+                            <input type="hidden" name="tableName" value="@tableName" />
+                            @foreach (DataColumn column in Model.Columns)
+                            {
+                                if (@column.ColumnName.Contains("CreatedDate") || @column.ColumnName.Contains("Id") || @column.ColumnName.Contains("id"))
+                                {
+                                    <!-- Skip specific columns -->
+                                }
+                                else if (@column.ColumnName.Contains("scheduleTime"))
+                                {
+                                    <input type="hidden" name="data[@column.ColumnName]" value="@DateTime.Now" />
+                                }
+                                else
+                                {
+                                    <div class="form-group d-inline-block w-auto">
+                                        <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" class="form-control" required />
+                                    </div>
+                                }
+                            }
+                            <button type="submit" class="btn btn-primary">Add Data</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!-- Add file Modal -->
+    <div class="modal fade" id="addColumnModal" tabindex="-1" role="dialog" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+                <h4 class="card-title">Upload File/Download Template</h4>
+                <div class="form-group">
+                    <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
+                        <div class="form-group">
+                            <label for="file">Select file to upload (xlsx or csv):</label>
+                            <input type="file" name="file" class="form-control" required />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-danger btn-icon-text">
+                                <i class="ti-upload btn-icon-prepend"></i>
+                                Upload
+                            </button>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="form-group">
+                    <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                        <div class="form-group">
+                            <label hidden for="tableName">Table Name</label>
+                            <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Download Template</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add column Modal -->
+    <div class="modal fade" id="addFileModal" tabindex="-1" role="dialog" aria-labelledby="addPlanModalLabel" aria-hidden="true">
+
+        <div class="modal-dialog modal-lg" role="document">
+            <form id="addPlanForm">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addPlanModalLabel">Add Plan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="mt-3">
+                            <h4 class="card-title">Column : Add/Delete</h4>
+                            <p class="card-description">
+                                Column Add and Delete
+                            </p>
+                            <div class="form-group row">
+                                <div class="col">
+                                    <label>
+                                        <p class="card-description">
+                                            Column Add
+                                        </p>
+                                    </label>
+                                    <div id="the-basics">
+                                        <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
+                                            <input type="hidden" name="tableName" value="@tableName" />
+                                            <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
+                                            <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
+                                                <option value="int">INT</option>
+                                                <option value="nvarchar(100)">NVARCHAR(100)</option>
+                                                <option value="datetime">DATETIME</option>
+                                                <!-- Add more types as needed -->
+                                            </select>
+                                            <button type="submit" class="btn btn-primary mb-2">Add Column</button>
+                                        </form>
+
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <label>
+                                        <p class="card-description">
+                                            Column Delete
+                                        </p>
+                                    </label>
+                                    <div id="bloodhound">
+                                        <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
+                                            <input type="hidden" name="tableName" value="@tableName" />
+                                            <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
+                                                @foreach (DataColumn column in Model.Columns)
+                                                {
+                                                    <option value="@column.ColumnName">@column.ColumnName</option>
+                                                }
+                                            </select>
+                                            <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Plan Modal -->
+    <div class="modal fade" id="editPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <form id="editPlanForm">
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <input class="form-control" id="editPlanId" hidden>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Plan Name</label>
+                            <input class="form-control" id="editPlanName" placeholder="Enter Plan Name" required pattern="^[A-Za-z0-9\s-(-)]+$">
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" id="editPlanDescription" rows="3" placeholder="Enter Plan Description" required></textarea>
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Price</label>
+                            <input class="form-control" id="editPlanPrice" placeholder="Enter Price" required pattern="^\d+(\.\d{1,2})?$">
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editIsActive">
+                                <label class="form-check-label" for="editIsActive">Active</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Type</label>
+                            <select class="form-control" id="editPlanType" required>
+                                <option value="conversations-api">Conversations API</option>
+                                <option value="conversations-inbox">Conversations Inbox</option>
+                            </select>
+                            <span class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Plan Duration</label>
+                            <select class="form-control" id="editPlanDuration" required>
+                                <option value="monthly">Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+@* //////////////
 <div class="content-wrapper">
     <div class="row">
         <div class="col-sm-12">
@@ -513,4 +680,4 @@
         </div>
     </div>
 </div>
- *@
+  *@
