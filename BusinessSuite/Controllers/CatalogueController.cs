@@ -290,17 +290,30 @@ namespace BusinessSuite.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddColumn(string tableName, string columnName, string columnType)
+        public async Task<IActionResult> AddColumn(string tableName, string columnName, string columnType, string referencedTable, string referencedColumn)
         {
             try
             {
-                string addColumnQuery = $"ALTER TABLE {tableName} ADD {columnName} {columnType}";
+                string addColumnQuery;
+                if (columnType == "foreign_key")
+                {
+                    // Create the column and add the foreign key constraint
+                    addColumnQuery = $"ALTER TABLE {tableName} ADD {columnName} INT;" +
+                                     $"ALTER TABLE {tableName} ADD CONSTRAINT FK_{tableName}_{columnName} FOREIGN KEY ({columnName}) REFERENCES {referencedTable}({referencedColumn})";
+                }
+                else
+                {
+                    // Add a regular column
+                    addColumnQuery = $"ALTER TABLE {tableName} ADD {columnName} {columnType}";
+                }
 
                 using (SqlCommand command = new SqlCommand(addColumnQuery, _connection))
                 {
-                   
+                    if (_connection.State != ConnectionState.Open)
+                    {
+                        await _connection.OpenAsync();
+                    }
                     await command.ExecuteNonQueryAsync();
-                    
                 }
 
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
@@ -311,6 +324,7 @@ namespace BusinessSuite.Controllers
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteColumn(string tableName, string columnName)

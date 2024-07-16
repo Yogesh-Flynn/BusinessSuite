@@ -336,62 +336,65 @@
             </div>
         </div> 
         <!-- Add column Modal -->
-        <div class="modal fade" id="addColumnModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <input type="hidden" name="tableName" value="@tableName" />
-                <div class="modal-content rounded-0">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <h4 class="card-title">Upload File/Download Template</h4>
-                    <div class="form-group row">
-                        <div class="col">
-                            <label>
-                                <p class="card-description">
-                                    Column Add
-                                </p>
-                            </label>
-                            <div id="the-basics">
-                                <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
-                                    <input type="hidden" name="tableName" value="@tableName" />
-                                    <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
-                                    <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
-                                        <option value="int">INT</option>
-                                        <option value="nvarchar(100)">NVARCHAR(100)</option>
-                                        <option value="datetime">DATETIME</option>
-                                        <!-- Add more types as needed -->
-                                    </select>
-                                    <button type="submit" class="btn btn-primary mb-2">Add Column</button>
-                                </form>
-
-                            </div>
+    <!-- Add column Modal -->
+    <div class="modal fade" id="addColumnModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <input type="hidden" name="tableName" value="@tableName" />
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <h4 class="card-title">Upload File/Download Template</h4>
+                <div class="form-group row">
+                    <div class="col">
+                        <label>
+                            <p class="card-description">
+                                Column Add
+                            </p>
+                        </label>
+                        <div id="the-basics">
+                            <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
+                                <input type="hidden" name="tableName" value="@tableName" />
+                                <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
+                                <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
+                                    <option value="int">INT</option>
+                                    <option value="nvarchar(100)">NVARCHAR(100)</option>
+                                    <option value="datetime">DATETIME</option>
+                                    <!-- Add more types as needed -->
+                                    <option value="foreign_key">FOREIGN KEY</option>
+                                </select>
+                                <input type="text" name="referencedTable" placeholder="Referenced Table" class="form-control d-inline-block w-auto mb-2" />
+                                <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" />
+                                <button type="submit" class="btn btn-primary mb-2">Add Column</button>
+                            </form>
                         </div>
-                        <div class="col">
-                            <label>
-                                <p class="card-description">
-                                    Column Delete
-                                </p>
-                            </label>
-                            <div id="bloodhound">
-                                <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
-                                    <input type="hidden" name="tableName" value="@tableName" />
-                                    <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                                        @foreach (DataColumn column in Model.Columns)
-                                        {
-                                            <option value="@column.ColumnName">@column.ColumnName</option>
-                                        }
-                                    </select>
-                                    <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
-                                </form>
-                            </div>
+                    </div>
+                    <div class="col">
+                        <label>
+                            <p class="card-description">
+                                Column Delete
+                            </p>
+                        </label>
+                        <div id="bloodhound">
+                            <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
+                                <input type="hidden" name="tableName" value="@tableName" />
+                                <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
+                                    @foreach (DataColumn column in Model.Columns)
+                                    {
+                                        <option value="@column.ColumnName">@column.ColumnName</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
+                            </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
     
     
