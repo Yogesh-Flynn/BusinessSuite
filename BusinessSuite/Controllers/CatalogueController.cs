@@ -478,7 +478,7 @@ namespace BusinessSuite.Controllers
                 return View("UploadFile", new DataTable());
             }
 
-            return View("UploadFile", dataTable);
+            return RedirectToAction("Index");
         }
 
         [HttpGet]

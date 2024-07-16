@@ -9,18 +9,19 @@
     <script>
         $(document).ready(function () {
             var pageIndex = 0;
-            var pageSize = 6;
+            var pageSize = 50;
             var tableName = '@ViewData["TableName"]';
-            debugger
+            
             fetchData();
-            debugger
-            $(window).scroll(function () {
-                debugger
-                //if ($(window).scrollTop() == $(document).height()) 
-                {
-                    pageIndex++;
-                    fetchData();
-                }
+            
+
+            $('.scroll-container').on('scroll', function () {
+                // Handle the scroll event
+                console.log('Table is being scrolled');
+                // You can add your custom logic here
+
+                pageIndex++;
+                fetchData();
             });
             function fetchData() {
                 $.ajax({
@@ -127,11 +128,26 @@
 <!-- Custom CSS -->
 
 <style>
+
     .scroll-container {
+        max-height: 400px; /* Set your desired fixed height */
+        overflow-y: scroll;
+
+    }
+
+    /* Optional: To ensure the table header stays fixed while scrolling */
+    #dataTable thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: white; /* Adjust this to match your table header background */
+    }
+
+    /* .scroll-container {
         display: flex;
         flex-direction: column;
         overflow-x: auto;
-    }
+    } */
 
     .table-header {
         overflow: hidden;
@@ -216,7 +232,6 @@
 <div class="content-wrapper">
     <div class="row">
         <div class="scroll-container table-responsive">
-
             <div id="scrollContainer">
                 <table id="dataTable" class="table table-hover table-striped">
                     <thead>
@@ -226,6 +241,8 @@
                 </table>
             </div>
         </div>
+    </div>
+
        
 
       @*   <a class="btn btn-success btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" data-planid="@plan.PlanId" data-planname="@plan.PlanName" data-plandescription="@plan.PlanDescription" data-planprice="@plan.PlanPrice" data-isactive="@plan.IsActive" data-plantype="@plan.PlanType" data-planduration="@plan.PlanDuration">Edit</a>
