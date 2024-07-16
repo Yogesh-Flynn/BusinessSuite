@@ -80,28 +80,55 @@ namespace BusinessSuite.Controllers
         {
             try
             {
-                DataTable tableSchema = new DataTable();
-                // string createTableQuery = $"SELECT * FROM {szTableName} where ";
-                string createTableQuery = @$"SELECT * FROM {szTableName}";
+                DataTable columnSchema = new DataTable();
+                List<string> tableNames = new List<string>();
 
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                // Query to get column names for the specific table
+                string getColumnNamesQuery = @"
+            SELECT COLUMN_NAME
+            FROM INFORMATION_SCHEMA.COLUMNS
+            WHERE TABLE_NAME = @TableName
+            ORDER BY ORDINAL_POSITION";
+
+                // Query to get all table names
+                string getTableNamesQuery = @"
+            SELECT TABLE_NAME
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_TYPE = 'BASE TABLE'
+            ORDER BY TABLE_NAME";
+
+                // Fetch column names for the specified table
+                using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
                 {
+                    command.Parameters.AddWithValue("@TableName", szTableName);
                     using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                     {
-                        adapter.Fill(tableSchema);
+                        adapter.Fill(columnSchema);
                     }
                 }
-                //if (tableSchema.Columns.Contains("Id"))
-                //{
-                //    tableSchema.Columns.Remove("Id");
-                //}
-                //if (tableSchema.Columns.Contains("CreatedDate"))
-                //{
-                //    tableSchema.Columns.Remove("CreatedDate");
-                //}
+
+                // Fetch all table names
+                using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
+                {
+                    if (_connection.State != ConnectionState.Open)
+                    {
+                        await _connection.OpenAsync();
+                    }
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+
+                ViewBag.TableNames = tableNames;
+                ViewBag.ColumnNames = columnSchema;
+
                 ViewBag.TableName = szTableName;
                 ViewData["TableName"] = szTableName;
-                return View(tableSchema);
+                return View();
             }
             catch (Exception ex)
             {
@@ -109,6 +136,7 @@ namespace BusinessSuite.Controllers
                 return StatusCode(500, "Internal server error");
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> GetTableData(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)

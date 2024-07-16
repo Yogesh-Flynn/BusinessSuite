@@ -3,6 +3,10 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var tableName = ViewBag.TableName as string;
+
+    List<string> tableNames = ViewBag.TableNames as List<string>;
+    DataTable columnNames = ViewBag.ColumnNames as DataTable;
+    string currentTableName = ViewBag.TableName as string;
 }
 
 @section Scripts {
@@ -266,23 +270,23 @@
                         <input class="form-control" id="editPlanId" hidden>
                         <div class="modal-body">
 
-                            @foreach (DataColumn column in Model.Columns)
+                        @foreach (DataRow row in columnNames.Rows)
+                        {
+                            if (@row["COLUMN_NAME"].ToString().Contains("CreatedDate") || @row["COLUMN_NAME"].ToString().Contains("Id") || @row["COLUMN_NAME"].ToString().Contains("id"))
                             {
-                                if (@column.ColumnName.Contains("CreatedDate") || @column.ColumnName.Contains("Id") || @column.ColumnName.Contains("id"))
-                                {
-                                    <!-- Skip specific columns -->
-                                }
-                                else if (@column.ColumnName.Contains("scheduleTime"))
-                                {
-                                    <input type="hidden" name="data[@column.ColumnName]" value="@DateTime.Now" />
-                                }
-                                else
-                                {
-                                    <div class="form-group d-inline-block w-auto">
-                                        <input type="text" name="data[@column.ColumnName]" placeholder="@column.ColumnName" class="form-control" required />
-                                    </div>
-                                }
+                                <!-- Skip specific columns -->
                             }
+                            else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                            {
+                            <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                            }
+                            else
+                            {
+                                <div class="form-group d-inline-block w-auto">
+                                <input type="text" name="data[@row["COLUMN_NAME"].ToString()]" placeholder="@row["COLUMN_NAME"].ToString()" class="form-control" required />
+                                </div>
+                            }
+                        }
                            
                         </div>
                         <div class="modal-footer">
@@ -382,9 +386,9 @@
                             <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
                                 <input type="hidden" name="tableName" value="@tableName" />
                                 <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                                    @foreach (DataColumn column in Model.Columns)
+                                    @foreach (DataRow row in columnNames.Rows)
                                     {
-                                        <option value="@column.ColumnName">@column.ColumnName</option>
+                                        <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
                                     }
                                 </select>
                                 <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
