@@ -8,8 +8,8 @@ namespace BusinessSuite.Models
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<CampaignCustomer> CampaignCustomers { get; set; }
+        public ICollection<Campaign_Customer> CampaignCustomers { get; set; }
 
-        public ICollection<MarketingCampaign> MarketingCampaigns { get; set; }
+        public ICollection<Campaign_Marketing> MarketingCampaigns { get; set; }
     }
 }
