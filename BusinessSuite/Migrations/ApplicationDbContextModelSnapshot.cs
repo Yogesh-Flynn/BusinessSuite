@@ -4,30 +4,60 @@ using BusinessSuite.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BusinessSuite.Data.Migrations
+namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240519172933_companies")]
-    partial class companies
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("BusinessSuite.Models.CampaignCustomer", b =>
+                {
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CampaignId", "CustomerId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("CampaignCustomers");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Campaigns");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Company", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CompanyName")
@@ -37,6 +67,131 @@ namespace BusinessSuite.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Customers", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BusinessName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Domain")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Marketing", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Marketings");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.MarketingCampaign", b =>
+                {
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MarketingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CampaignId", "MarketingId");
+
+                    b.HasIndex("MarketingId");
+
+                    b.ToTable("MarketingCampaigns");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Product_Marketing", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MarketingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductId", "MarketingId");
+
+                    b.HasIndex("MarketingId");
+
+                    b.ToTable("Product_Marketings");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Products", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UniqueCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -271,6 +426,63 @@ namespace BusinessSuite.Data.Migrations
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.CampaignCustomer", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Campaigns", "Campaign")
+                        .WithMany("CampaignCustomers")
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessSuite.Models.Customers", "Customer")
+                        .WithMany("CampaignCustomers")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.MarketingCampaign", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Campaigns", "Campaigns")
+                        .WithMany("MarketingCampaigns")
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
+                        .WithMany("MarketingCampaigns")
+                        .HasForeignKey("MarketingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaigns");
+
+                    b.Navigation("Marketing");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Product_Marketing", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
+                        .WithMany("Product_Marketings")
+                        .HasForeignKey("MarketingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessSuite.Models.Products", "Products")
+                        .WithMany("Product_Marketings")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Marketing");
+
+                    b.Navigation("Products");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -331,6 +543,30 @@ namespace BusinessSuite.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns", b =>
+                {
+                    b.Navigation("CampaignCustomers");
+
+                    b.Navigation("MarketingCampaigns");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Customers", b =>
+                {
+                    b.Navigation("CampaignCustomers");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Marketing", b =>
+                {
+                    b.Navigation("MarketingCampaigns");
+
+                    b.Navigation("Product_Marketings");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Products", b =>
+                {
+                    b.Navigation("Product_Marketings");
                 });
 #pragma warning restore 612, 618
         }

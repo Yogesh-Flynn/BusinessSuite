@@ -4,8 +4,6 @@ namespace BusinessSuite.Models
 {
     public class MarketingCampaign
     {
-        [Key]
-        public int Id { get; set; }
         public int CampaignId { get; set; }
         public Campaigns Campaigns { get; set; }
 
