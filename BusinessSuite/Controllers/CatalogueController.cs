@@ -1,6 +1,7 @@
 ﻿using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -8,9 +9,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
 using System.Globalization;
 using System.Text;
+using static System.Runtime.InteropServices.Marshalling.IIUnknownCacheStrategy;
 
 namespace BusinessSuite.Controllers
 {
+   
     public class CatalogueController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -80,15 +83,76 @@ namespace BusinessSuite.Controllers
         {
             try
             {
-                DataTable columnSchema = new DataTable();
-                List<string> tableNames = new List<string>();
 
-                // Query to get column names for the specific table
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                /*DECLARE @TableA NVARCHAR(128) = 'Campaigns'; -- Replace with your first table name
+DECLARE @TableB NVARCHAR(128) = 'Campaign_Customers'; -- Replace with your second table name
+
+-- Check if TableA has a foreign key referencing TableB
+SELECT 
+    FKCU.TABLE_NAME AS ReferencingTable,
+    FKCU.COLUMN_NAME AS ReferencingColumn,
+    PKCU.TABLE_NAME AS ReferencedTable,
+    PKCU.COLUMN_NAME AS ReferencedColumn
+FROM 
+    INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+INNER JOIN 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+INNER JOIN 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+WHERE 
+    FKCU.TABLE_NAME = @TableA
+    AND PKCU.TABLE_NAME = @TableB
+
+UNION
+
+-- Check if TableB has a foreign key referencing TableA
+SELECT 
+    FKCU.TABLE_NAME AS ReferencingTable,
+    FKCU.COLUMN_NAME AS ReferencingColumn,
+    PKCU.TABLE_NAME AS ReferencedTable,
+    PKCU.COLUMN_NAME AS ReferencedColumn
+FROM 
+    INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+INNER JOIN 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+INNER JOIN 
+    INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+WHERE 
+    FKCU.TABLE_NAME = @TableB
+    AND PKCU.TABLE_NAME = @TableA;
+*/
+
+
+
+                DataTable columnSchema = new DataTable();
+                DataTable columnSchemaDetail = new DataTable();
+                List<string> tableNames = new List<string>();
+                // Query to get column names and data types for the specific table
                 string getColumnNamesQuery = @"
-            SELECT COLUMN_NAME
-            FROM INFORMATION_SCHEMA.COLUMNS
-            WHERE TABLE_NAME = @TableName
-            ORDER BY ORDINAL_POSITION";
+                    SELECT COLUMN_NAME, DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @TableName
+                    ORDER BY ORDINAL_POSITION";
 
                 // Query to get all table names
                 string getTableNamesQuery = @"
@@ -123,6 +187,91 @@ namespace BusinessSuite.Controllers
                     }
                 }
 
+
+
+
+                //////////////////////////
+                ///
+                foreach (var item in tableNames)
+                {
+                    string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                    using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                    {
+                        command.Parameters.AddWithValue("@TableA", szTableName);
+                        command.Parameters.AddWithValue("@TableB", item);
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(columnSchemaDetail);
+                        }
+                    }
+
+                }
+
+
+                ////////////////////////////////////////
+                foreach (DataRow row in columnSchemaDetail.Rows)
+                {
+                    var referencingtable = row["ReferencingTable"].ToString();
+                    var referencingColumn = row["referencingColumn"].ToString();
+                    var referencedtable = row["ReferencedTable"].ToString();
+                    var referencedColumn = row["ReferencedColumn"].ToString();
+
+                    String[] tablename = referencingtable.Split('_');
+                    if(tablename.Length > 1)
+                    {
+                        if (tablename[0].Contains(szTableName))
+                        {
+                            var table = tablename[1];
+                            columnSchema.Rows.Add(table, "int");
+
+                        }
+                    }
+                }
+
+
+
+
+
+
+
+
+
+
+
+                    
                 ViewBag.TableNames = tableNames;
                 ViewBag.ColumnNames = columnSchema;
 
@@ -143,17 +292,292 @@ namespace BusinessSuite.Controllers
         {
             try
             {
-                DataTable tableSchema = new DataTable();
-                string createTableQuery = @$"SELECT * FROM (
-                                       SELECT *,
-                                       ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
-                                       FROM {szTableName}) AS SubQuery WHERE RowNum > 
-                                       (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
+                DataTable columnSchema = new DataTable();
+                DataTable columnSchemaDetail = new DataTable();
+                DataTable columnSchemaDetail1= new DataTable();
+                List<string> tableNames = new List<string>();
+                // Query to get column names and data types for the specific table
+                string getColumnNamesQuery = @"
+                    SELECT COLUMN_NAME, DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @TableName
+                    ORDER BY ORDINAL_POSITION";
 
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                // Query to get all table names
+                string getTableNamesQuery = @"
+            SELECT TABLE_NAME
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_TYPE = 'BASE TABLE'
+            ORDER BY TABLE_NAME";
+
+                // Fetch column names for the specified table
+                using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", szTableName);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(columnSchema);
+                    }
+                }
+
+                // Fetch all table names
+                using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
+                {
+                    if (_connection.State != ConnectionState.Open)
+                    {
+                        await _connection.OpenAsync();
+                    }
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+
+
+
+
+                //////////////////////////
+                ///
+                foreach (var item in tableNames)
+                {
+                    string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                    using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                    {
+                        command.Parameters.AddWithValue("@TableA", szTableName);
+                        command.Parameters.AddWithValue("@TableB", item);
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(columnSchemaDetail);
+                        }
+                    }
+
+                }
+
+
+                ////////////////////////////////////////
+                foreach (DataRow row in columnSchemaDetail.Rows)
+                {
+                    var referencingtable = row["ReferencingTable"].ToString();
+                    var referencingColumn = row["referencingColumn"].ToString();
+                    var referencedtable = row["ReferencedTable"].ToString();
+                    var referencedColumn = row["ReferencedColumn"].ToString();
+
+                    String[] tablename = referencingtable.Split('_');
+                    if (tablename.Length > 1)
+                    {
+                        if (tablename[0].Contains(szTableName))
+                        {
+                            var table = tablename[1];
+                            columnSchema.Rows.Add(table, "int");
+
+                        }
+                    }
+                }
+
+
+
+                DataTable columnSchema1 = new DataTable();
+                // Query to get column names and data types for the specific table
+                string getColumnNamesQuery1 = @"
+                    SELECT COLUMN_NAME, DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @TableName
+                    ORDER BY ORDINAL_POSITION";
+
+
+
+                // Fetch column names for the specified table
+                using (SqlCommand command = new SqlCommand(getColumnNamesQuery1, _connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", szTableName);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(columnSchema1);
+                    }
+                }
+
+                Dictionary<string, string> remaingdata1 = new Dictionary<string, string>();
+                List<string> one = new List<string>();
+                List<string> two = new List<string>();
+                foreach (DataRow row in columnSchema.Rows)
+                {
+                    one.Add(row["COLUMN_NAME"].ToString());
+                }
+                foreach (DataRow row1 in columnSchema1.Rows)
+                {
+                    two.Add(row1["COLUMN_NAME"].ToString());
+                    
+                }
+              
+
+
+                var nonMatchingFromOne = one.Except(two).ToList();
+
+                // Get items that are in list 'two' but not in list 'one'
+                var nonMatchingFromTwo = two.Except(one).ToList();
+
+                // Combine both results
+                var nonMatching = nonMatchingFromOne.Concat(nonMatchingFromTwo).ToList();
+
+                var thirdtable = "";
+                foreach (DataRow row1 in columnSchemaDetail.Rows)
+                {
+                    var cool = row1["ReferencingTable"].ToString();
+                    if (cool.Contains(szTableName)&&cool.Contains(nonMatching[0]))
+                    {
+                        thirdtable = cool;
+                    }
+                }
+
+                //////////////////////////
+                ///
+                foreach (var item in tableNames)
+                {
+                    string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                    using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                    {
+                        command.Parameters.AddWithValue("@TableA", thirdtable);
+                        command.Parameters.AddWithValue("@TableB", item);
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(columnSchemaDetail1);
+                        }
+                    }
+
+                }
+                ///////////////////////////////////////////////////
+                ///
+                // Assuming connection is already initialized
+
+
+                DataTable tableSchema1 = new DataTable();
+                string createTableQuery1 = @$"
+            SELECT * FROM (
+                 SELECT 
+         m.*,p.Name AS {nonMatching[0]}Name,
+         ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
+     FROM 
+         {szTableName} m
+     LEFT JOIN 
+         {thirdtable} mp ON m.Id = mp.{szTableName+"Id"}
+     LEFT JOIN 
+         {nonMatching[0]} p ON mp.{nonMatching[0]+ "Id"} = p.Id
+            ) AS SubQuery 
+            WHERE 
+                RowNum > (@PageIndex * @PageSize) AND RowNum <= ((@PageIndex + 1) * @PageSize)";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery1, _connection))
                 {
                     command.Parameters.AddWithValue("@PageIndex", szPageIndex);
                     command.Parameters.AddWithValue("@PageSize", szPageSize);
+
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(tableSchema1);
+                    }
+                }
+
+                var jsonData = DataTableToJson(tableSchema1);
+
+
+                /////////////////////////////////////////////////////
+                //DataTable tableSchema = new DataTable();
+                //string createTableQuery = @$"SELECT * FROM (
+                //                       SELECT *,
+                //                       ROW_NUMBER() OVER (ORDER BY {szColumnName}) AS RowNum 
+                //                       FROM {szTableName}) AS SubQuery WHERE RowNum > 
+                //                       (@PageIndex * @PageSize) AND RowNum<=((@PageIndex+1)*@PageSize)";
+
+                //using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                //{
+                //    command.Parameters.AddWithValue("@PageIndex", szPageIndex);
+                //    command.Parameters.AddWithValue("@PageSize", szPageSize);
+
+                //    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                //    {
+                //        adapter.Fill(tableSchema);
+                //    }
+                //}
+
+                //var jsonData = DataTableToJson(tableSchema);
+                return Json(jsonData);
+            }
+            catch (Exception ex)
+            {
+                DataTable tableSchema = new DataTable();
+                string createTableQuery = @$"SELECT * FROM {szTableName}";
+
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
 
                     using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                     {
@@ -163,9 +587,7 @@ namespace BusinessSuite.Controllers
 
                 var jsonData = DataTableToJson(tableSchema);
                 return Json(jsonData);
-            }
-            catch (Exception ex)
-            {
+
                 _logger.LogError(ex, "An error occurred while fetching table data.");
                 return RedirectToAction("Error");
             }
@@ -179,7 +601,16 @@ namespace BusinessSuite.Controllers
                 var dict = new Dictionary<string, object>();
                 foreach (DataColumn col in table.Columns)
                 {
-                    dict[col.ColumnName] = row[col];
+                    var rwdata = row[col];
+
+                    if (rwdata != null && !string.IsNullOrWhiteSpace(rwdata.ToString()))
+                    {
+                        dict[col.ColumnName] = rwdata;
+                    }
+                    else {
+                        dict[col.ColumnName] = "-";
+                    }
+                    
                 }
                 list.Add(dict);
             }
@@ -382,21 +813,243 @@ namespace BusinessSuite.Controllers
         {
             try
             {
-                string columns = string.Join(", ", data.Keys);
-                string values = string.Join(", ", data.Values.Select(v => $"'{v}'"));
-                string insertDataQuery = $"INSERT INTO {tableName} ({columns},CreatedDate) VALUES ({values},'{DateTime.Now}')";
+
+                DataTable columnSchema = new DataTable();
+                // Query to get column names and data types for the specific table
+                string getColumnNamesQuery = @"
+                    SELECT COLUMN_NAME, DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @TableName
+                    ORDER BY ORDINAL_POSITION";
+
+               
+
+                // Fetch column names for the specified table
+                using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", tableName);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(columnSchema);
+                    }
+                }
+
+                Dictionary<string, string> remaingdata = new Dictionary<string, string>();
+
+                foreach (DataRow row in columnSchema.Rows)
+                {
+                    var columnName = row["COLUMN_NAME"].ToString();
+                    if (data.ContainsKey(columnName))
+                    {
+                        remaingdata.Add(columnName, data[columnName]);
+                        data.Remove(columnName);
+                    }
+                    else
+                    {
+                        if (!columnName.Equals("Id") && !columnName.Equals("CreatedDate"))
+                        {
+                            remaingdata.Add(columnName, data[columnName]);
+
+
+                            data.Remove(columnName);
+                        }
+
+                    }
+                }
+
+
+
+
+                Dictionary<string, string> insertedData = new Dictionary<string, string>();
+
+                /////////////////////////////////////////////////////////////
+                string columns = string.Join(", ", remaingdata.Keys);
+                string values = string.Join(", ", remaingdata.Values.Select(v => $"'{v}'"));
+                string insertDataQuery = $@"
+                INSERT INTO {tableName} ({columns}, CreatedDate) 
+                VALUES ({values}, '{DateTime.Now}');
+                SELECT SCOPE_IDENTITY();";
 
                 using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
                 {
-                   
-                    await command.ExecuteNonQueryAsync();
-                    
+                    var insertedId = await command.ExecuteScalarAsync();
+                    insertedData.Add(tableName, insertedId.ToString());
+                    //return insertedId; // Assuming you want to return the inserted ID from your method
+                }
+                foreach (var entry in data)
+                {
+                    insertedData.Add(entry.Key, entry.Value);
+                    ////////////////////////////////////////
+                    ///
+                    List<string> tableNames = new List<string>();
+
+                    DataTable columnSchemaDetail = new DataTable();
+                    // Query to get all table names
+                    string getTableNamesQuery = @"
+                        SELECT TABLE_NAME
+                        FROM INFORMATION_SCHEMA.TABLES
+                        WHERE TABLE_TYPE = 'BASE TABLE'
+                        ORDER BY TABLE_NAME";
+
+                 
+
+                    // Fetch all table names
+                    using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
+                    {
+                        if (_connection.State != ConnectionState.Open)
+                        {
+                            await _connection.OpenAsync();
+                        }
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                tableNames.Add(reader.GetString(0));
+                            }
+                        }
+                    }
+
+
+
+
+                    //////////////////////////
+                    ///
+                    foreach (var item in tableNames)
+                    {
+                        string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                        using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                        {
+                            command.Parameters.AddWithValue("@TableA", entry.Key);
+                            command.Parameters.AddWithValue("@TableB", item);
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(columnSchemaDetail);
+                            }
+                        }
+
+                    }
+                    foreach (var item in tableNames)
+                    {
+                        string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                        using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                        {
+                            command.Parameters.AddWithValue("@TableA", tableName);
+                            command.Parameters.AddWithValue("@TableB", item);
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(columnSchemaDetail);
+                            }
+                        }
+
+                    }
+
+                    string cols = "";
+                    string paramsq= "";
+                    string newtabname = "";
+                    ////////////////////////////////////////
+                    foreach (DataRow row in columnSchemaDetail.Rows)
+                    {
+                        var referencingtable = row["ReferencingTable"].ToString();
+                        var referencingColumn = row["referencingColumn"].ToString();
+                        var referencedtable = row["ReferencedTable"].ToString();
+                        var referencedColumn = row["ReferencedColumn"].ToString();
+
+                        if(referencingtable.Contains(entry.Key) && referencingtable.Contains(tableName))
+                        {
+                            newtabname = referencingtable;
+                            cols = cols + ","+ referencingColumn;
+                            paramsq= paramsq + ","+ insertedData[referencedtable];
+                        }
+
+                      
+                    }
+                    cols = cols.Substring(1);
+                    paramsq = paramsq.Substring(1);
+
+
+                    string insertDataQuery1 = $@"
+                INSERT INTO {newtabname} ({cols}) 
+                VALUES ({paramsq});
+                SELECT SCOPE_IDENTITY();";
+
+                    using (SqlCommand command = new SqlCommand(insertDataQuery1, _connection))
+                    {
+                        var insertedId = await command.ExecuteScalarAsync();
+                        //return insertedId; // Assuming you want to return the inserted ID from your method
+                    }
+                    /////////////////////////////////////////////
                 }
 
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
-            {
+             {
                 _logger.LogError(ex, "An error occurred while adding the data.");
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }

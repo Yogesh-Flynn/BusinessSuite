@@ -13,7 +13,7 @@ namespace BusinessSuite.Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public string BusinessName { get; set; }
         public string Address { get; set; }
-        public ICollection<Campaign_Customer> CampaignCustomers { get; set; }
+        public ICollection<Campaigns_Customers> CampaignCustomers { get; set; }
 
     }
 }

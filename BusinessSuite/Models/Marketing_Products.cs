@@ -2,12 +2,12 @@
 
 namespace BusinessSuite.Models
 {
-    public class Marketing_Product
+    public class Marketing_Products
     {
-        public int ProductId { get; set; }
+        public int ProductsId { get; set; }
         public Products Products { get; set; }
 
-        public int MarketingId { get; set; }
+        public int MarketingsId { get; set; }
         public Marketing Marketing { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace BusinessSuite.Models
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
-        public ICollection<Marketing_Product> Product_Marketings { get; set; }
-        public ICollection<Campaign_Marketing> MarketingCampaigns { get; set; }
+        public ICollection<Marketing_Products> Product_Marketings { get; set; }
+        public ICollection<Campaigns_Marketings> MarketingCampaigns { get; set; }
     }
 }

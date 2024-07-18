@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240717085845_crm1")]
-    partial class crm1
+    [Migration("20240717124908_crm")]
+    partial class crm
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,36 +24,6 @@ namespace BusinessSuite.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("BusinessSuite.Models.Campaign_Customer", b =>
-                {
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CampaignId", "CustomerId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Campaign_Customers");
-                });
-
-            modelBuilder.Entity("BusinessSuite.Models.Campaign_Marketing", b =>
-                {
-                    b.Property<int>("CampaignId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MarketingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CampaignId", "MarketingId");
-
-                    b.HasIndex("MarketingId");
-
-                    b.ToTable("Campaigns_Marketing");
-                });
 
             modelBuilder.Entity("BusinessSuite.Models.Campaigns", b =>
                 {
@@ -70,6 +40,36 @@ namespace BusinessSuite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Campaigns");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Customers", b =>
+                {
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CampaignId", "CustomerId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Campaign_Customers");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketing", b =>
+                {
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MarketingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CampaignId", "MarketingId");
+
+                    b.HasIndex("MarketingId");
+
+                    b.ToTable("Campaigns_Marketing");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Company", b =>
@@ -151,7 +151,7 @@ namespace BusinessSuite.Migrations
                     b.ToTable("Marketings");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Marketing_Product", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Marketing_Products", b =>
                 {
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
@@ -429,7 +429,7 @@ namespace BusinessSuite.Migrations
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Campaign_Customer", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Customers", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Campaigns", "Campaign")
                         .WithMany("CampaignCustomers")
@@ -448,7 +448,7 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Campaign_Marketing", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketing", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Campaigns", "Campaigns")
                         .WithMany("MarketingCampaigns")
@@ -467,7 +467,7 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Marketing");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Marketing_Product", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Marketing_Products", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
                         .WithMany("Product_Marketings")
