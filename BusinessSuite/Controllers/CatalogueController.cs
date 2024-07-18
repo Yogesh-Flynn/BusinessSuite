@@ -255,13 +255,38 @@ WHERE
                         if (tablename[0].Contains(szTableName))
                         {
                             var table = tablename[1];
-                            columnSchema.Rows.Add(table, "int");
+                            DataTable tableSchema = new DataTable();
+                            string createTableQuery = @$"SELECT Id,Name,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {table}";
+
+                            using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                            {
+
+                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                {
+                                    adapter.Fill(tableSchema);
+                                }
+                            }
+                            String data = "";
+                            foreach (DataRow item in tableSchema.Rows)
+                            {
+                               data=data+'~'+ item["Name"].ToString()+"-"+ item["Id"].ToString();
+                            }
+                            if (!data.Equals(""))
+                            {
+                                data = data.Substring(1);
+                               
+                            }
+                            columnSchema.Rows.Add(table, data);
 
                         }
                     }
                 }
 
 
+                /////////////////////////////////////////////////////
+                
 
 
 
@@ -271,7 +296,6 @@ WHERE
 
 
 
-                    
                 ViewBag.TableNames = tableNames;
                 ViewBag.ColumnNames = columnSchema;
 
