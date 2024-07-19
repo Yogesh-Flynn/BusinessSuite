@@ -911,14 +911,14 @@ WHERE
                 /////////////////////////////////////////////////////////////
                 string columns = string.Join(", ", remaingdata.Keys);
                 string values = string.Join(", ", remaingdata.Values.Select(v => $"'{v}'"));
-                string insertDataQuery = $@"
-                INSERT INTO {tableName} ({columns}) 
-                VALUES ({values});
-                SELECT SCOPE_IDENTITY();";
                 //string insertDataQuery = $@"
-                //INSERT INTO {tableName} ({columns}, CreatedDate) 
-                //VALUES ({values}, '{DateTime.Now}');
+                //INSERT INTO {tableName} ({columns}) 
+                //VALUES ({values});
                 //SELECT SCOPE_IDENTITY();";
+                string insertDataQuery = $@"
+                INSERT INTO {tableName} ({columns}, CreatedDate) 
+                VALUES ({values}, '{DateTime.Now}');
+                SELECT SCOPE_IDENTITY();";
                 using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();

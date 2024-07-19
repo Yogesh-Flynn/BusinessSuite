@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BusinessSuite.Migrations
 {
     /// <inheritdoc />
-    public partial class crm : Migration
+    public partial class xxx : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -31,7 +31,8 @@ namespace BusinessSuite.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -85,6 +86,22 @@ namespace BusinessSuite.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Messages",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ScheduleTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Messages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -118,6 +135,29 @@ namespace BusinessSuite.Migrations
                         name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
                         column: x => x.RoleId,
                         principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Notifications",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Message = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CampaignId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Notifications", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Notifications_Campaigns_CampaignId",
+                        column: x => x.CampaignId,
+                        principalTable: "Campaigns",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -158,72 +198,72 @@ namespace BusinessSuite.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Campaign_Customers",
+                name: "Campaigns_Customers",
                 columns: table => new
                 {
-                    CampaignId = table.Column<int>(type: "int", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false)
+                    CampaignsId = table.Column<int>(type: "int", nullable: false),
+                    CustomersId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Campaign_Customers", x => new { x.CampaignId, x.CustomerId });
+                    table.PrimaryKey("PK_Campaigns_Customers", x => new { x.CampaignsId, x.CustomersId });
                     table.ForeignKey(
-                        name: "FK_Campaign_Customers_Campaigns_CampaignId",
-                        column: x => x.CampaignId,
+                        name: "FK_Campaigns_Customers_Campaigns_CampaignsId",
+                        column: x => x.CampaignsId,
                         principalTable: "Campaigns",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Campaign_Customers_Customers_CustomerId",
-                        column: x => x.CustomerId,
+                        name: "FK_Campaigns_Customers_Customers_CustomersId",
+                        column: x => x.CustomersId,
                         principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Campaigns_Marketing",
+                name: "Campaigns_Marketings",
                 columns: table => new
                 {
-                    CampaignId = table.Column<int>(type: "int", nullable: false),
-                    MarketingId = table.Column<int>(type: "int", nullable: false)
+                    CampaignsId = table.Column<int>(type: "int", nullable: false),
+                    MarketingsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Campaigns_Marketing", x => new { x.CampaignId, x.MarketingId });
+                    table.PrimaryKey("PK_Campaigns_Marketings", x => new { x.CampaignsId, x.MarketingsId });
                     table.ForeignKey(
-                        name: "FK_Campaigns_Marketing_Campaigns_CampaignId",
-                        column: x => x.CampaignId,
+                        name: "FK_Campaigns_Marketings_Campaigns_CampaignsId",
+                        column: x => x.CampaignsId,
                         principalTable: "Campaigns",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Campaigns_Marketing_Marketings_MarketingId",
-                        column: x => x.MarketingId,
+                        name: "FK_Campaigns_Marketings_Marketings_MarketingsId",
+                        column: x => x.MarketingsId,
                         principalTable: "Marketings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Marketings_Product",
+                name: "Marketings_Products",
                 columns: table => new
                 {
-                    ProductId = table.Column<int>(type: "int", nullable: false),
-                    MarketingId = table.Column<int>(type: "int", nullable: false)
+                    ProductsId = table.Column<int>(type: "int", nullable: false),
+                    MarketingsId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Marketings_Product", x => new { x.ProductId, x.MarketingId });
+                    table.PrimaryKey("PK_Marketings_Products", x => new { x.ProductsId, x.MarketingsId });
                     table.ForeignKey(
-                        name: "FK_Marketings_Product_Marketings_MarketingId",
-                        column: x => x.MarketingId,
+                        name: "FK_Marketings_Products_Marketings_MarketingsId",
+                        column: x => x.MarketingsId,
                         principalTable: "Marketings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Marketings_Product_Products_ProductId",
-                        column: x => x.ProductId,
+                        name: "FK_Marketings_Products_Products_ProductsId",
+                        column: x => x.ProductsId,
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -359,19 +399,24 @@ namespace BusinessSuite.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Campaign_Customers_CustomerId",
-                table: "Campaign_Customers",
-                column: "CustomerId");
+                name: "IX_Campaigns_Customers_CustomersId",
+                table: "Campaigns_Customers",
+                column: "CustomersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Campaigns_Marketing_MarketingId",
-                table: "Campaigns_Marketing",
-                column: "MarketingId");
+                name: "IX_Campaigns_Marketings_MarketingsId",
+                table: "Campaigns_Marketings",
+                column: "MarketingsId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Marketings_Product_MarketingId",
-                table: "Marketings_Product",
-                column: "MarketingId");
+                name: "IX_Marketings_Products_MarketingsId",
+                table: "Marketings_Products",
+                column: "MarketingsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Notifications_CampaignId",
+                table: "Notifications",
+                column: "CampaignId");
         }
 
         /// <inheritdoc />
@@ -393,13 +438,19 @@ namespace BusinessSuite.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Campaign_Customers");
+                name: "Campaigns_Customers");
 
             migrationBuilder.DropTable(
-                name: "Campaigns_Marketing");
+                name: "Campaigns_Marketings");
 
             migrationBuilder.DropTable(
-                name: "Marketings_Product");
+                name: "Marketings_Products");
+
+            migrationBuilder.DropTable(
+                name: "Messages");
+
+            migrationBuilder.DropTable(
+                name: "Notifications");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -411,13 +462,13 @@ namespace BusinessSuite.Migrations
                 name: "Customers");
 
             migrationBuilder.DropTable(
-                name: "Campaigns");
-
-            migrationBuilder.DropTable(
                 name: "Marketings");
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Campaigns");
 
             migrationBuilder.DropTable(
                 name: "Companies");

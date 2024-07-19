@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240717124908_crm")]
-    partial class crm
+    [Migration("20240719075535_xxx")]
+    partial class xxx
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace BusinessSuite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -44,32 +47,32 @@ namespace BusinessSuite.Migrations
 
             modelBuilder.Entity("BusinessSuite.Models.Campaigns_Customers", b =>
                 {
-                    b.Property<int>("CampaignId")
+                    b.Property<int>("CampaignsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomerId")
+                    b.Property<int>("CustomersId")
                         .HasColumnType("int");
 
-                    b.HasKey("CampaignId", "CustomerId");
+                    b.HasKey("CampaignsId", "CustomersId");
 
-                    b.HasIndex("CustomerId");
+                    b.HasIndex("CustomersId");
 
-                    b.ToTable("Campaign_Customers");
+                    b.ToTable("Campaigns_Customers");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketing", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketings", b =>
                 {
-                    b.Property<int>("CampaignId")
+                    b.Property<int>("CampaignsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MarketingId")
+                    b.Property<int>("MarketingsId")
                         .HasColumnType("int");
 
-                    b.HasKey("CampaignId", "MarketingId");
+                    b.HasKey("CampaignsId", "MarketingsId");
 
-                    b.HasIndex("MarketingId");
+                    b.HasIndex("MarketingsId");
 
-                    b.ToTable("Campaigns_Marketing");
+                    b.ToTable("Campaigns_Marketings");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Company", b =>
@@ -153,17 +156,78 @@ namespace BusinessSuite.Migrations
 
             modelBuilder.Entity("BusinessSuite.Models.Marketing_Products", b =>
                 {
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("MarketingId")
+                    b.Property<int>("MarketingsId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductId", "MarketingId");
+                    b.HasKey("ProductsId", "MarketingsId");
 
-                    b.HasIndex("MarketingId");
+                    b.HasIndex("MarketingsId");
 
-                    b.ToTable("Marketings_Product");
+                    b.ToTable("Marketings_Products");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Messages", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ScheduleTime")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CampaignId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Products", b =>
@@ -433,13 +497,13 @@ namespace BusinessSuite.Migrations
                 {
                     b.HasOne("BusinessSuite.Models.Campaigns", "Campaign")
                         .WithMany("CampaignCustomers")
-                        .HasForeignKey("CampaignId")
+                        .HasForeignKey("CampaignsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessSuite.Models.Customers", "Customer")
                         .WithMany("CampaignCustomers")
-                        .HasForeignKey("CustomerId")
+                        .HasForeignKey("CustomersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -448,17 +512,17 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketing", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketings", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Campaigns", "Campaigns")
                         .WithMany("MarketingCampaigns")
-                        .HasForeignKey("CampaignId")
+                        .HasForeignKey("CampaignsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
                         .WithMany("MarketingCampaigns")
-                        .HasForeignKey("MarketingId")
+                        .HasForeignKey("MarketingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -471,19 +535,30 @@ namespace BusinessSuite.Migrations
                 {
                     b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
                         .WithMany("Product_Marketings")
-                        .HasForeignKey("MarketingId")
+                        .HasForeignKey("MarketingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessSuite.Models.Products", "Products")
                         .WithMany("Product_Marketings")
-                        .HasForeignKey("ProductId")
+                        .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Marketing");
 
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Notification", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Campaigns", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
