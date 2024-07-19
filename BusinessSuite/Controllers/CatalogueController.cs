@@ -257,18 +257,38 @@ WHERE
                         {
                             var table = tablename[1];
                             DataTable tableSchema = new DataTable();
-                            string createTableQuery = @$"SELECT Id,Name,
+                            try
+                            {
+                                string createTableQuery = @$"SELECT Id,Name,
                                        ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
                                        FROM {table}";
 
-                            using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
-                            {
-
-                                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
                                 {
-                                    adapter.Fill(tableSchema);
+
+                                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                    {
+                                        adapter.Fill(tableSchema);
+                                    }
                                 }
                             }
+                            catch
+                            {
+                                string createTableQuery = @$"SELECT *,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {table}";
+
+                                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                                {
+
+                                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                    {
+                                        adapter.Fill(tableSchema);
+                                    }
+                                }
+                            }
+
+                          
                             String data = "";
                             foreach (DataRow item in tableSchema.Rows)
                             {
@@ -285,32 +305,61 @@ WHERE
                     }
                     else
                     {
-                        DataTable tableSchema = new DataTable();
-                        string createTableQuery = @$"SELECT Id,Name,
+                        if (!referencedtable.Equals(szTableName))
+                        {
+                            DataTable tableSchema = new DataTable();
+                            try
+                            {
+                                string createTableQuery = @$"SELECT Id,Name,
                                        ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
                                        FROM {referencedtable}";
 
-                        using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
-                        {
+                                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                                {
 
-                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                            {
-                                adapter.Fill(tableSchema);
+                                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                    {
+                                        adapter.Fill(tableSchema);
+                                    }
+                                }
                             }
-                        }
-                        String data = "";
-                        foreach (DataRow item in tableSchema.Rows)
-                        {
-                            data = data + '~' + item["Name"].ToString() + "-" + item["Id"].ToString();
-                        }
-                        if (!data.Equals(""))
-                        {
-                            data = data.Substring(1);
+                            catch
+                            {
+                                string createTableQuery = @$"SELECT *,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {referencedtable}";
+
+                                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                                {
+
+                                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                                    {
+                                        adapter.Fill(tableSchema);
+                                    }
+                                }
+                            }
+                            string namecol = "";
+                            foreach (DataColumn dataColumn in tableSchema.Columns)
+                            {
+                                string colname= dataColumn.ColumnName;
+                                if(colname.Contains("Name"))
+                                {
+                                    namecol = colname;
+                                }
+                            }
+                            String data = "";
+                            foreach (DataRow item in tableSchema.Rows)
+                            {
+                                data = data + '~' + item[namecol].ToString() + "-" + item["Id"].ToString();
+                            }
+                            if (!data.Equals(""))
+                            {
+                                data = data.Substring(1);
+
+                            }
+                            columnSchema.Rows.Add(referencedtable, data);
 
                         }
-                        columnSchema.Rows.Add(referencedtable, data);
-
-
                     }
                 }
 

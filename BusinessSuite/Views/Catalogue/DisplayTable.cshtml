@@ -276,59 +276,66 @@
                         {
                             var columnName = @row["COLUMN_NAME"].ToString();
                             var columnType = @row["DATA_TYPE"].ToString();
-                            if (@row["COLUMN_NAME"].ToString().Contains("CreatedDate") || @row["COLUMN_NAME"].ToString().Contains("Id") || @row["COLUMN_NAME"].ToString().Contains("id"))
+
+                            if (columnType == "bit" || columnType == "datetimeoffset")
                             {
-                                <!-- Skip specific columns -->
+
                             }else
                             {
-                                <div class="form-group d-inline-block w-auto">
-                                    @if (columnType == "int")
-                                    {
-                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" required />
-                                    }
-                                    else if (columnType == "nvarchar")
-                                    {
-                                        <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." />
-                                    }
-                                    else if (columnType == "datetime2")
-                                    { 
-                                       @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                                if (@row["COLUMN_NAME"].ToString().Contains("CreatedDate") || @row["COLUMN_NAME"].ToString().Contains("Id") || @row["COLUMN_NAME"].ToString().Contains("id"))
+                                {
+                                    <!-- Skip specific columns -->
+                                }else
+                                {
+                                    <div class="form-group d-inline-block w-auto">
+                                        @if (columnType == "int")
                                         {
-                                            <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                                            <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" required />
                                         }
- *@
-                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
-                                    }
-                                    else
-                                    {
-
-                                        var strsplit = columnType.Split('~');
-
-                                        foreach (var str in strsplit)
+                                        else if (columnType == "nvarchar")
                                         {
-                                            @if (!dropDownOptions.Contains(str))
+                                            <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." />
+                                        }
+                                        else if (columnType == "datetime2")
+                                        { 
+                                           @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
                                             {
-                                                dropDownOptions.Add(str);
+                                                <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
                                             }
+     *@
+                                            <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
                                         }
-                                        @if (dropDownOptions.Any())
+                                        else
                                         {
-                                            <div class="form-group d-inline-block w-auto">
-                                                <select name="data[@columnName]" class="form-control">
-                                                    @foreach (var option in dropDownOptions)
-                                                    {
-                                                        if(!option.Equals("")){
-                                                        string[] strsply = option.Split('-');
-                                                        <option value="@strsply[1]">@strsply[0]</option>
+
+                                            var strsplit = columnType.Split('~');
+
+                                            foreach (var str in strsplit)
+                                            {
+                                                @if (!dropDownOptions.Contains(str))
+                                                {
+                                                    dropDownOptions.Add(str);
+                                                }
+                                            }
+                                            @if (dropDownOptions.Any())
+                                            {
+                                                <div class="form-group d-inline-block w-auto">
+                                                    <select name="data[@columnName]" class="form-control">
+                                                        @foreach (var option in dropDownOptions)
+                                                        {
+                                                            if(!option.Equals("")){
+                                                            string[] strsply = option.Split('-');
+                                                            <option value="@strsply[1]">@strsply[0]</option>
+                                                            }
                                                         }
-                                                    }
-                                                </select>
-                                            </div>
+                                                    </select>
+                                                </div>
+                                            }
+                                            dropDownOptions.Clear();
                                         }
-                                        dropDownOptions.Clear();
-                                    }
-                                 </div>
-                             }
+                                     </div>
+                                }
+                            }
                         }
                         
                         </div>
