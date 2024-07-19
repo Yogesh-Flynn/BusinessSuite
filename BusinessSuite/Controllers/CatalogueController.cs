@@ -479,21 +479,28 @@ WHERE
                 // Combine both results
                 var nonMatching = nonMatchingFromOne.Concat(nonMatchingFromTwo).ToList();
 
-                var thirdtable = "";
+                List<string> thirdtable = new List<string>();
                 foreach (DataRow row1 in columnSchemaDetail.Rows)
                 {
                     var cool = row1["ReferencingTable"].ToString();
-                    if (cool.Contains(szTableName)&&cool.Contains(nonMatching[0]))
+                    foreach (var item in nonMatching)
                     {
-                        thirdtable = cool;
+                        if (cool.Contains(szTableName) && cool.Contains(item))
+                        {
+                            thirdtable.Add(cool);
+                        }
+
                     }
+                   
                 }
 
                 //////////////////////////
                 ///
                 foreach (var item in tableNames)
                 {
-                    string getColumnDetailsQuery = @"
+                    foreach (var item2 in thirdtable)
+                    {
+                        string getColumnDetailsQuery = @"
                                                         -- Check if TableA has a foreign key referencing TableB
                                                         SELECT 
                                                             FKCU.TABLE_NAME AS ReferencingTable,
@@ -527,16 +534,16 @@ WHERE
                                                         WHERE 
                                                             FKCU.TABLE_NAME = @TableB
                                                             AND PKCU.TABLE_NAME = @TableA;";
-                    using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
-                    {
-                        command.Parameters.AddWithValue("@TableA", thirdtable);
-                        command.Parameters.AddWithValue("@TableB", item);
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
                         {
-                            adapter.Fill(columnSchemaDetail1);
+                            command.Parameters.AddWithValue("@TableA", item2);
+                            command.Parameters.AddWithValue("@TableB", item);
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(columnSchemaDetail1);
+                            }
                         }
                     }
-
                 }
                 ///////////////////////////////////////////////////
                 ///
@@ -544,17 +551,32 @@ WHERE
 
 
                 DataTable tableSchema1 = new DataTable();
+
+                var displaycols = "";
+                int cnt = 0;
+                foreach (var item in nonMatching)
+                {
+                    displaycols += $"p{cnt}.Name AS {item}Name,";
+                    cnt++;
+                }
+                var leftjoin = "";
+                 cnt = 0;
+                foreach (var item in nonMatching)
+                {
+                    leftjoin += $@" LEFT JOIN 
+                                        {thirdtable[cnt]} mp{cnt} ON m.Id = mp{cnt}.{szTableName + "Id"}
+                                         LEFT JOIN 
+                                        {item} p{cnt} ON mp{cnt}.{item + "Id"} = p{cnt}.Id";
+                    cnt++;
+                }
                 string createTableQuery1 = @$"
             SELECT * FROM (
                  SELECT 
-         m.*,p.Name AS {nonMatching[0]}Name,
+         m.*,{displaycols}
          ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
      FROM 
          {szTableName} m
-     LEFT JOIN 
-         {thirdtable} mp ON m.Id = mp.{szTableName+"Id"}
-     LEFT JOIN 
-         {nonMatching[0]} p ON mp.{nonMatching[0]+ "Id"} = p.Id
+    {leftjoin}
             ) AS SubQuery 
             WHERE 
                 RowNum > (@PageIndex * @PageSize) AND RowNum <= ((@PageIndex + 1) * @PageSize)";
@@ -890,10 +912,13 @@ WHERE
                 string columns = string.Join(", ", remaingdata.Keys);
                 string values = string.Join(", ", remaingdata.Values.Select(v => $"'{v}'"));
                 string insertDataQuery = $@"
-                INSERT INTO {tableName} ({columns}, CreatedDate) 
-                VALUES ({values}, '{DateTime.Now}');
+                INSERT INTO {tableName} ({columns}) 
+                VALUES ({values});
                 SELECT SCOPE_IDENTITY();";
-
+                //string insertDataQuery = $@"
+                //INSERT INTO {tableName} ({columns}, CreatedDate) 
+                //VALUES ({values}, '{DateTime.Now}');
+                //SELECT SCOPE_IDENTITY();";
                 using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();
