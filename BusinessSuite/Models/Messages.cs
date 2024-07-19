@@ -10,5 +10,7 @@ namespace BusinessSuite.Models
         public string Message { get; set; }
         public string Image { get; set; }
         public DateTime ScheduleTime { get; set; } = DateTime.Now;
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
 }

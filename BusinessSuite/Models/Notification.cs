@@ -11,6 +11,7 @@ namespace BusinessSuite.Models
         public string Image { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
+        public DateTime ScheduleTime { get; set; } = DateTime.Now;
         // Foreign key property
         public int CampaignId { get; set; }
 
