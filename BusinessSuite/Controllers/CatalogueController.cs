@@ -3,6 +3,7 @@ using BusinessSuite.Models.ViewModels;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -281,6 +282,35 @@ WHERE
                             columnSchema.Rows.Add(table, data);
 
                         }
+                    }
+                    else
+                    {
+                        DataTable tableSchema = new DataTable();
+                        string createTableQuery = @$"SELECT Id,Name,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {referencedtable}";
+
+                        using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                        {
+
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(tableSchema);
+                            }
+                        }
+                        String data = "";
+                        foreach (DataRow item in tableSchema.Rows)
+                        {
+                            data = data + '~' + item["Name"].ToString() + "-" + item["Id"].ToString();
+                        }
+                        if (!data.Equals(""))
+                        {
+                            data = data.Substring(1);
+
+                        }
+                        columnSchema.Rows.Add(referencedtable, data);
+
+
                     }
                 }
 
@@ -909,12 +939,46 @@ WHERE
                 Dictionary<string, string> insertedData = new Dictionary<string, string>();
 
                 /////////////////////////////////////////////////////////////
+                ///
+
+
+
                 string columns = string.Join(", ", remaingdata.Keys);
                 string values = string.Join(", ", remaingdata.Values.Select(v => $"'{v}'"));
                 //string insertDataQuery = $@"
                 //INSERT INTO {tableName} ({columns}) 
                 //VALUES ({values});
                 //SELECT SCOPE_IDENTITY();";
+
+                // Split the input string
+                string output = $"";
+                if (values.Contains(':'))
+                {
+                    string[] parts = values.Split(',');
+
+                   foreach(var x in parts)
+                    {
+                        if(x.Contains(":"))
+                        {
+                            
+                            output +="'"+ DateTime.Now+"'"+",";
+                        }
+                        else
+                        {
+                            output += x + ",";
+                        }
+                    }
+
+
+
+                    values = output.Substring(0, output.Length - 1);
+
+                }
+
+
+
+
+
                 string insertDataQuery = $@"
                 INSERT INTO {tableName} ({columns}, CreatedDate) 
                 VALUES ({values}, '{DateTime.Now}');

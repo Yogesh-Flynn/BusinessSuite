@@ -291,8 +291,13 @@
                                         <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." />
                                     }
                                     else if (columnType == "datetime2")
-                                    {
-                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" required />
+                                    { 
+                                       @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                                        {
+                                            <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                                        }
+ *@
+                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
                                     }
                                     else
                                     {
