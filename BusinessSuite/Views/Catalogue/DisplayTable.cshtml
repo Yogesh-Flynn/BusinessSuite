@@ -203,6 +203,11 @@
         color: black; /* Input text color */
     }
 
+    select[multiple] {
+        height: auto;
+        overflow-y: auto;
+    }
+
 </style>
 
 
@@ -233,10 +238,19 @@
         </div>
     </div>
 </div>
-
+<div class="scroll-container table-responsive">
+    <div id="scrollContainer">
+        <table id="dataTable" class="table table-hover table-striped">
+            <thead>
+            </thead>
+            <tbody class="table-body">
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <div class="content-wrapper">
-    <div class="row">
+   @*  <div class="row">
         <div class="scroll-container table-responsive">
             <div id="scrollContainer">
                 <table id="dataTable" class="table table-hover table-striped">
@@ -247,7 +261,7 @@
                 </table>
             </div>
         </div>
-    </div>
+    </div> *@
 
        
 
@@ -330,7 +344,26 @@
                                                         }
                                                     </select>
                                                 </div>
+
+
                                             }
+
+                                            @if (dropDownOptions.Any())
+                                            {
+                                                <div class="form-group d-inline-block w-auto">
+                                                    <select name="data[@columnName][]" class="form-control" multiple="multiple">
+                                                        @foreach (var option in dropDownOptions)
+                                                        {
+                                                            if (!option.Equals(""))
+                                                            {
+                                                                string[] strsply = option.Split('-');
+                                                                <option value="@strsply[1]">@strsply[0]</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            }
+
                                             dropDownOptions.Clear();
                                         }
                                      </div>
