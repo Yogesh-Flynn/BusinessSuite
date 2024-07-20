@@ -14,10 +14,9 @@ namespace BusinessSuite.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Customers> Customers { get; set; }
         public DbSet<Campaigns> Campaigns { get; set; }
-        public DbSet<Campaigns_Customers> Campaigns_Customers { get; set; }
+        public DbSet<Marketing_Customers> Marketings_Customers { get; set; }
         public DbSet<Marketing> Marketings { get; set; }
         public DbSet<Products> Products { get; set; }
-        public DbSet<Marketing_Products> Marketings_Products { get; set; }
         public DbSet<Campaigns_Marketings> Campaigns_Marketings { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Messages> Messages { get; set; }
@@ -29,36 +28,18 @@ namespace BusinessSuite.Data
             base.OnModelCreating(modelBuilder);
 
 
-            modelBuilder.Entity<Campaigns_Customers>()
-                .HasKey(cc => new { cc.CampaignsId, cc.CustomersId });
+            modelBuilder.Entity<Marketing_Customers>()
+                .HasKey(cc => new { cc.MarketingId, cc.CustomersId });
 
-            modelBuilder.Entity<Campaigns_Customers>()
-                .HasOne(cc => cc.Campaign)
-                .WithMany(c => c.CampaignCustomers)
-                .HasForeignKey(cc => cc.CampaignsId);
-
-            modelBuilder.Entity<Campaigns_Customers>()
-                .HasOne(cc => cc.Customer)
-                .WithMany(c => c.CampaignCustomers)
-                .HasForeignKey(cc => cc.CustomersId);
-            
-            
-            
-            
-            modelBuilder.Entity<Marketing_Products>()
-                .HasKey(cc => new { cc.ProductsId, cc.MarketingsId });
-
-            modelBuilder.Entity<Marketing_Products>()
-                .HasOne(cc => cc.Products)
-                .WithMany(c => c.Product_Marketings)
-                .HasForeignKey(cc => cc.ProductsId);
-
-            modelBuilder.Entity<Marketing_Products>()
+            modelBuilder.Entity<Marketing_Customers>()
                 .HasOne(cc => cc.Marketing)
-                .WithMany(c => c.Product_Marketings)
-                .HasForeignKey(cc => cc.MarketingsId);
-            
-            
+                .WithMany(c => c.Marketings_Customers)
+                .HasForeignKey(cc => cc.MarketingId);
+
+            modelBuilder.Entity<Marketing_Customers>()
+                .HasOne(cc => cc.Customer)
+                .WithMany(c => c.Marketing_Customers)
+                .HasForeignKey(cc => cc.CustomersId);
             
             
             modelBuilder.Entity<Campaigns_Marketings>()
@@ -66,13 +47,18 @@ namespace BusinessSuite.Data
 
             modelBuilder.Entity<Campaigns_Marketings>()
                 .HasOne(cc => cc.Marketing)
-                .WithMany(c => c.MarketingCampaigns)
+                .WithMany(c => c.Campaigns_Marketing)
                 .HasForeignKey(cc => cc.MarketingsId);
 
             modelBuilder.Entity<Campaigns_Marketings>()
                 .HasOne(cc => cc.Campaigns)
-                .WithMany(c => c.MarketingCampaigns)
+                .WithMany(c => c.Campaigns_Marketings)
                 .HasForeignKey(cc => cc.CampaignsId);
+
+            modelBuilder.Entity<Products>()
+           .HasOne(p => p.Marketing)
+           .WithOne(m => m.Products)
+           .HasForeignKey<Marketing>(m => m.ProductId);
         }
 
     }

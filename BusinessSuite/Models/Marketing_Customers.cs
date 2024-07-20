@@ -2,10 +2,10 @@
 
 namespace BusinessSuite.Models
 {
-    public class Campaigns_Customers
+    public class Marketing_Customers
     {
-        public int CampaignsId { get; set; }
-        public Campaigns Campaign { get; set; }
+        public int MarketingId { get; set; }
+        public Marketing Marketing { get; set; }
 
         public int CustomersId { get; set; }
         public Customers Customer { get; set; }

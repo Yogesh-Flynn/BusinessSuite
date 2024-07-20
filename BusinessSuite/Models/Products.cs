@@ -12,6 +12,6 @@ namespace BusinessSuite.Models
         public string UniqueCode { get; set; }
         public int Quantity { get; set; }
 
-        public ICollection<Marketing_Products> Product_Marketings { get; set; }
+        public Marketing Marketing { get; set; }
     }
 }
