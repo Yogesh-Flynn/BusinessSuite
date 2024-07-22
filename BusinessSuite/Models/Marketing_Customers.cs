@@ -4,7 +4,7 @@ namespace BusinessSuite.Models
 {
     public class Marketing_Customers
     {
-        public int MarketingId { get; set; }
+        public int MarketingsId { get; set; }
         public Marketing Marketing { get; set; }
 
         public int CustomersId { get; set; }

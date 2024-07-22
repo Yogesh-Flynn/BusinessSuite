@@ -20,9 +20,9 @@
             var pageIndex = 0;
             var pageSize = 50;
             var tableName = '@ViewData["TableName"]';
-            
+
             fetchData();
-            
+
 
             $('.scroll-container').on('scroll', function () {
                 // Handle the scroll event
@@ -72,6 +72,7 @@
             container.innerHTML = ''; // Clear any existing hidden fields
 
             checkboxes.forEach(function (checkbox) {
+                debugger
                 var name = checkbox.getAttribute('data-name');
                 var id = checkbox.getAttribute('data-id');
 
@@ -83,7 +84,7 @@
             });
         });
 
-         $(document).ready(function () {
+        $(document).ready(function () {
             $('#itemSearch').on('input', function () {
                 var searchValue = $(this).val().toLowerCase();
                 $('#itemsContainer .form-check').filter(function () {
@@ -92,6 +93,7 @@
             });
 
             $('#catalogueForm').on('submit', function (event) {
+                debugger
                 var checkboxes = $('#itemsContainer input[type="checkbox"]:checked');
                 var container = $('#hiddenFieldsContainer');
                 container.empty(); // Clear any existing hidden fields
@@ -188,7 +190,6 @@
     .scroll-container {
         max-height: 400px; /* Set your desired fixed height */
         overflow-y: scroll;
-
     }
 
     /* Optional: To ensure the table header stays fixed while scrolling */
@@ -200,10 +201,10 @@
     }
 
     /* .scroll-container {
-        display: flex;
-        flex-direction: column;
-        overflow-x: auto;
-    } */
+            display: flex;
+            flex-direction: column;
+            overflow-x: auto;
+        } */
 
     .table-header {
         overflow: hidden;
@@ -312,56 +313,59 @@
 </div>
 
 <div class="content-wrapper">
-   @*  <div class="row">
-        <div class="scroll-container table-responsive">
-            <div id="scrollContainer">
-                <table id="dataTable" class="table table-hover table-striped">
-                    <thead>
-                    </thead>
-                    <tbody class="table-body">
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    @*  <div class="row">
+    <div class="scroll-container table-responsive">
+    <div id="scrollContainer">
+    <table id="dataTable" class="table table-hover table-striped">
+    <thead>
+    </thead>
+    <tbody class="table-body">
+    </tbody>
+    </table>
+    </div>
+    </div>
     </div> *@
 
-       
-
-      @*   <a class="btn btn-success btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" data-planid="@plan.PlanId" data-planname="@plan.PlanName" data-plandescription="@plan.PlanDescription" data-planprice="@plan.PlanPrice" data-isactive="@plan.IsActive" data-plantype="@plan.PlanType" data-planduration="@plan.PlanDuration">Edit</a>
-
-        <a class="btn btn-danger btn-sm delete-plan" data-plan-id="@plan.PlanId" href="#">Delete</a>
-     *@<div id="partialContainer"></div>
 
 
-        <!-- Add Plan Modal -->
-        <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
+    @*   <a class="btn btn-success btn-sm edit-plan" data-toggle="modal" data-target="#editPlanModal" data-planid="@plan.PlanId" data-planname="@plan.PlanName" data-plandescription="@plan.PlanDescription" data-planprice="@plan.PlanPrice" data-isactive="@plan.IsActive" data-plantype="@plan.PlanType" data-planduration="@plan.PlanDuration">Edit</a>
+
+    <a class="btn btn-danger btn-sm delete-plan" data-plan-id="@plan.PlanId" href="#">Delete</a>
+    *@<div id="partialContainer"></div>
+
+
+    <!-- Add Plan Modal -->
+    <div class="modal fade" id="addPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
-                    <input type="hidden" name="tableName" value="@tableName" />
-                    <div class="modal-content rounded-0">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <input class="form-control" id="editPlanId" hidden>
-                        <div class="modal-body">
+                <input type="hidden" name="tableName" value="@tableName" />
+                <div class="modal-content rounded-0">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <input class="form-control" id="editPlanId" hidden>
+                    <div class="modal-body">
 
                         @foreach (DataRow row in columnNames.Rows)
                         {
                             var columnName = @row["COLUMN_NAME"].ToString();
                             var columnType = @row["DATA_TYPE"].ToString();
+                            var columnData = @row["coldata"].ToString();
 
                             if (columnType == "bit" || columnType == "datetimeoffset")
                             {
 
-                            }else
+                            }
+                            else
                             {
-                                if (@row["COLUMN_NAME"].ToString().Contains("CreatedDate") || @row["COLUMN_NAME"].ToString().Contains("Id") || @row["COLUMN_NAME"].ToString().Contains("id"))
+                                if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
                                 {
                                     <!-- Skip specific columns -->
-                                }else
+                                }
+                                else
                                 {
                                     <div class="form-group d-inline-block w-auto">
                                         @if (columnType == "int")
@@ -373,18 +377,19 @@
                                             <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." />
                                         }
                                         else if (columnType == "datetime2")
-                                        { 
-                                           @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
-                                            {
-                                                <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
-                                            }
-     *@
+                                        {
+                                            @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                            {
+                            <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                            }
+                            *@
                                             <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
                                         }
                                         else
                                         {
 
-                                            var strsplit = columnType.Split('~');
+                                            var coltype = columnType;
+                                            var strsplit = columnData.Split('~');
 
                                             foreach (var str in strsplit)
                                             {
@@ -395,107 +400,112 @@
                                             }
                                             @if (dropDownOptions.Any())
                                             {
-                                               @*  <div class="form-group d-inline-block w-auto">
-                                                    <select name="data[@columnName]" class="form-control">
-                                                        @foreach (var option in dropDownOptions)
-                                                        {
-                                                            if(!option.Equals("")){
-                                                            string[] strsply = option.Split('-');
-                                                            <option value="@strsply[1]">@strsply[0]</option>
-                                                            }
-                                                        }
-                                                    </select>
-                                                </div> *@
-
-                                                <div class="form-group">
-                                                    <label for="itemSearch" class="control-label">Search Items</label>
-                                                    <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
-                                                </div>
-
-                                                <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
-                                                    <div id="itemsContainer">
-                                                        @foreach (var option in dropDownOptions)
-                                                        {
-                                                            if (!option.Equals(""))
+                                                if (coltype.Equals("oneselect"))
+                                                {
+                                                    <div class="form-group d-inline-block w-auto">
+                                                        <select name="data[@columnName]" class="form-control">
+                                                            @foreach (var option in dropDownOptions)
                                                             {
-                                                                string[] strsply = option.Split('-');
-
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" class="form-check-input" data-name="@strsply[0]" data-id="@strsply[1]" />
-                                                                    <label class="form-check-label">@strsply[0]</label>
-                                                                </div>
+                                                                if (!option.Equals(""))
+                                                                {
+                                                                    string[] strsply = option.Split('-');
+                                                                    <option value="@strsply[1]">@strsply[0]</option>
+                                                                }
                                                             }
-
-                                                        }
+                                                        </select>
                                                     </div>
-                                                </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="form-group">
+                                                        <label for="itemSearch" class="control-label">Search Items</label>
+                                                        <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
+                                                    </div>
 
-                                                <div id="hiddenFieldsContainer"></div>
+                                                    <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
+                                                        <div id="itemsContainer">
+                                                            @foreach (var option in dropDownOptions)
+                                                            {
+                                                                if (!option.Equals(""))
+                                                                {
+                                                                    string[] strsply = option.Split('-');
 
-                                                
+                                                                    <div class="form-check">
+                                                                        <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
+                                                                        <label class="form-check-label">@strsply[0]</label>
+                                                                    </div>
+                                                                }
+
+                                                            }
+                                                        </div>
+                                                    </div>
+
+                                                    <div id="hiddenFieldsContainer"></div>
+                                                }
+
                                             }
 
-                                          
+
 
                                             dropDownOptions.Clear();
                                         }
-                                     </div>
+                                    </div>
                                 }
                             }
                         }
-                        
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-primary">Save</button>
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        
-        
-        <!-- Add file Modal -->
-        <div class="modal fade" id="addFileModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg" role="document">
-                <input type="hidden" name="tableName" value="@tableName" />
-                <div class="modal-content rounded-0">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <h4 class="card-title">Upload File/Download Template</h4>
-                    <div class="form-group">
-                        <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
-                            <div class="form-group">
-                                <label for="file">Select file to upload (xlsx or csv):</label>
-                                <input type="file" name="file" class="form-control" required />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-danger btn-icon-text">
-                                    <i class="ti-upload btn-icon-prepend"></i>
-                                    Upload
-                                </button>
 
-                            </div>
-                        </form>
                     </div>
-                    <div class="form-group">
-                        <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
-                            <div class="form-group">
-                                <label hidden for="tableName">Table Name</label>
-                                <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
-                            </div>
-                            <button type="submit" class="btn btn-primary">Download Template</button>
-                        </form>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </div>
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- Add file Modal -->
+    <div class="modal fade" id="addFileModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <input type="hidden" name="tableName" value="@tableName" />
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPlanModalLabel">Edit Plan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <h4 class="card-title">Upload File/Download Template</h4>
+                <div class="form-group">
+                    <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
+                        <div class="form-group">
+                            <label for="file">Select file to upload (xlsx or csv):</label>
+                            <input type="file" name="file" class="form-control" required />
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-danger btn-icon-text">
+                                <i class="ti-upload btn-icon-prepend"></i>
+                                Upload
+                            </button>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="form-group">
+                    <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                        <div class="form-group">
+                            <label hidden for="tableName">Table Name</label>
+                            <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Download Template</button>
+                    </form>
+                </div>
             </div>
-        </div> 
-        <!-- Add column Modal -->
+        </div>
+    </div>
+    <!-- Add column Modal -->
     <!-- Add column Modal -->
     <div class="modal fade" id="addColumnModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
@@ -562,8 +572,8 @@
         </div>
     </div>
 
-    
-    
+
+
     <!-- Edit Plan Modal -->
     <div class="modal fade" id="editPlanModal" tabindex="-1" role="dialog" aria-labelledby="editPlanModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">

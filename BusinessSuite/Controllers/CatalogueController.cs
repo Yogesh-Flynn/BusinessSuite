@@ -10,11 +10,12 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
 using System.Globalization;
 using System.Text;
+using X.PagedList;
 using static System.Runtime.InteropServices.Marshalling.IIUnknownCacheStrategy;
 
 namespace BusinessSuite.Controllers
 {
-   
+
     public class CatalogueController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -50,7 +51,7 @@ namespace BusinessSuite.Controllers
                             DateTime datecreated = reader.GetDateTime(7);
                             Catalogues catalogues = new Catalogues();
                             catalogues.Name = tableName;
-                            catalogues.CreatedDate= datecreated;
+                            catalogues.CreatedDate = datecreated;
                             tableNames.Add(catalogues);
                         }
                     }
@@ -242,6 +243,7 @@ WHERE
                 }
 
 
+                columnSchema.Columns.Add("coldata");
                 ////////////////////////////////////////
                 foreach (DataRow row in columnSchemaDetail.Rows)
                 {
@@ -251,7 +253,7 @@ WHERE
                     var referencedColumn = row["ReferencedColumn"].ToString();
 
                     String[] tablename = referencingtable.Split('_');
-                    if(tablename.Length > 1)
+                    if (tablename.Length > 1)
                     {
                         if (tablename[0].Contains(szTableName))
                         {
@@ -288,18 +290,18 @@ WHERE
                                 }
                             }
 
-                          
+
                             String data = "";
                             foreach (DataRow item in tableSchema.Rows)
                             {
-                               data=data+'~'+ item["Name"].ToString()+"-"+ item["Id"].ToString();
+                                data = data + '~' + item["Name"].ToString() + "-" + item["Id"].ToString();
                             }
                             if (!data.Equals(""))
                             {
                                 data = data.Substring(1);
-                               
+
                             }
-                            columnSchema.Rows.Add(table, data);
+                            columnSchema.Rows.Add(table, "manyselect", data);
 
                         }
                     }
@@ -341,8 +343,8 @@ WHERE
                             string namecol = "";
                             foreach (DataColumn dataColumn in tableSchema.Columns)
                             {
-                                string colname= dataColumn.ColumnName;
-                                if(colname.Contains("Name"))
+                                string colname = dataColumn.ColumnName;
+                                if (colname.Contains("Name"))
                                 {
                                     namecol = colname;
                                 }
@@ -357,7 +359,9 @@ WHERE
                                 data = data.Substring(1);
 
                             }
-                            columnSchema.Rows.Add(referencedtable, data);
+                            // Delete a row by Name
+                            DeleteRowByName(columnSchema, referencingColumn);
+                            columnSchema.Rows.Add(referencingColumn, "oneselect", data);
 
                         }
                     }
@@ -365,7 +369,7 @@ WHERE
 
 
                 /////////////////////////////////////////////////////
-                
+
 
 
 
@@ -388,7 +392,23 @@ WHERE
                 return StatusCode(500, "Internal server error");
             }
         }
+        void DeleteRowByName(DataTable table, string name)
+        {
+            DataRow rowToDelete = null;
+            foreach (DataRow row in table.Rows)
+            {
+                if (row["COLUMN_NAME"].ToString() == name)
+                {
+                    rowToDelete = row;
+                    break;
+                }
+            }
 
+            if (rowToDelete != null)
+            {
+                table.Rows.Remove(rowToDelete);
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetTableData(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
@@ -397,7 +417,7 @@ WHERE
             {
                 DataTable columnSchema = new DataTable();
                 DataTable columnSchemaDetail = new DataTable();
-                DataTable columnSchemaDetail1= new DataTable();
+                DataTable columnSchemaDetail1 = new DataTable();
                 List<string> tableNames = new List<string>();
                 // Query to get column names and data types for the specific table
                 string getColumnNamesQuery = @"
@@ -511,6 +531,15 @@ WHERE
 
                         }
                     }
+                    else
+                    {
+                        if(columnSchemaDetail.Rows.Count>1 && !referencedtable.Equals(szTableName))
+                        {
+                            columnSchema.Rows.Add(referencedtable, "int");
+                        }
+                        //DeleteRowByName(columnSchema, referencingColumn);
+                        //columnSchema.Rows.Add(referencedtable, "int");
+                    }
                 }
 
 
@@ -545,9 +574,9 @@ WHERE
                 foreach (DataRow row1 in columnSchema1.Rows)
                 {
                     two.Add(row1["COLUMN_NAME"].ToString());
-                    
+
                 }
-              
+
 
 
                 var nonMatchingFromOne = one.Except(two).ToList();
@@ -570,7 +599,7 @@ WHERE
                         }
 
                     }
-                   
+
                 }
 
                 //////////////////////////
@@ -632,34 +661,115 @@ WHERE
                 DataTable tableSchema1 = new DataTable();
 
                 var displaycols = "";
+                var displaygroupby= "";
                 int cnt = 0;
                 foreach (var item in nonMatching)
                 {
-                    displaycols += $"p{cnt}.Name AS {item}Name,";
+                    if (thirdtable.Count == 1)
+                    {
+                        if (thirdtable[0].Contains(item))
+                        {
+
+                            displaycols += $"m.Id,m.Name,m.Description,STRING_AGG(p{cnt}.Name, ', ') AS {item},";
+                            displaygroupby += $"GROUP BY m.Id, m.Name, m.Description,";
+
+                        }
+                        else
+                        {
+                            displaycols += $"p{cnt}.Name AS {item}Name,";
+                            displaygroupby += $"p{cnt}.Name";
+                        }
+                    }
+                    else
+                    {
+                        displaycols += $"p{cnt}.Name AS {item}Name,";
+                    }
                     cnt++;
                 }
                 var leftjoin = "";
-                 cnt = 0;
+                cnt = 0;
+
+
+                /*  SELECT 
+        m.Id,
+        m.Name,
+        m.Description,
+        m.ProductId,
+        STRING_AGG(p0.Name, ', ') AS Customers,
+        p1.Name AS ProductsName,
+        ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
+    FROM 
+        Marketings m
+    LEFT JOIN 
+        Marketings_Customers mp0 ON m.Id = mp0.MarketingId
+    LEFT JOIN 
+        Customers p0 ON mp0.CustomersId = p0.Id 
+    LEFT JOIN 
+        Products p1 ON m.ProductId = p1.Id
+    GROUP BY 
+        m.Id, m.Name, m.Description, m.ProductId, p1.Name*/
+
                 foreach (var item in nonMatching)
                 {
-                    leftjoin += $@" LEFT JOIN 
+                    if (thirdtable.Count == 0)
+                    {
+                    }
+                    else
+                    {
+                        if (thirdtable.Count == 1)
+                        {
+                            if (thirdtable[0].Contains(item))
+                            {
+                                leftjoin += $@" LEFT JOIN 
+                                        {thirdtable[0]} mp{cnt} ON m.Id = mp{cnt}.{szTableName + "Id"}
+                                         LEFT JOIN 
+                                        {item} p{cnt} ON mp{cnt}.{item + "Id"} = p{cnt}.Id";
+                            }
+                            else
+                            {
+                                leftjoin += $@" 
+                                             LEFT JOIN 
+                                            {item} p{cnt} ON m.{item + "Id"} = p{cnt}.Id";
+                            }
+                        }
+                        else
+                        {
+                            leftjoin += $@" LEFT JOIN 
                                         {thirdtable[cnt]} mp{cnt} ON m.Id = mp{cnt}.{szTableName + "Id"}
                                          LEFT JOIN 
                                         {item} p{cnt} ON mp{cnt}.{item + "Id"} = p{cnt}.Id";
+
+                        }
+                    }
                     cnt++;
                 }
-                string createTableQuery1 = @$"
+                string createTableQuery1 = "";
+                if (displaygroupby.Equals(""))
+                {
+                    createTableQuery1 = @$"
+                        SELECT * FROM (
+                             SELECT *,
+                     ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
+                 FROM 
+                     {szTableName} m
+                {leftjoin}
+                        ) AS SubQuery 
+                        WHERE 
+                            RowNum > (@PageIndex * @PageSize) AND RowNum <= ((@PageIndex + 1) * @PageSize)";
+                }
+                else
+                {
+                     createTableQuery1 = @$"
             SELECT * FROM (
-                 SELECT 
-         m.*,{displaycols}
+                 SELECT {displaycols}
          ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
      FROM 
          {szTableName} m
-    {leftjoin}
+    {leftjoin} {displaygroupby}
             ) AS SubQuery 
             WHERE 
                 RowNum > (@PageIndex * @PageSize) AND RowNum <= ((@PageIndex + 1) * @PageSize)";
-
+                }
                 using (SqlCommand command = new SqlCommand(createTableQuery1, _connection))
                 {
                     command.Parameters.AddWithValue("@PageIndex", szPageIndex);
@@ -698,21 +808,6 @@ WHERE
             }
             catch (Exception ex)
             {
-                DataTable tableSchema = new DataTable();
-                string createTableQuery = @$"SELECT * FROM {szTableName}";
-
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
-                {
-
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                    {
-                        adapter.Fill(tableSchema);
-                    }
-                }
-
-                var jsonData = DataTableToJson(tableSchema);
-                return Json(jsonData);
-
                 _logger.LogError(ex, "An error occurred while fetching table data.");
                 return RedirectToAction("Error");
             }
@@ -732,10 +827,11 @@ WHERE
                     {
                         dict[col.ColumnName] = rwdata;
                     }
-                    else {
+                    else
+                    {
                         dict[col.ColumnName] = "-";
                     }
-                    
+
                 }
                 list.Add(dict);
             }
@@ -796,9 +892,9 @@ WHERE
 
                 using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
                 {
-                   
+
                     await command.ExecuteNonQueryAsync();
-                   
+
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after creating the table
@@ -829,9 +925,9 @@ WHERE
 
                 using (SqlCommand command = new SqlCommand(renameTableQuery, _connection))
                 {
-                    
+
                     await command.ExecuteNonQueryAsync();
-                 
+
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after renaming the table
@@ -859,9 +955,9 @@ WHERE
 
                 using (SqlCommand command = new SqlCommand(dropTableQuery, _connection))
                 {
-                    
+
                     await command.ExecuteNonQueryAsync();
-                   
+
                 }
 
                 return RedirectToAction("Index"); // Redirect to the catalogues list after deleting the table
@@ -919,9 +1015,9 @@ WHERE
 
                 using (SqlCommand command = new SqlCommand(deleteColumnQuery, _connection))
                 {
-                   
+
                     await command.ExecuteNonQueryAsync();
-                    
+
                 }
 
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
@@ -947,7 +1043,7 @@ WHERE
                     WHERE TABLE_NAME = @TableName
                     ORDER BY ORDINAL_POSITION";
 
-               
+
 
                 // Fetch column names for the specified table
                 using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
@@ -981,8 +1077,15 @@ WHERE
 
                     }
                 }
+                List<(string, string)> values1 = new List<(string, string)>();
+                Dictionary<string, string> thirddata = new Dictionary<string, string>();
+                foreach (var item in data)
+                {
+                    string sztablename = item.Key.ToString();
+                    string[] table = sztablename.Split('~');
 
-
+                    values1.Add((table[1], item.Value));
+                }
 
 
                 Dictionary<string, string> insertedData = new Dictionary<string, string>();
@@ -1005,12 +1108,12 @@ WHERE
                 {
                     string[] parts = values.Split(',');
 
-                   foreach(var x in parts)
+                    foreach (var x in parts)
                     {
-                        if(x.Contains(":"))
+                        if (x.Contains(":"))
                         {
-                            
-                            output +="'"+ DateTime.Now+"'"+",";
+
+                            output += "'" + DateTime.Now + "'" + ",";
                         }
                         else
                         {
@@ -1038,9 +1141,15 @@ WHERE
                     insertedData.Add(tableName, insertedId.ToString());
                     //return insertedId; // Assuming you want to return the inserted ID from your method
                 }
-                foreach (var entry in data)
+                foreach(var entry in values1)
                 {
-                    insertedData.Add(entry.Key, entry.Value);
+                    var x = entry.Item1;
+                    var y = entry.Item2;
+
+                }
+                foreach (var entry in values1)
+                {
+                    insertedData.Add(entry.Item1, entry.Item2);
                     ////////////////////////////////////////
                     ///
                     List<string> tableNames = new List<string>();
@@ -1053,7 +1162,7 @@ WHERE
                         WHERE TABLE_TYPE = 'BASE TABLE'
                         ORDER BY TABLE_NAME";
 
-                 
+
 
                     // Fetch all table names
                     using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
@@ -1114,7 +1223,7 @@ WHERE
                                                             AND PKCU.TABLE_NAME = @TableA;";
                         using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
                         {
-                            command.Parameters.AddWithValue("@TableA", entry.Key);
+                            command.Parameters.AddWithValue("@TableA", entry.Item1);
                             command.Parameters.AddWithValue("@TableB", item);
                             using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                             {
@@ -1172,7 +1281,7 @@ WHERE
                     }
 
                     string cols = "";
-                    string paramsq= "";
+                    string paramsq = "";
                     string newtabname = "";
                     ////////////////////////////////////////
                     foreach (DataRow row in columnSchemaDetail.Rows)
@@ -1182,14 +1291,14 @@ WHERE
                         var referencedtable = row["ReferencedTable"].ToString();
                         var referencedColumn = row["ReferencedColumn"].ToString();
 
-                        if(referencingtable.Contains(entry.Key) && referencingtable.Contains(tableName))
+                        if (referencingtable.Contains(entry.Item1) && referencingtable.Contains(tableName))
                         {
                             newtabname = referencingtable;
-                            cols = cols + ","+ referencingColumn;
-                            paramsq= paramsq + ","+ insertedData[referencedtable];
+                            cols = cols + "," + referencingColumn;
+                            paramsq = paramsq + "," + insertedData[referencedtable];
                         }
 
-                      
+
                     }
                     cols = cols.Substring(1);
                     paramsq = paramsq.Substring(1);
@@ -1206,12 +1315,14 @@ WHERE
                         //return insertedId; // Assuming you want to return the inserted ID from your method
                     }
                     /////////////////////////////////////////////
+                    ///
+                    insertedData.Remove(entry.Item1);
                 }
 
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
-             {
+            {
                 _logger.LogError(ex, "An error occurred while adding the data.");
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
@@ -1226,9 +1337,9 @@ WHERE
 
         //        using (SqlCommand command = new SqlCommand(deleteDataQuery, _connection))
         //        {
-                   
+
         //            await command.ExecuteNonQueryAsync();
-                    
+
         //        }
 
         //        return RedirectToAction("GetTableData", new { szTableName = tableName });
@@ -1250,9 +1361,9 @@ WHERE
 
         //        using (SqlCommand command = new SqlCommand(updateDataQuery, _connection))
         //        {
-                   
+
         //            await command.ExecuteNonQueryAsync();
-                    
+
         //        }
 
         //        return RedirectToAction("GetTableData", new { szTableName = tableName });
@@ -1265,7 +1376,7 @@ WHERE
         //}
 
         [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile file,string tablename)
+        public async Task<IActionResult> UploadFile(IFormFile file, string tablename)
         {
             if (file == null || (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && file.ContentType != "text/csv"))
             {
@@ -1307,7 +1418,7 @@ WHERE
                     {
                         var columnNames = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
                         var parameters = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"@{c.ColumnName}"));
-                        
+
                         var insertCommandText = $"INSERT INTO {tablename} ({columnNames},CreatedDate) VALUES ({parameters},'{DateTime.Now}')";
                         using (var command = new SqlCommand(insertCommandText, _connection))
                         {
@@ -1349,16 +1460,16 @@ WHERE
             var dataTable = new DataTable();
             try
             {
-               
-                    var query = $"SELECT TOP 0 * FROM {tableName}";
-                    using (var command = new SqlCommand(query, _connection))
+
+                var query = $"SELECT TOP 0 * FROM {tableName}";
+                using (var command = new SqlCommand(query, _connection))
+                {
+                    using (var adapter = new SqlDataAdapter(command))
                     {
-                        using (var adapter = new SqlDataAdapter(command))
-                        {
-                            adapter.Fill(dataTable);
-                        }
+                        adapter.Fill(dataTable);
                     }
-                
+                }
+
                 using (var workbook = new XLWorkbook())
                 {
                     var worksheet = workbook.Worksheets.Add("Template");

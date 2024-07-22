@@ -131,26 +131,25 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("ProductsId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ProductId")
-                        .IsUnique();
+                    b.HasIndex("ProductsId");
 
                     b.ToTable("Marketings");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Marketing_Customers", b =>
                 {
-                    b.Property<int>("MarketingId")
+                    b.Property<int>("MarketingsId")
                         .HasColumnType("int");
 
                     b.Property<int>("CustomersId")
                         .HasColumnType("int");
 
-                    b.HasKey("MarketingId", "CustomersId");
+                    b.HasKey("MarketingsId", "CustomersId");
 
                     b.HasIndex("CustomersId");
 
@@ -509,8 +508,8 @@ namespace BusinessSuite.Migrations
             modelBuilder.Entity("BusinessSuite.Models.Marketing", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Products", "Products")
-                        .WithOne("Marketing")
-                        .HasForeignKey("BusinessSuite.Models.Marketing", "ProductId")
+                        .WithMany("Marketings")
+                        .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -527,7 +526,7 @@ namespace BusinessSuite.Migrations
 
                     b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
                         .WithMany("Marketings_Customers")
-                        .HasForeignKey("MarketingId")
+                        .HasForeignKey("MarketingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -628,8 +627,7 @@ namespace BusinessSuite.Migrations
 
             modelBuilder.Entity("BusinessSuite.Models.Products", b =>
                 {
-                    b.Navigation("Marketing")
-                        .IsRequired();
+                    b.Navigation("Marketings");
                 });
 #pragma warning restore 612, 618
         }

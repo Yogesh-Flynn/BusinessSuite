@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240719080304_xxxx")]
-    partial class xxxx
+    [Migration("20240722055729_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -43,21 +43,6 @@ namespace BusinessSuite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Campaigns");
-                });
-
-            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Customers", b =>
-                {
-                    b.Property<int>("CampaignsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CustomersId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CampaignsId", "CustomersId");
-
-                    b.HasIndex("CustomersId");
-
-                    b.ToTable("Campaigns_Customers");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketings", b =>
@@ -149,24 +134,29 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductsId");
 
                     b.ToTable("Marketings");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Marketing_Products", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Marketing_Customers", b =>
                 {
-                    b.Property<int>("ProductsId")
-                        .HasColumnType("int");
-
                     b.Property<int>("MarketingsId")
                         .HasColumnType("int");
 
-                    b.HasKey("ProductsId", "MarketingsId");
+                    b.Property<int>("CustomersId")
+                        .HasColumnType("int");
 
-                    b.HasIndex("MarketingsId");
+                    b.HasKey("MarketingsId", "CustomersId");
 
-                    b.ToTable("Marketings_Products");
+                    b.HasIndex("CustomersId");
+
+                    b.ToTable("Marketings_Customers");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Messages", b =>
@@ -499,35 +489,16 @@ namespace BusinessSuite.Migrations
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Campaigns_Customers", b =>
-                {
-                    b.HasOne("BusinessSuite.Models.Campaigns", "Campaign")
-                        .WithMany("CampaignCustomers")
-                        .HasForeignKey("CampaignsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BusinessSuite.Models.Customers", "Customer")
-                        .WithMany("CampaignCustomers")
-                        .HasForeignKey("CustomersId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Campaign");
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("BusinessSuite.Models.Campaigns_Marketings", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Campaigns", "Campaigns")
-                        .WithMany("MarketingCampaigns")
+                        .WithMany("Campaigns_Marketings")
                         .HasForeignKey("CampaignsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
-                        .WithMany("MarketingCampaigns")
+                        .WithMany("Campaigns_Marketing")
                         .HasForeignKey("MarketingsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -537,23 +508,34 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Marketing");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Marketing_Products", b =>
+            modelBuilder.Entity("BusinessSuite.Models.Marketing", b =>
                 {
-                    b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
-                        .WithMany("Product_Marketings")
-                        .HasForeignKey("MarketingsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("BusinessSuite.Models.Products", "Products")
-                        .WithMany("Product_Marketings")
+                        .WithMany("Marketings")
                         .HasForeignKey("ProductsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Marketing");
-
                     b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Marketing_Customers", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Customers", "Customer")
+                        .WithMany("Marketing_Customers")
+                        .HasForeignKey("CustomersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BusinessSuite.Models.Marketing", "Marketing")
+                        .WithMany("Marketings_Customers")
+                        .HasForeignKey("MarketingsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Marketing");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Notification", b =>
@@ -631,26 +613,24 @@ namespace BusinessSuite.Migrations
 
             modelBuilder.Entity("BusinessSuite.Models.Campaigns", b =>
                 {
-                    b.Navigation("CampaignCustomers");
-
-                    b.Navigation("MarketingCampaigns");
+                    b.Navigation("Campaigns_Marketings");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Customers", b =>
                 {
-                    b.Navigation("CampaignCustomers");
+                    b.Navigation("Marketing_Customers");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Marketing", b =>
                 {
-                    b.Navigation("MarketingCampaigns");
+                    b.Navigation("Campaigns_Marketing");
 
-                    b.Navigation("Product_Marketings");
+                    b.Navigation("Marketings_Customers");
                 });
 
             modelBuilder.Entity("BusinessSuite.Models.Products", b =>
                 {
-                    b.Navigation("Product_Marketings");
+                    b.Navigation("Marketings");
                 });
 #pragma warning restore 612, 618
         }

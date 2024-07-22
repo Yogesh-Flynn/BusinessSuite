@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessSuite.Models
 {
@@ -9,7 +10,9 @@ namespace BusinessSuite.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
-        public int ProductId { get; set; }
+        
+        [ForeignKey("Products")]
+        public int ProductsId { get; set; }
         public Products Products { get; set; }
 
         public ICollection<Marketing_Customers> Marketings_Customers { get; set; }

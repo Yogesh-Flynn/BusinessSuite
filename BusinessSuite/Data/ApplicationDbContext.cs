@@ -29,12 +29,12 @@ namespace BusinessSuite.Data
 
 
             modelBuilder.Entity<Marketing_Customers>()
-                .HasKey(cc => new { cc.MarketingId, cc.CustomersId });
+                .HasKey(cc => new { cc.MarketingsId, cc.CustomersId });
 
             modelBuilder.Entity<Marketing_Customers>()
                 .HasOne(cc => cc.Marketing)
                 .WithMany(c => c.Marketings_Customers)
-                .HasForeignKey(cc => cc.MarketingId);
+                .HasForeignKey(cc => cc.MarketingsId);
 
             modelBuilder.Entity<Marketing_Customers>()
                 .HasOne(cc => cc.Customer)
@@ -56,9 +56,11 @@ namespace BusinessSuite.Data
                 .HasForeignKey(cc => cc.CampaignsId);
 
             modelBuilder.Entity<Products>()
-           .HasOne(p => p.Marketing)
-           .WithOne(m => m.Products)
-           .HasForeignKey<Marketing>(m => m.ProductId);
+            .HasMany(p => p.Marketings)
+            .WithOne(m => m.Products)
+            .HasForeignKey(m => m.ProductsId)
+            .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }
