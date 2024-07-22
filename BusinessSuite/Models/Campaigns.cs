@@ -9,6 +9,7 @@ namespace BusinessSuite.Models
         public string Name { get; set; }
 
         public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime ScheduledDate { get; set; } = DateTime.Now;
 
         public ICollection<Campaigns_Marketings> Campaigns_Marketings { get; set; }
     }
