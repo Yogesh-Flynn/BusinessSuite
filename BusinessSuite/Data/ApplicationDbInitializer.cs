@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using BusinessSuite.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace BusinessSuite.Data
 {
@@ -21,10 +22,12 @@ namespace BusinessSuite.Data
                 }
             }
 
-            var powerUser = new IdentityUser
+            var powerUser = new ApplicationUser
             {
                 UserName = "admin@domain.com",
                 Email = "admin@domain.com",
+                FirstName = "SuperAdmin",
+                LastName = "Test", 
             };
 
             string userPassword = "Admin@123";
@@ -38,6 +41,9 @@ namespace BusinessSuite.Data
                     await userManager.AddToRoleAsync(powerUser, "Admin");
                 }
             }
+
+
+
         }
     }
 }
