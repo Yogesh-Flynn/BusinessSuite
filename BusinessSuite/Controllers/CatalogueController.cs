@@ -1125,7 +1125,18 @@ WHERE
                         if (x.Contains(":"))
                         {
 
-                            output += "'" + DateTime.Now + "'" + ",";
+                           
+
+                            string time = x.Replace("'","");
+                            time = time.Trim();
+                            // Parse the input string into a DateTime object
+                            DateTime dateTime = DateTime.ParseExact(time, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
+
+                            // Format the DateTime object to the desired string format
+                            string formattedTime = dateTime.ToString("M/d/yyyy h:mm tt", CultureInfo.InvariantCulture);
+
+                            Console.WriteLine(formattedTime);
+                            output += "'" + formattedTime + "'" + ",";
                         }
                         else
                         {
@@ -1138,7 +1149,6 @@ WHERE
                     values = output.Substring(0, output.Length - 1);
 
                 }
-
 
                 string campaignId = "";
 
