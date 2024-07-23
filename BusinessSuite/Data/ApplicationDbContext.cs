@@ -19,7 +19,7 @@ namespace BusinessSuite.Data
         public DbSet<Products> Products { get; set; }
         public DbSet<Campaigns_Marketings> Campaigns_Marketings { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        public DbSet<Messages> Messages { get; set; }
+        public DbSet<Message> Messages { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

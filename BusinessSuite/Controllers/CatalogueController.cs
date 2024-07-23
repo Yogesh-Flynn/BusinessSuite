@@ -1,8 +1,12 @@
-﻿using BusinessSuite.Models;
+﻿using Azure.Core;
+using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using BusinessSuite.Services;
 using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Office2010.Excel;
+using DocumentFormat.OpenXml.Office2016.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -18,11 +22,13 @@ namespace BusinessSuite.Controllers
 
     public class CatalogueController : Controller
     {
+        private readonly MyJobService _jobService;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private readonly SqlConnection _connection;
-        public CatalogueController(ILogger<HomeController> logger, IConfiguration configuration)
+        public CatalogueController(MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration)
         {
+            _jobService = jobService;
             _logger = logger;
             _configuration = configuration;
             _connection = new SqlConnection(_configuration.GetConnectionString("customDBConn"));
@@ -670,8 +676,8 @@ WHERE
                         if (thirdtable[0].Contains(item))
                         {
 
-                            displaycols += $"m.Id,m.Name,m.Description,STRING_AGG(p{cnt}.Name, ', ') AS {item},";
-                            displaygroupby += $"GROUP BY m.Id, m.Name, m.Description,";
+                            displaycols += $"m.Id,m.Name,STRING_AGG(p{cnt}.Name, ', ') AS {item},";
+                            displaygroupby += $"GROUP BY m.Id, m.Name,";
 
                         }
                         else
@@ -744,6 +750,12 @@ WHERE
                     cnt++;
                 }
                 string createTableQuery1 = "";
+                if (displaygroupby.EndsWith(","))
+                {
+                    // Remove the comma from the end
+                    displaygroupby = displaygroupby.TrimEnd(',');
+                }
+
                 if (displaygroupby.Equals(""))
                 {
                     createTableQuery1 = @$"
@@ -1128,7 +1140,7 @@ WHERE
                 }
 
 
-
+                string campaignId = "";
 
 
                 string insertDataQuery = $@"
@@ -1139,14 +1151,10 @@ WHERE
                 {
                     var insertedId = await command.ExecuteScalarAsync();
                     insertedData.Add(tableName, insertedId.ToString());
+                    campaignId=insertedId.ToString();
                     //return insertedId; // Assuming you want to return the inserted ID from your method
                 }
-                foreach(var entry in values1)
-                {
-                    var x = entry.Item1;
-                    var y = entry.Item2;
-
-                }
+             
                 foreach (var entry in values1)
                 {
                     insertedData.Add(entry.Item1, entry.Item2);
@@ -1316,9 +1324,62 @@ WHERE
                     }
                     /////////////////////////////////////////////
                     ///
+                    if (tableName.Equals("Campaigns"))
+                    {
+
+
+                        string query = @$"SELECT 
+                            m.Id AS MarketingId,
+                            c.Id AS CampaignId,
+					        c.ScheduledDate as ScheduledDate,
+                            m.Message as Message,
+                            p0.PhoneNumber as PhoneNumber,
+                            p0.Name AS CustomerName,
+                            ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
+                        FROM 
+                            Marketings m
+                        LEFT JOIN 
+                            Marketings_Customers mp0 ON m.Id = mp0.MarketingsId
+                        LEFT JOIN 
+                            Customers p0 ON mp0.CustomersId = p0.Id 
+                        LEFT JOIN 
+                            Campaigns_Marketings cm ON m.Id = cm.MarketingsId
+                        LEFT JOIN 
+                            Campaigns c ON cm.CampaignsId = c.Id
+                        WHERE 
+                            c.Id = {campaignId}
+                                         ";
+                        DataTable dataTable = new DataTable();
+                        using (SqlCommand command = new SqlCommand(query, _connection))
+                        {
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                            {
+                                adapter.Fill(dataTable);
+                            }
+                        }
+
+                        foreach (DataRow row in dataTable.Rows)
+                        {
+                            var PhoneNumber = row["PhoneNumber"].ToString();
+                            var Message = row["Message"].ToString();
+                            var ScheduledDate = row["ScheduledDate"].ToString();
+                            string scheduledDateString = row["ScheduledDate"].ToString();
+                            DateTime scheduledDate;
+
+                            if (DateTime.TryParse(scheduledDateString, out scheduledDate))
+                            {
+                                // scheduledDate now contains the parsed date
+                                Console.WriteLine("Parsed Date: " + scheduledDate);
+                            }
+                            BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
+                        }
+                        //BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber, request.MessageText, request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
+
+                    }
                     insertedData.Remove(entry.Item1);
                 }
 
+              
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
             catch (Exception ex)
