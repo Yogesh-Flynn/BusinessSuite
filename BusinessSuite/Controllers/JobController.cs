@@ -19,7 +19,7 @@ namespace BusinessSuite.Controllers
         public IActionResult ScheduleJob(Message request)
         {
             // Schedule a job to store data at the specified time
-            BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber,request.MessageText,request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
+            //BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber,request.MessageText,request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
 
             return Ok("Job scheduled successfully");
         }

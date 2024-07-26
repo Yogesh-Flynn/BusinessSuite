@@ -14,14 +14,14 @@ namespace BusinessSuite.Services
             _logger = logger;
         }
 
-        public async Task StoreDataAsync(string PhoneNumber,string MessageText,string status, DateTime createdAt)
-        {
-            var data = new Message { PhoneNumber = PhoneNumber,MessageText=MessageText, ScheduleTime = createdAt,Status="Pending",IsDeleted=false};
+        //public async Task StoreDataAsync(string PhoneNumber,string MessageText,string status, DateTime createdAt)
+        //{
+        //    var data = new Message { PhoneNumber = PhoneNumber,MessageText=MessageText, ScheduleTime = createdAt,Status="Pending",IsDeleted=false};
 
-            _context.Messages.Add(data);
-            await _context.SaveChangesAsync();
+        //    _context.Messages.Add(data);
+        //    await _context.SaveChangesAsync();
 
-            _logger.LogInformation("Data stored successfully at {Time}", DateTime.UtcNow);
-        }
+        //    _logger.LogInformation("Data stored successfully at {Time}", DateTime.UtcNow);
+        //}
     }
 }

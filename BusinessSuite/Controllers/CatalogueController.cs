@@ -1381,7 +1381,7 @@ WHERE
                                 // scheduledDate now contains the parsed date
                                 Console.WriteLine("Parsed Date: " + scheduledDate);
                             }
-                            BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
+                           // BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
                         }
                         //BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber, request.MessageText, request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
 

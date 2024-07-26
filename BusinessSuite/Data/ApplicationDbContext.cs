@@ -12,6 +12,22 @@ namespace BusinessSuite.Data
         }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Company> Companies { get; set; }
+        
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            base.OnModelCreating(modelBuilder);
+
+        }
+
+    } 
+    public class CRMDbContext : DbContext
+    {
+        public CRMDbContext(DbContextOptions<CRMDbContext> options)
+            : base(options)
+        {
+        }
         public DbSet<Customers> Customers { get; set; }
         public DbSet<Campaigns> Campaigns { get; set; }
         public DbSet<Marketing_Customers> Marketings_Customers { get; set; }
