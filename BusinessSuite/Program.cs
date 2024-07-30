@@ -56,7 +56,9 @@ using (var scope = app.Services.CreateScope())
 
     try
     {
-        await ApplicationDbInitializer.SeedRolesAndUsersAsync(services);
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        
+        await ApplicationDbInitializer.SeedRolesAndUsersAsync(services, context);
     }
     catch (Exception ex)
     {

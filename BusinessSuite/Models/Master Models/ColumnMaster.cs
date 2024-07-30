@@ -9,6 +9,7 @@ namespace BusinessSuite.Models.Master_Models
         public int Id { get; set; }
         public string DisplayName { get; set; }
         public string Name { get; set; }
+        public string Type { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public bool Visibility { get; set; }
         public bool IsDeleted { get; set; }
