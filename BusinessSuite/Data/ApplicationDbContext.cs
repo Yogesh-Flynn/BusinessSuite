@@ -1,4 +1,5 @@
 ﻿using BusinessSuite.Models;
+using BusinessSuite.Models.Master_Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,6 +13,13 @@ namespace BusinessSuite.Data
         }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<ColumnMaster> ColumnMasters { get; set; }
+        public DbSet<DatabaseMaster> DatabaseMasters { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Module> Modules { get; set; }
+        public DbSet<PermissionMaster> PermissionMasters { get; set; }
+        public DbSet<TableMaster> TableMasters { get; set; }
+        public DbSet<Website> Websites { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
