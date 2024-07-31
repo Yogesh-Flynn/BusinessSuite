@@ -100,6 +100,7 @@ namespace BusinessSuite.Controllers
                 _connection.Open();
 
 
+                TempData["DbMasterId"] = szDatabaseMasterId;
 
 
 
@@ -378,7 +379,6 @@ WHERE
 
 
 
-
                 ViewBag.TableNames = tableNames;
                 ViewBag.ColumnNames = columnSchema;
 
@@ -419,6 +419,13 @@ WHERE
         {
             try
             {
+
+                int? szDatabaseMasterId = TempData["DbMasterId"] as int?;
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+                TempData["DbMasterId"] = szDatabaseMasterId;
+
                 DataTable columnSchema = new DataTable();
                 DataTable columnSchemaDetail = new DataTable();
                 DataTable columnSchemaDetail1 = new DataTable();
@@ -821,6 +828,10 @@ WHERE
                 _logger.LogError(ex, "An error occurred while fetching table data.");
                 return RedirectToAction("Error");
             }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
         private List<Dictionary<string, object>> DataTableToJson(DataTable table)
@@ -1044,6 +1055,12 @@ WHERE
         {
             try
             {
+
+                int? szDatabaseMasterId = TempData["DbMasterId"] as int?;
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+                TempData["DbMasterId"] = szDatabaseMasterId;
 
                 DataTable columnSchema = new DataTable();
                 // Query to get column names and data types for the specific table
@@ -1394,6 +1411,10 @@ WHERE
             {
                 _logger.LogError(ex, "An error occurred while adding the data.");
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
+            }
+            finally
+            {
+                _connection.Close();
             }
         }
 
