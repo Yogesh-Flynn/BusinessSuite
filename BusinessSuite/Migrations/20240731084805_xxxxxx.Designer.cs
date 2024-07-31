@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240730091902_xxxxxx")]
+    [Migration("20240731084805_xxxxxx")]
     partial class xxxxxx
     {
         /// <inheritdoc />
@@ -218,7 +218,12 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("WebsiteId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("Websites");
                 });
@@ -536,6 +541,13 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabaseMasters");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.Website", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Master_Models.Website", null)
+                        .WithMany("Websites")
+                        .HasForeignKey("WebsiteId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -613,6 +625,8 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabasesMaster");
 
                     b.Navigation("Modules");
+
+                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

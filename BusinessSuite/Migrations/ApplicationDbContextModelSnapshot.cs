@@ -108,6 +108,35 @@ namespace BusinessSuite.Migrations
                     b.ToTable("DatabaseMasters");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.MasterUICodes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PageCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WebsiteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteId");
+
+                    b.ToTable("MasterUICodes");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.Module", b =>
                 {
                     b.Property<int>("Id")
@@ -215,7 +244,12 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("WebsiteId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("WebsiteId");
 
                     b.ToTable("Websites");
                 });
@@ -511,6 +545,17 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Websites");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.MasterUICodes", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Master_Models.Website", "Websites")
+                        .WithMany()
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Websites");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.Module", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Master_Models.Website", "Websites")
@@ -531,6 +576,13 @@ namespace BusinessSuite.Migrations
                         .IsRequired();
 
                     b.Navigation("DatabaseMasters");
+                });
+
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.Website", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Master_Models.Website", null)
+                        .WithMany("Websites")
+                        .HasForeignKey("WebsiteId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -610,6 +662,8 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabasesMaster");
 
                     b.Navigation("Modules");
+
+                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

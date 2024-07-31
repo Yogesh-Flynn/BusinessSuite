@@ -14,16 +14,17 @@
     // Check if the user is authenticated
     if (user != null)
     {
-       
+
         applicationUser = _dbcontext.ApplicationUsers.Where(x => x.Id == user.Id).FirstOrDefault();
         // Get the user's roles
-         roles = await UserManager.GetRolesAsync(user);
+        roles = await UserManager.GetRolesAsync(user);
 
     }
     else
     {
     }
- }
+    var websites = _dbcontext.Websites.ToList();
+}
 
 
 
@@ -126,7 +127,28 @@
                     <span class="menu-title">Catalogue</span>
                 </a>
             </li>
+
+
+            <!-- Websites-->
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="collapse" href="#ui-website" aria-expanded="false" aria-controls="ui-website">
+                    <i class="menu-icon mdi mdi-account-multiple"></i>
+                    <span class="menu-title">Websites</span>
+                    <i class="menu-arrow"></i>
+                </a>
+                <div class="collapse" id="ui-website">
+                    <ul class="nav flex-column sub-menu">
+                        @foreach (var website in websites)
+                        {
+                            <li class="nav-item"> <a asp-controller="Website" asp-action="Index" asp-route-websiteid="@website.Id" class="nav-link">@website.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            </li>
+            
         </ul>
+       
     </nav>
     <!-- partial -->
+   
 }

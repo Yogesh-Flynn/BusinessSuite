@@ -20,6 +20,7 @@ namespace BusinessSuite.Data
         public DbSet<PermissionMaster> PermissionMasters { get; set; }
         public DbSet<TableMaster> TableMasters { get; set; }
         public DbSet<Website> Websites { get; set; }
+        public DbSet<MasterUICodes> MasterUICodes { get; set; }
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

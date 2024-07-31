@@ -148,3 +148,9 @@ namespace BusinessSuite.Controllers
 //  </ItemGroup>
 
 //</Project>
+
+//PM> add-migration xxxxxx -c ApplicationDbContext
+//Build started...
+//Build succeeded.
+//To undo this action, use Remove-Migration.
+//PM> update-database -context ApplicationDbContext

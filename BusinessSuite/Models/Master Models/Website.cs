@@ -12,6 +12,7 @@ namespace BusinessSuite.Models.Master_Models
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public bool IsDeleted { get; set; }
         public ICollection<Module> Modules { get; set; }
+        public ICollection<Website> Websites { get; set; }
         public ICollection<DatabaseMaster> DatabasesMaster { get; set; }
     }
 }
