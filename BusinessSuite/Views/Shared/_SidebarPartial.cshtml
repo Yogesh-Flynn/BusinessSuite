@@ -1,4 +1,6 @@
 ﻿@using BusinessSuite.Data
+@using BusinessSuite.Models.Master_Models
+
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
@@ -23,12 +25,26 @@
     else
     {
     }
-    var websites = _dbcontext.Websites.ToList();
+    var webId = 0;
+    int? websiteId = TempData["WebsiteId"] as int?;
+
+    // Check if count has a value and is greater than 0
+    if (websiteId.HasValue)
+    {
+        webId = websiteId.HasValue ? websiteId.Value : 0;
+    }
+    var dbMaster = _dbcontext.DatabaseMasters.Where(i => i.WebsiteId == webId).FirstOrDefault();
+    List<TableMaster> catalogs = null;
+    if (dbMaster != null)
+    {
+        catalogs = _dbcontext.TableMasters.Where(i => i.DatabaseMasterId == dbMaster.Id).ToList();
+    }
+
 }
 
 
 
-@if (SignInManager.IsSignedIn(User))
+@if (SignInManager.IsSignedIn(User) && catalogs != null)
 {
      @* <li class="nav-item">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
@@ -120,32 +136,37 @@
                     </ul>
                 </div>
             </li>
-            <!-- catalogue -->
+          @*   <!-- catalogue -->
             <li class="nav-item">
                 <a asp-controller="Catalogue" asp-action="Index" class="nav-link">
                     <i class="menu-icon mdi mdi-folder-multiple-outline"></i>
                     <span class="menu-title">Catalogue</span>
                 </a>
             </li>
-
-
-            <!-- Websites-->
+ *@
             <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="collapse" href="#ui-website" aria-expanded="false" aria-controls="ui-website">
+                <a class="nav-link" data-bs-toggle="collapse" href="#ui-x" aria-expanded="false" aria-controls="ui-x">
                     <i class="menu-icon mdi mdi-account-multiple"></i>
-                    <span class="menu-title">Websites</span>
+                    <span class="menu-title">Catalogue</span>
                     <i class="menu-arrow"></i>
                 </a>
-                <div class="collapse" id="ui-website">
+                <div class="collapse" id="ui-x">
                     <ul class="nav flex-column sub-menu">
-                        @foreach (var website in websites)
+                        @foreach (var website in catalogs)
                         {
-                            <li class="nav-item"> <a asp-controller="Website" asp-action="Index" asp-route-websiteid="@website.Id" class="nav-link">@website.Name</a></li>
+                            <li class="nav-item">
+                                <a asp-controller="Catalogue" asp-action="DisplayTable"
+                                   asp-route-szTableName="@website.Name"
+                                   asp-route-szDatabaseMasterId="@website.DatabaseMasterId"
+                                   class="nav-link">
+                                    @website.Name
+                                </a>
+                            </li>
                         }
                     </ul>
                 </div>
             </li>
-            
+           
         </ul>
        
     </nav>

@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using BusinessSuite.Data;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using BusinessSuite.Services;
@@ -10,7 +11,9 @@ using Hangfire;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Globalization;
 using System.Text;
@@ -23,16 +26,17 @@ namespace BusinessSuite.Controllers
     public class CatalogueController : Controller
     {
         private readonly MyJobService _jobService;
+        private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly SqlConnection _connection;
-        public CatalogueController(MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration)
+        private  SqlConnection _connection;
+        public CatalogueController(MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration,ApplicationDbContext dbContext)
         {
             _jobService = jobService;
             _logger = logger;
             _configuration = configuration;
-            _connection = new SqlConnection(_configuration.GetConnectionString("customDBConn"));
-            _connection.Open();
+            _dbContext = dbContext;
+            
         }
         public IActionResult Index()
         {
@@ -87,23 +91,13 @@ namespace BusinessSuite.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> DisplayTable(string szTableName)
+        public async Task<IActionResult> DisplayTable(string szTableName,int szDatabaseMasterId)
         {
             try
             {
-
-
-
-
-
-
-
-
-
-
-
-
-
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i=>i.Id==szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
 
 
 
@@ -396,6 +390,10 @@ WHERE
             {
                 _logger.LogError(ex, "An error occurred while fetching table data.");
                 return StatusCode(500, "Internal server error");
+            }
+            finally
+            {
+                _connection.Close();
             }
         }
         void DeleteRowByName(DataTable table, string name)

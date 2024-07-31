@@ -18,6 +18,8 @@ namespace BusinessSuite.Controllers
             MasterUICodes code =await _ApplicationDbContext.MasterUICodes.Where(i=>i.WebsiteId == websiteid).FirstOrDefaultAsync(); 
             string message =code.PageCode;
             ViewBag.HtmlContent = message;
+            ViewBag.WebsiteId = websiteid;
+            TempData["WebsiteId"] = websiteid;
             return View();
         }
         public async Task<IActionResult> GetSidebarData()
