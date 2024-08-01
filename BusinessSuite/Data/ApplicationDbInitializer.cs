@@ -52,7 +52,6 @@ namespace BusinessSuite.Data
                 var website = new Website
                 {
                     Name = "CRM",
-                    Url = "",
                     IsDeleted = false,
                     CreatedDate = DateTime.UtcNow,
                     Description="SKAUTECH CRM",

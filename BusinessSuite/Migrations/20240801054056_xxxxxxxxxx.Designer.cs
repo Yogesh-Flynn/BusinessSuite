@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240731090850_xxxxxxx")]
-    partial class xxxxxxx
+    [Migration("20240801054056_xxxxxxxxxx")]
+    partial class xxxxxxxxxx
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -229,6 +229,9 @@ namespace BusinessSuite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -247,12 +250,7 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("WebsiteId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("WebsiteId");
 
                     b.ToTable("Websites");
                 });
@@ -581,13 +579,6 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabaseMasters");
                 });
 
-            modelBuilder.Entity("BusinessSuite.Models.Master_Models.Website", b =>
-                {
-                    b.HasOne("BusinessSuite.Models.Master_Models.Website", null)
-                        .WithMany("Websites")
-                        .HasForeignKey("WebsiteId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -665,8 +656,6 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabasesMaster");
 
                     b.Navigation("Modules");
-
-                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240731084805_xxxxxx")]
-    partial class xxxxxx
+    [Migration("20240801053955_xxxxxxxxx")]
+    partial class xxxxxxxxx
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -111,6 +111,35 @@ namespace BusinessSuite.Migrations
                     b.ToTable("DatabaseMasters");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.MasterUICodes", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PageCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PageName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("WebsiteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WebsiteId");
+
+                    b.ToTable("MasterUICodes");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.Module", b =>
                 {
                     b.Property<int>("Id")
@@ -200,6 +229,12 @@ namespace BusinessSuite.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyId1")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
@@ -218,12 +253,9 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("WebsiteId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("WebsiteId");
+                    b.HasIndex("CompanyId1");
 
                     b.ToTable("Websites");
                 });
@@ -519,6 +551,17 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Websites");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Master_Models.MasterUICodes", b =>
+                {
+                    b.HasOne("BusinessSuite.Models.Master_Models.Website", "Websites")
+                        .WithMany()
+                        .HasForeignKey("WebsiteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Websites");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.Module", b =>
                 {
                     b.HasOne("BusinessSuite.Models.Master_Models.Website", "Websites")
@@ -543,9 +586,9 @@ namespace BusinessSuite.Migrations
 
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.Website", b =>
                 {
-                    b.HasOne("BusinessSuite.Models.Master_Models.Website", null)
+                    b.HasOne("BusinessSuite.Models.Company", null)
                         .WithMany("Websites")
-                        .HasForeignKey("WebsiteId");
+                        .HasForeignKey("CompanyId1");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -610,6 +653,11 @@ namespace BusinessSuite.Migrations
                     b.Navigation("Company");
                 });
 
+            modelBuilder.Entity("BusinessSuite.Models.Company", b =>
+                {
+                    b.Navigation("Websites");
+                });
+
             modelBuilder.Entity("BusinessSuite.Models.Master_Models.DatabaseMaster", b =>
                 {
                     b.Navigation("TableMasters");
@@ -625,8 +673,6 @@ namespace BusinessSuite.Migrations
                     b.Navigation("DatabasesMaster");
 
                     b.Navigation("Modules");
-
-                    b.Navigation("Websites");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BusinessSuite.Models.Master_Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BusinessSuite.Models
@@ -9,5 +10,6 @@ namespace BusinessSuite.Models
         [Key]
         public string Id { get; set; }
         public string CompanyName { get; set; }
+
     }
 }
