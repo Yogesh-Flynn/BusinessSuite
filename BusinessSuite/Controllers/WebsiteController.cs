@@ -20,8 +20,8 @@ namespace BusinessSuite.Controllers
         {
             var websitedata= await _ApplicationDbContext.Websites.Where(i=>i.Id == websiteid).FirstOrDefaultAsync();
             MasterUICodes code =await _ApplicationDbContext.MasterUICodes.Where(i=>i.WebsiteId == websiteid).FirstOrDefaultAsync(); 
-            string message =code.PageCode;
-            ViewBag.HtmlContent = message;
+            //string message =code.PageCode;
+           // ViewBag.HtmlContent = message;
             ViewBag.WebsiteId = websiteid;
             TempData["WebsiteId"] = websiteid;
             return View();

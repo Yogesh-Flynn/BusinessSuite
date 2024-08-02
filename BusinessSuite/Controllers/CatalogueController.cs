@@ -38,10 +38,18 @@ namespace BusinessSuite.Controllers
             _dbContext = dbContext;
             
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int szDatabaseMasterId)
         {
             try
             {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+
+
+                TempData["DbMasterId"] = szDatabaseMasterId;
+
+
                 // Use a concise way to create the query
                 string createTableQuery = "SELECT * FROM sys.tables";
 
@@ -84,6 +92,10 @@ namespace BusinessSuite.Controllers
                 // Handle the exception gracefully, show an error message, or redirect to an error page
                 // You can customize this based on your application's needs.
                 return RedirectToAction("Error");
+            }
+            finally
+            {
+                _connection.Close();
             }
             return View();
         }

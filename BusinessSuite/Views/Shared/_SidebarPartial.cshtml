@@ -136,14 +136,14 @@
                     </ul>
                 </div>
             </li>
-          @*   <!-- catalogue -->
+             <!-- catalogue -->
             <li class="nav-item">
-                <a asp-controller="Catalogue" asp-action="Index" class="nav-link">
+                <a asp-controller="Catalogue" asp-action="Index" asp-route-szDatabaseMasterId="@dbMaster.Id" class="nav-link">
                     <i class="menu-icon mdi mdi-folder-multiple-outline"></i>
                     <span class="menu-title">Catalogue</span>
                 </a>
             </li>
- *@
+            @*  *@
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="collapse" href="#ui-x" aria-expanded="false" aria-controls="ui-x">
                     <i class="menu-icon mdi mdi-account-multiple"></i>
