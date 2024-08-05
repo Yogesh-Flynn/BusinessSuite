@@ -5,6 +5,7 @@ using BusinessSuite.Models.ViewModels;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Data;
 
 namespace BusinessSuite.Services
 {
@@ -64,14 +65,88 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> RetrieveAllColumnAsync(string ModuleName, string TableName)
+        public async Task<DataTable> RetrieveAllColumnAsync(string szConnectionString, string TableName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                DataTable columnSchema = new DataTable();
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+                string getColumnNamesQuery = @"
+                    SELECT COLUMN_NAME, DATA_TYPE
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = @TableName
+                    ORDER BY ORDINAL_POSITION";
+
+                using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TableName", TableName);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(columnSchema);
+                    }
+                }
+
+                return columnSchema;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
-        public Task<bool> RetrieveAllDataAsync(string ModuleName, string TableName)
+        public async Task<DataTable> RetrieveAllDataAsync(string szConnectionString, string TableName)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+                DataTable tableSchema = new DataTable();
+                try
+                {
+                    string createTableQuery = @$"SELECT Id,Name,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {TableName}";
+
+                    using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                    {
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(tableSchema);
+                        }
+                    }
+                }
+                catch
+                {
+                    string createTableQuery = @$"SELECT *,
+                                       ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
+                                       FROM {TableName}";
+
+                    using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                    {
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(tableSchema);
+                        }
+                    }
+                }
+
+                return tableSchema;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
         public Task<bool> RetrieveAllModuleAsync(string WebsiteName)
@@ -125,6 +200,110 @@ namespace BusinessSuite.Services
             finally
             {
                 _connection.Close();
+            }
+        }
+
+        public async Task<List<string>> RetrieveAllTableNameAsync(string szConnectionString)
+        {
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+                List<string> tableNames = new List<string>();
+                string getTableNamesQuery = @"SELECT TABLE_NAME
+                                                FROM INFORMATION_SCHEMA.TABLES
+                                                WHERE TABLE_TYPE = 'BASE TABLE'
+                                                ORDER BY TABLE_NAME";
+
+                // Fetch column names for the specified table
+
+
+                // Fetch all table names
+                using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
+                {
+                    if (_connection.State != ConnectionState.Open)
+                    {
+                        await _connection.OpenAsync();
+                    }
+                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            tableNames.Add(reader.GetString(0));
+                        }
+                    }
+                }
+                return tableNames;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+        public async Task<DataTable> RetrieveAllTableReferencesAsync(string szConnectionString, string sourceTable, string targetTable)
+        {
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+
+                DataTable columnSchemaDetail = new DataTable();
+                string getColumnDetailsQuery = @"
+                                                        -- Check if TableA has a foreign key referencing TableB
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableA
+                                                            AND PKCU.TABLE_NAME = @TableB
+
+                                                        UNION
+
+                                                        -- Check if TableB has a foreign key referencing TableA
+                                                        SELECT 
+                                                            FKCU.TABLE_NAME AS ReferencingTable,
+                                                            FKCU.COLUMN_NAME AS ReferencingColumn,
+                                                            PKCU.TABLE_NAME AS ReferencedTable,
+                                                            PKCU.COLUMN_NAME AS ReferencedColumn
+                                                        FROM 
+                                                            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS RC
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE FKCU ON RC.CONSTRAINT_NAME = FKCU.CONSTRAINT_NAME
+                                                        INNER JOIN 
+                                                            INFORMATION_SCHEMA.KEY_COLUMN_USAGE PKCU ON RC.UNIQUE_CONSTRAINT_NAME = PKCU.CONSTRAINT_NAME
+                                                        WHERE 
+                                                            FKCU.TABLE_NAME = @TableB
+                                                            AND PKCU.TABLE_NAME = @TableA;";
+                using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                {
+                    command.Parameters.AddWithValue("@TableA", sourceTable);
+                    command.Parameters.AddWithValue("@TableB", targetTable);
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    {
+                        adapter.Fill(columnSchemaDetail);
+                    }
+                }
+                return columnSchemaDetail;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.CloseAsync();
             }
         }
 
