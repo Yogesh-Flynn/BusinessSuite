@@ -911,16 +911,26 @@ WHERE
         }
 
         [HttpGet]
-        public IActionResult CreateTable()
+        public IActionResult CreateTable(int szDatabaseMasterId)
         {
+;
+            TempData["DbMasterId"]= szDatabaseMasterId;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTable(string tableName)
+        public async Task<IActionResult> CreateTable(string tableName,int szDatabaseMasterId)
         {
             try
             {
+                var dbmasterid = TempData["DbMasterId"];
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+
+
+                TempData["DbMasterId"] = szDatabaseMasterId;
+
                 string createTableQuery = $"CREATE TABLE {tableName} (Id INT PRIMARY KEY IDENTITY, Name NVARCHAR(100), CreatedDate DATETIME)";
 
                 using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
@@ -930,7 +940,7 @@ WHERE
 
                 }
 
-                return RedirectToAction("Index"); // Redirect to the catalogues list after creating the table
+                return RedirectToAction("Index", new { szDatabaseMasterId }); // Redirect to the catalogues list after creating the table
             }
             catch (Exception ex)
             {
@@ -938,7 +948,10 @@ WHERE
                 return View();
             }
 
-
+            finally
+            {
+                _connection.Close();
+            }
 
         }
 
@@ -1003,7 +1016,7 @@ WHERE
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddColumn(string tableName, string columnName, string columnType, string referencedTable, string referencedColumn)
+        public async Task<IActionResult> AddColumn(int szDatabaseMasterId,string tableName, string columnName, string columnType, string referencedTable, string referencedColumn)
         {
             try
             {
@@ -1417,12 +1430,12 @@ WHERE
                 }
 
               
-                return RedirectToAction("DisplayTable", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId= szDatabaseMasterId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the data.");
-                return RedirectToAction("DisplayTable", new { szTableName = tableName });
+                return BadRequest();//RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId= szDatabaseMasterId });
             }
             finally
             {

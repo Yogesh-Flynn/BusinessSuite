@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Create Table";
+    var dbmasterid = TempData["DbMasterId"];
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -8,6 +8,7 @@
     <div class="form-group">
         <label for="tableName">Table Name</label>
         <input type="text" class="form-control" id="tableName" name="tableName" required>
+        <input type="hidden" class="form-control" id="szDatabaseMasterId" name="szDatabaseMasterId" value="@dbmasterid" required>
     </div>
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
