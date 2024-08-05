@@ -1,4 +1,6 @@
-﻿namespace BusinessSuite.Interfaces
+﻿using BusinessSuite.Models.ViewModels;
+
+namespace BusinessSuite.Interfaces
 {
     public interface ICatalogueService
     { // Website map
@@ -16,7 +18,7 @@
         //table map
         public Task<bool> CreateTableAsync(string TableName, string ModuleName);
         public Task<bool> RetrieveTableAsync(string TableName, string ModuleName);
-        public Task<bool> RetrieveAllTableAsync(string ModuleName);
+        public Task<CataloguesViewModel> RetrieveAllTableAsync(int szDatabaseMasterId);
         public Task<bool> UpdateTableAsync(string TableName, string ModuleName);
         public Task<bool> DeleteTableAsync(string TableName, string ModuleName);
         //Column map

@@ -1,4 +1,5 @@
 using BusinessSuite.Data;
+using BusinessSuite.Interfaces;
 using BusinessSuite.Services;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Hangfire;
@@ -18,6 +19,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDbContext<CRMDbContext>(options =>
           options.UseSqlServer(builder.Configuration.GetConnectionString("CRMDBCONN")));
+
+
+
+
+builder.Services.AddScoped<IDataService, DataService>();
+
+builder.Services.AddScoped<ICatalogueService, CatalogueService>();
 
 
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)

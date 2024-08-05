@@ -1,5 +1,8 @@
 ﻿using BusinessSuite.Controllers;
 using BusinessSuite.Interfaces;
+using BusinessSuite.Models;
+using BusinessSuite.Models.ViewModels;
+using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -7,19 +10,10 @@ namespace BusinessSuite.Services
 {
     public class DataService : IDataService
     {
-        private readonly MyJobService _jobService;
-        private readonly ILogger<HomeController> _logger;
-        private readonly IConfiguration _configuration;
-        private readonly SqlConnection _connection;
-        public DataService(MyJobService jobService, ILogger<HomeController> logger, IConfiguration configuration)
-        {
-            _jobService = jobService;
-            _logger = logger;
-            _configuration = configuration;
-            _connection = new SqlConnection(_configuration.GetConnectionString("customDBConn"));
+        private SqlConnection _connection;
+        public DataService() { 
             
         }
-
         public Task<bool> CreateColumnAsync(string ModuleName, string TableName, string ColumnName, string ColumnDataType, bool isNull, string ColumnConstraint)
         {
             throw new NotImplementedException();
@@ -30,56 +24,14 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public async Task<bool> CreateTableAsync(string TableName, string ModuleName)
+        public Task<bool> CreateTableAsync(string TableName, string ModuleName)
         {
-            try
-            {
-                string createTableQuery = $"CREATE TABLE {TableName} (Id INT PRIMARY KEY IDENTITY, Name NVARCHAR(100), CreatedDate DATETIME)";
-                await _connection.OpenAsync();
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
-                {
-                    await command.ExecuteNonQueryAsync();
-                }
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while creating the table.");
-            }
-            finally
-            {
-                await _connection.CloseAsync();
-            }
-            return false;
+            throw new NotImplementedException();
         }
 
-        public async Task<bool> CreateWebsiteAsync(string WebsiteName)
+        public Task<bool> CreateWebsiteAsync(string WebsiteName)
         {
-            string connectionString = $"Server={_configuration.GetConnectionString("ServerName")};Integrated Security=true;";
-            string createDatabaseQuery = $"CREATE DATABASE {WebsiteName}";
-
-            try
-            {
-                using (SqlConnection connection = new SqlConnection(connectionString))
-                {
-                    await _connection.OpenAsync();
-                    using (SqlCommand command = new SqlCommand(createDatabaseQuery, connection))
-                    {
-                        command.ExecuteNonQuery();
-                        Console.WriteLine("Database created successfully.");
-                    }
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"An error occurred: {ex.Message}");
-            }
-            finally
-            {
-                await _connection.CloseAsync();
-            }
-            return false;
+            throw new NotImplementedException();
         }
 
         public Task<bool> DeleteColumnAsync(string ModuleName, string TableName, string ColumnName)
@@ -127,9 +79,53 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> RetrieveAllTableAsync(string ModuleName)
+        public async Task<CataloguesViewModel> RetrieveAllTableAsync(String szConnectionString)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+
+                // Use a concise way to create the query
+                string createTableQuery = "SELECT * FROM sys.tables";
+
+                // Create a list directly without the need for a DataTable
+                List<Catalogues> tableNames = new List<Catalogues>();
+
+                // Use a using statement for SqlCommand and SqlDataAdapter to ensure proper resource disposal
+                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                {
+                    // Use ExecuteReaderAsync to execute the command asynchronously
+                    using (SqlDataReader reader =await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            // Use reader.GetString to get the table name directly
+                            string tableName = reader.GetString(0);
+                            DateTime datecreated = reader.GetDateTime(7);
+                            Catalogues catalogues = new Catalogues();
+                            catalogues.Name = tableName;
+                            catalogues.CreatedDate = datecreated;
+                            tableNames.Add(catalogues);
+                        }
+                    }
+                }
+
+                // Use object initializer syntax for TableNameViewModel
+                var tableNameViewModel = new CataloguesViewModel
+                {
+                    Catalogues = tableNames
+                };
+                return tableNameViewModel;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
         public Task<bool> RetrieveAllWebsitesAsync()

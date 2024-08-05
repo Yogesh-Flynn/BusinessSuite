@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using BusinessSuite.Data;
+using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using BusinessSuite.Services;
@@ -25,79 +26,37 @@ namespace BusinessSuite.Controllers
 
     public class CatalogueController : Controller
     {
+        private readonly ICatalogueService _catalogueService;
+
+
         private readonly MyJobService _jobService;
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private  SqlConnection _connection;
-        public CatalogueController(MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration,ApplicationDbContext dbContext)
+        public CatalogueController(ICatalogueService catalogueService,MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration,ApplicationDbContext dbContext)
         {
             _jobService = jobService;
             _logger = logger;
             _configuration = configuration;
             _dbContext = dbContext;
+            _catalogueService = catalogueService;
             
         }
         public async Task<IActionResult> Index(int szDatabaseMasterId)
         {
             try
             {
-                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
-                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
-                _connection.Open();
-
-
+                var tableNameViewModel = await _catalogueService.RetrieveAllTableAsync(szDatabaseMasterId);
                 TempData["DbMasterId"] = szDatabaseMasterId;
-
-
-                // Use a concise way to create the query
-                string createTableQuery = "SELECT * FROM sys.tables";
-
-                // Create a list directly without the need for a DataTable
-                List<Catalogues> tableNames = new List<Catalogues>();
-
-                // Use a using statement for SqlCommand and SqlDataAdapter to ensure proper resource disposal
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
-                {
-                    // Use ExecuteReaderAsync to execute the command asynchronously
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            // Use reader.GetString to get the table name directly
-                            string tableName = reader.GetString(0);
-                            DateTime datecreated = reader.GetDateTime(7);
-                            Catalogues catalogues = new Catalogues();
-                            catalogues.Name = tableName;
-                            catalogues.CreatedDate = datecreated;
-                            tableNames.Add(catalogues);
-                        }
-                    }
-                }
-
-                // Use object initializer syntax for TableNameViewModel
-                var tableNameViewModel = new CataloguesViewModel
-                {
-                    Catalogues = tableNames
-                };
-
-                // Return the view with the populated model
                 return View(tableNameViewModel);
             }
             catch (Exception ex)
             {
-                // Log the exception for debugging purposes
                 _logger.LogError(ex, "An error occurred while fetching table names.");
 
-                // Handle the exception gracefully, show an error message, or redirect to an error page
-                // You can customize this based on your application's needs.
                 return RedirectToAction("Error");
             }
-            finally
-            {
-                _connection.Close();
-            }
-            return View();
         }
 
 
