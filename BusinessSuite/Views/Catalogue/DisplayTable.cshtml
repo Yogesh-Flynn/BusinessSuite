@@ -567,6 +567,8 @@
                         <div id="bloodhound">
                             <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
                                 <input type="hidden" name="tableName" value="@tableName" />
+
+                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
                                 <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
                                     @foreach (DataRow row in columnNames.Rows)
                                     {

@@ -1019,6 +1019,12 @@ WHERE
         {
             try
             {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+
+
+                TempData["DbMasterId"] = szDatabaseMasterId;
                 string addColumnQuery;
                 if (columnType == "foreign_key")
                 {
@@ -1041,21 +1047,32 @@ WHERE
                     await command.ExecuteNonQueryAsync();
                 }
 
-                return RedirectToAction("DisplayTable", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the column.");
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
             }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
 
         [HttpPost]
-        public async Task<IActionResult> DeleteColumn(string tableName, string columnName)
+        public async Task<IActionResult> DeleteColumn(int szDatabaseMasterId, string tableName, string columnName)
         {
             try
             {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                _connection = new SqlConnection(sqlConnectionString.ConnectionString);
+                _connection.Open();
+
+
+                TempData["DbMasterId"] = szDatabaseMasterId;
+
                 string deleteColumnQuery = $"ALTER TABLE {tableName} DROP COLUMN {columnName}";
 
                 using (SqlCommand command = new SqlCommand(deleteColumnQuery, _connection))
@@ -1065,12 +1082,16 @@ WHERE
 
                 }
 
-                return RedirectToAction("DisplayTable", new { szTableName = tableName });
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting the column.");
                 return RedirectToAction("DisplayTable", new { szTableName = tableName });
+            }
+            finally
+            {
+                _connection.Close();
             }
         }
 
