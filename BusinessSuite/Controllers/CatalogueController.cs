@@ -427,12 +427,11 @@ WHERE
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetTableData(string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
+        public async Task<IActionResult> GetTableData(int szDatabaseMasterId, string szTableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10)
         {
             try
             {
 
-                int? szDatabaseMasterId = TempData["DbMasterId"] as int?;
                 var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
                 _connection = new SqlConnection(sqlConnectionString.ConnectionString);
                 _connection.Open();

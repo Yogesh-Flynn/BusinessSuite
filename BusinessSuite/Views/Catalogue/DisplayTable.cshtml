@@ -9,6 +9,7 @@
     string currentTableName = ViewBag.TableName as string;
 
     var dropDownOptions = new List<string>();
+    var dbmasterid = @TempData["DbMasterId"];
 }
 
 @section Scripts {
@@ -20,7 +21,7 @@
             var pageIndex = 0;
             var pageSize = 50;
             var tableName = '@ViewData["TableName"]';
-
+            var dbmasterid = @dbmasterid;
             fetchData();
 
 
@@ -33,10 +34,11 @@
                 fetchData();
             });
             function fetchData() {
+                debugger
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
                     type: 'GET',
-                    data: { szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+                    data: { szDatabaseMasterId : dbmasterid , szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
                         debugger
                         if (data.length > 0) {
@@ -533,7 +535,9 @@
                         </label>
                         <div id="the-basics">
                             <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
+                                
                                 <input type="hidden" name="tableName" value="@currentTableName" />
+                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
                                 <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
                                 <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
                                     <option value="int">INT</option>
