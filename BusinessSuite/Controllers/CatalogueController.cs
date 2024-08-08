@@ -297,7 +297,13 @@ namespace BusinessSuite.Controllers
         {
             try
             {
+                if (data == null || data.Values.All(string.IsNullOrEmpty))
+                {
 
+                    TempData["ErrorMessage"] = "The data dictionary is empty. Please provide data to insert.";
+                    return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
+
+                }
 
                 await _catalogueService.InsertDataAsync(szDatabaseMasterId, tableName, data);
                 TempData["DbMasterId"] = szDatabaseMasterId;
@@ -308,9 +314,11 @@ namespace BusinessSuite.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while adding the data.");
-                return BadRequest();//RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId= szDatabaseMasterId });
+                TempData["ErrorMessage"] = "An error occurred while adding the data.";
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
+        
             }
-         
+
         }
 
         //[HttpPost]
