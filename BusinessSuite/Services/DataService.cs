@@ -2,6 +2,7 @@
 using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -60,9 +61,33 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> InsertDataAsync(string ModuleName, string TableName, Dictionary<string, string> Data)
+        public async Task<int> InsertDataAsync(string szConnectionString, string TableName, string Columns, string ColumnValues)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+
+                string insertDataQuery = $@"
+                INSERT INTO {TableName} ({Columns}, CreatedDate) 
+                VALUES ({ColumnValues}, '{DateTime.Now}');
+                SELECT SCOPE_IDENTITY();";
+                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                {
+                    var insertedId = await command.ExecuteScalarAsync();
+                   
+                    
+                    return int.Parse(insertedId.ToString()); // Assuming you want to return the inserted ID from your method
+                }
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
 
         public async Task<DataTable> RetrieveAllColumnAsync(string szConnectionString, string TableName)
@@ -135,6 +160,42 @@ namespace BusinessSuite.Services
                             adapter.Fill(tableSchema);
                         }
                     }
+                }
+
+                return tableSchema;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+        public async Task<DataTable> RunCustomQueryAsync(string szConnectionString, string szQuery)
+        {
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+                DataTable tableSchema = new DataTable();
+                try
+                {
+                    
+
+                    using (SqlCommand command = new SqlCommand(szQuery, _connection))
+                    {
+
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(tableSchema);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
                 }
 
                 return tableSchema;
