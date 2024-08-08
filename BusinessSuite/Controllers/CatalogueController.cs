@@ -93,7 +93,7 @@ namespace BusinessSuite.Controllers
             try
             {
 
-                var jsonData = await _catalogueService.RetrieveAllTableDataAsync(szDatabaseMasterId, szTableName);
+                var jsonData = await _catalogueService.RetrieveAllTableDataAsync(szDatabaseMasterId, szTableName, szColumnName, szPageIndex, szPageSize);
                 TempData["DbMasterId"] = szDatabaseMasterId;
                
                 return Json(jsonData);
