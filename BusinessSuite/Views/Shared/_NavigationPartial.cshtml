@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Identity
+﻿@using BusinessSuite.Models.Master_Models
+@using Microsoft.AspNetCore.Identity
 @using BusinessSuite.Data
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
@@ -48,14 +49,30 @@
     {
         greetings = "Hello";
     }
+
+
+    var webId = 0;
+    int? websiteId = TempData["WebsiteId"] as int?;
+
+    // Check if count has a value and is greater than 0
+    if (websiteId.HasValue)
+    {
+        webId = websiteId.HasValue ? websiteId.Value : 0;
+    }
+    var dbMaster = _dbcontext.DatabaseMasters.Where(i => i.WebsiteId == webId).FirstOrDefault();
+    List<TableMaster> catalogs = null;
+    if (dbMaster != null)
+    {
+        catalogs = _dbcontext.TableMasters.Where(i => i.DatabaseMasterId == dbMaster.Id).ToList();
+    }
 }
 
 <ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User)) 
+    @if (SignInManager.IsSignedIn(User))
     {
 
 
-         @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        @* <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BusinessSuite</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -88,11 +105,14 @@
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
             <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-                <div class="me-3">
-                    <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+                @if (catalogs != null)
+                {
+                    <div class="me-3">
+                        <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
                         <span class="icon-menu"></span>
                     </button>
                 </div>
+                }
                 <div>
                     <a class="navbar-brand brand-logo" href="index.html">
                         <img src="~/images/logo.svg" alt="logo" />
