@@ -1,2 +1,14 @@
 ﻿
+
+@{
+    var baseUrl = $"{Context.Request.Scheme}://{Context.Request.Host}/";
+    var hangfireUrl = $"{baseUrl}hangfire";
+}
+
+<div class="text-center">
+    <iframe src="@hangfireUrl" width="100%" height="600px" frameborder="0">
+        Your browser does not support iframes.
+    </iframe>
+</div>
+
 @Html.Raw(ViewBag.HtmlContent)
