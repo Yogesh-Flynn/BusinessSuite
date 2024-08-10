@@ -97,55 +97,94 @@
 
         /////////////////////////////////
 
+        var pageIndex = 0;
+        var pageSize = 50;
+        var tableName = '@tableName';
+        var dbmasterid = @dbmasterid;
+
         $(document).ready(function () {
-            var pageIndex = 0;
-            var pageSize = 50;
-            var tableName = '@ViewData["TableName"]';
-            var dbmasterid = @dbmasterid;
             fetchData();
 
-
             $('.scroll-container').on('scroll', function () {
-                // Handle the scroll event
                 console.log('Table is being scrolled');
-                // You can add your custom logic here
-
                 pageIndex++;
                 fetchData();
             });
+
+            $('#select-all').on('click', function () {
+                $('input:checkbox').not(this).prop('checked', this.checked);
+            });
+
             function fetchData() {
-                debugger
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
                     type: 'GET',
-                    data: { szDatabaseMasterId : dbmasterid , szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+                    data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
-                        debugger
                         if (data.length > 0) {
-                            debugger
                             var tableHeader = $('<tr>');
+                            tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+
                             $.each(data[0], function (key, value) {
                                 $('<th>').text(key).appendTo(tableHeader);
                             });
+
+                            $('<th>').text('Actions').appendTo(tableHeader);
 
                             $('#dataTable thead').empty().append(tableHeader);
 
                             var tableBody = $('#dataTable tbody');
                             $.each(data, function (index, item) {
                                 var row = $('<tr>').appendTo(tableBody);
+                                $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
+
                                 $.each(item, function (key, value) {
                                     $('<td>').text(value).appendTo(row);
                                 });
 
-                                // Add Edit/Delete buttons
                                 var actions = $('<td>');
-                                $('<button>').text('Edit').addClass('btn btn-primary edit-btn').attr('data-id', item.Id).appendTo(actions);
-                                $('<button>').text('Delete').addClass('btn btn-danger delete-btn').attr('data-id', item.Id).appendTo(actions);
+                                $('<button>')
+                                    .text('Edit')
+                                    .addClass('btn btn-primary edit-btn')
+                                    .attr('data-id', item.Id)
+                                    .appendTo(actions);
+                                $('<button>')
+                                    .text('Delete')
+                                    .addClass('btn btn-danger delete-btn')
+                                    .attr('data-id', item.Id)
+                                    .appendTo(actions);
                                 row.append(actions);
                             });
 
-                          
+                            // Re-bind the select-all checkbox after new data is loaded
+                            $('#select-all').on('click', function () {
+                                $('input:checkbox').not(this).prop('checked', this.checked);
+                            });
+
+                            bindActions();
                         }
+                    }
+                });
+            }
+
+            function bindActions() {
+                $('.edit-btn').off('click').on('click', function () {
+                    var id = $(this).data('id');
+                    console.log('Edit', id);
+                });
+
+                $('.delete-btn').off('click').on('click', function () {
+                    var id = $(this).data('id');
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        $.ajax({
+                            url: '@Url.Action("DeleteData", "Catalogue")',
+                            type: 'POST',
+                            data: { id: id, tableName: tableName, szDatabaseMasterId: dbmasterid },
+                            success: function (response) {
+                                alert('Item deleted successfully');
+                                location.reload();
+                            }
+                        });
                     }
                 });
             }
@@ -765,3 +804,17 @@
     </div>
 </div>
 
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
