@@ -33,6 +33,7 @@ namespace BusinessSuite.Interfaces
         public Task<bool> DeleteColumnAsync(string szConnectionString, string TableName, string ColumnName);
         // data map
         public Task<int> InsertDataAsync(string szConnectionString, string TableName,string Columns, string ColumnValues);
+        public Task<int> UploadDataAsync(string szConnectionString, string TableName,DataTable dataTable);
         public Task<bool> RetrieveDataAsync(string szConnectionString, string TableName, string filter);
         public Task<DataTable> RetrieveAllDataAsync(string szConnectionString, string TableName);
         public Task<DataTable> RunCustomQueryAsync(string szConnectionString, string TableName);

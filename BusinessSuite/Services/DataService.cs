@@ -89,6 +89,47 @@ namespace BusinessSuite.Services
                 _connection.Close();
             }
         }
+        public async Task<int> UploadDataAsync(string szConnectionString, string TableName, DataTable dataTable)
+        {
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+
+                foreach (DataRow row in dataTable.Rows)
+                {
+                    var columnNames = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
+                    var parameters = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"@{c.ColumnName}"));
+
+                    var insertCommandText = $"INSERT INTO {TableName} ({columnNames},CreatedDate) VALUES ({parameters},'{DateTime.Now}')";
+
+
+                    using (var command = new SqlCommand(insertCommandText, _connection))
+                    {
+                        foreach (DataColumn column in dataTable.Columns)
+                        {
+                            command.Parameters.AddWithValue($"@{column.ColumnName}", row[column.ColumnName]);
+                        }
+
+                        // Using SqlDataAdapter to execute the command
+                        using (var adapter = new SqlDataAdapter())
+                        {
+                            adapter.InsertCommand = command;
+                            await command.ExecuteNonQueryAsync();
+                        }
+                    }
+                }
+                return 1;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
 
         public async Task<DataTable> RetrieveAllColumnAsync(string szConnectionString, string TableName)
         {

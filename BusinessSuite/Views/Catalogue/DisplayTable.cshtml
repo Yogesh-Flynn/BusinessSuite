@@ -629,7 +629,7 @@
             </div>
             <h4 class="card-title">Upload File/Download Template</h4>
             <div class="form-group">
-                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" enctype="multipart/form-data" method="post">
+                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
                     <div class="form-group">
                         <label for="file">Select file to upload (xlsx or csv):</label>
                         <input type="file" name="file" class="form-control" required />

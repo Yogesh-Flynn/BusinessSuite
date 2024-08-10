@@ -2,6 +2,7 @@
 using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using ClosedXML.Excel;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
@@ -69,6 +70,60 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
+        public async Task<bool> UploadDataAsync(int szDatabaseMasterId, string TableName, IFormFile file)
+        {
+
+            try
+            {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+
+
+                var dataTable = new DataTable();
+                try
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        await file.CopyToAsync(stream);
+                        stream.Position = 0;
+
+                        if (file.FileName.EndsWith(".xlsx"))
+                        {
+                            using (var workbook = new XLWorkbook(stream))
+                            {
+                                var worksheet = workbook.Worksheet(1);
+                                foreach (var cell in worksheet.Row(1).CellsUsed())
+                                {
+                                    dataTable.Columns.Add(cell.Value.ToString());
+                                }
+
+                                foreach (var row in worksheet.RowsUsed().Skip(1))
+                                {
+                                    var dataRow = dataTable.NewRow();
+                                    for (int i = 0; i < dataTable.Columns.Count; i++)
+                                    {
+                                        dataRow[i] = row.Cell(i + 1).Value;
+                                    }
+                                    dataTable.Rows.Add(dataRow);
+                                }
+                            }
+                        }
+
+                        await _dataService.UploadDataAsync(sqlConnectionString.ConnectionString, TableName, dataTable);
+
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
         public async Task<bool> InsertDataAsync(int szDatabaseMasterId, string TableName, Dictionary<string, string> data)
         {
 

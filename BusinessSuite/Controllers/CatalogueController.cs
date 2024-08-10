@@ -369,77 +369,26 @@ namespace BusinessSuite.Controllers
         //}
 
         [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile file, string tablename)
+        public async Task<IActionResult> UploadFile(IFormFile file, string tablename, int szDatabaseMasterId)
         {
-            if (file == null || (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && file.ContentType != "text/csv"))
-            {
-                ModelState.AddModelError("", "Invalid file type. Please upload an Excel or CSV file.");
-                return View("UploadFile", new DataTable());
-            }
-
-            var dataTable = new DataTable();
             try
             {
-                using (var stream = new MemoryStream())
+                if (file == null || (file.ContentType != "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" && file.ContentType != "text/csv"))
                 {
-                    await file.CopyToAsync(stream);
-                    stream.Position = 0;
-
-                    if (file.FileName.EndsWith(".xlsx"))
-                    {
-                        using (var workbook = new XLWorkbook(stream))
-                        {
-                            var worksheet = workbook.Worksheet(1);
-                            foreach (var cell in worksheet.Row(1).CellsUsed())
-                            {
-                                dataTable.Columns.Add(cell.Value.ToString());
-                            }
-
-                            foreach (var row in worksheet.RowsUsed().Skip(1))
-                            {
-                                var dataRow = dataTable.NewRow();
-                                for (int i = 0; i < dataTable.Columns.Count; i++)
-                                {
-                                    dataRow[i] = row.Cell(i + 1).Value;
-                                }
-                                dataTable.Rows.Add(dataRow);
-                            }
-                        }
-                    }
-
-                    foreach (DataRow row in dataTable.Rows)
-                    {
-                        var columnNames = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => c.ColumnName));
-                        var parameters = string.Join(", ", dataTable.Columns.Cast<DataColumn>().Select(c => $"@{c.ColumnName}"));
-
-                        var insertCommandText = $"INSERT INTO {tablename} ({columnNames},CreatedDate) VALUES ({parameters},'{DateTime.Now}')";
-                        using (var command = new SqlCommand(insertCommandText, _connection))
-                        {
-                            foreach (DataColumn column in dataTable.Columns)
-                            {
-                                command.Parameters.AddWithValue($"@{column.ColumnName}", row[column.ColumnName]);
-                            }
-
-                            // Using SqlDataAdapter to execute the command
-                            using (var adapter = new SqlDataAdapter())
-                            {
-                                adapter.InsertCommand = command;
-                                await command.ExecuteNonQueryAsync();
-                            }
-                        }
-                    }
-
+                    ModelState.AddModelError("", "Invalid file type. Please upload an Excel or CSV file.");
+                    return View("UploadFile", new DataTable());
                 }
 
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while processing the file.");
-                ModelState.AddModelError("", "An error occurred while processing the file.");
-                return View("UploadFile", new DataTable());
-            }
+                await _catalogueService.UploadDataAsync(szDatabaseMasterId, tablename, file);
+                TempData["DbMasterId"] = szDatabaseMasterId;
 
-            return RedirectToAction("Index");
+                return RedirectToAction("DisplayTable", new { szTableName = tablename, szDatabaseMasterId = szDatabaseMasterId });
+            }
+            catch
+            {
+                return View();
+            }
+           
         }
 
         [HttpGet]
