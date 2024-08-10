@@ -3,6 +3,7 @@ using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
@@ -50,9 +51,35 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteDataAsync(int szDatabaseMasterId, string TableName, string DataId)
+        public async Task<bool> DeleteDataAsync(int szDatabaseMasterId, string TableName, int DataId)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+
+
+               await _dataService.DeleteDataAsync(sqlConnectionString.ConnectionString, TableName, DataId);
+               return true;
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
+        }
+        public async Task<bool> DeleteAllDataAsync(int szDatabaseMasterId, string TableName)
+        {
+            try
+            {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+
+
+                await _dataService.DeleteAllDataAsync(sqlConnectionString.ConnectionString, TableName);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         public Task<bool> DeleteModuleAsync(int szDatabaseMasterId, string WebsiteName)

@@ -2,6 +2,7 @@
 using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
@@ -41,11 +42,58 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteDataAsync(string ModuleName, string TableName, string DataId)
+        public async Task<bool> DeleteDataAsync(string szConnectionString, string TableName, int DataId)
         {
-            throw new NotImplementedException();
-        }
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
 
+                string insertDataQuery = $"DELETE FROM {TableName} WHERE Id = {DataId}";
+
+                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                {
+                    var insertedId = await command.ExecuteScalarAsync();
+
+
+                    return true; // Assuming you want to return the inserted ID from your method
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
+        public async Task<bool> DeleteAllDataAsync(string szConnectionString, string TableName)
+        {
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+
+                string insertDataQuery = $"DELETE FROM {TableName}";
+
+                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                {
+                    var insertedId = await command.ExecuteScalarAsync();
+
+
+                    return true; // Assuming you want to return the inserted ID from your method
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
+        }
         public Task<bool> DeleteModuleAsync(string ModuleName, string WebsiteName)
         {
             throw new NotImplementedException();

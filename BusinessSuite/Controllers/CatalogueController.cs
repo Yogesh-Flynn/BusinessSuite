@@ -390,7 +390,37 @@ namespace BusinessSuite.Controllers
             }
            
         }
-
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id, string tablename, int szDatabaseMasterId)
+        {
+            try
+            {
+                await _catalogueService.DeleteDataAsync(szDatabaseMasterId, tablename, id);
+                return Json(new { success = true });
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false });
+            }
+            
+            
+        } 
+        [HttpPost]
+        public async Task<IActionResult> DeleteAll(int id, string tablename, int szDatabaseMasterId)
+        {
+            try
+            {
+                await _catalogueService.DeleteAllDataAsync(szDatabaseMasterId, tablename);
+                return Json(new { success = true });
+            }
+            catch(Exception ex)
+            {
+                return Json(new { success = false });
+            }
+            
+            
+        }
+       
         [HttpGet]
         public IActionResult UploadFile()
         {

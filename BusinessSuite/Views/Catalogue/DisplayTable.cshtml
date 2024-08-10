@@ -136,63 +136,85 @@
                                 $.each(item, function (key, value) {
                                     $('<td>').text(value).appendTo(row);
                                 });
+
+                                // Add Edit/Delete buttons
+                                var actions = $('<td>');
+                                $('<button>').text('Edit').addClass('btn btn-primary edit-btn').attr('data-id', item.Id).appendTo(actions);
+                                $('<button>').text('Delete').addClass('btn btn-danger delete-btn').attr('data-id', item.Id).appendTo(actions);
+                                row.append(actions);
                             });
 
-
+                          
                         }
                     }
                 });
             }
         });
 
+        var deleteId = null;
+        var tableName = '@ViewData["TableName"]';
+        var dbmasterid = @dbmasterid;
 
-
-        document.getElementById('catalogueForm').addEventListener('submit', function (event) {
-            debugger
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            var container = document.getElementById('hiddenFieldsContainer');
-            container.innerHTML = ''; // Clear any existing hidden fields
-
-            checkboxes.forEach(function (checkbox) {
-                debugger
-                var name = checkbox.getAttribute('data-name');
-                var id = checkbox.getAttribute('data-id');
-
-                var inputName = document.createElement('input');
-                inputName.type = 'hidden';
-                inputName.name = 'data[' + name + ']';
-                inputName.value = id;
-                container.appendChild(inputName);
-            });
+        // Show Delete Confirmation Modal
+        $(document).on('click', '.delete-btn', function () {
+            deleteId = $(this).data('id');
+            $('#deleteModal').show();
         });
 
-        $(document).ready(function () {
-            $('#itemSearch').on('input', function () {
-                var searchValue = $(this).val().toLowerCase();
-                $('#itemsContainer .form-check').filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+        // Handle "Yes" Button Click for Single Record Deletion
+        $('#confirmDelete').click(function () {
+            if (deleteId !== null) {
+                $.ajax({
+                    url: '@Url.Action("Delete", "Catalogue")',
+                    type: 'POST',
+                    data: { id: deleteId, tableName: tableName, szDatabaseMasterId: dbmasterid },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('Record deleted successfully');
+                            location.reload();
+                        } else {
+                            alert('An error occurred: ' + response.message);
+                        }
+                        $('#deleteModal').hide();
+                    },
+                    error: function () {
+                        alert('An error occurred while deleting the record');
+                        $('#deleteModal').hide();
+                    }
                 });
-            });
-
-            $('#catalogueForm').on('submit', function (event) {
-                debugger
-                var checkboxes = $('#itemsContainer input[type="checkbox"]:checked');
-                var container = $('#hiddenFieldsContainer');
-                container.empty(); // Clear any existing hidden fields
-
-                checkboxes.each(function () {
-                    var name = $(this).data('name');
-                    var id = $(this).data('id');
-
-                    var inputName = $('<input>').attr({
-                        type: 'hidden',
-                        name: 'data[' + name + ']',
-                        value: id
-                    });
-                    container.append(inputName);
-                });
-            });
+            }
         });
+
+        // Handle "Delete All" Button Click
+        $('#deleteAll').click(function () {
+            if (confirm('Are you sure you want to delete all records? This action cannot be undone.')) {
+                $.ajax({
+                    url: '@Url.Action("DeleteAll", "Catalogue")',
+                    type: 'POST',
+                    data: { tableName: tableName, szDatabaseMasterId: dbmasterid },
+                    success: function (response) {
+                        if (response.success) {
+                            alert('All records deleted successfully');
+                            location.reload();
+                        } else {
+                            alert('An error occurred: ' + response.message);
+                        }
+                        $('#deleteModal').hide();
+                    },
+                    error: function () {
+                        alert('An error occurred while deleting all records');
+                        $('#deleteModal').hide();
+                    }
+                });
+            }
+        });
+
+        // Handle Modal Close
+        $('.close, .btn-secondary').click(function () {
+            $('#deleteModal').hide();
+        });
+
+      
     </script>
 }
 
@@ -201,6 +223,36 @@
 
 
 <style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
+
+    .modal-header, .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close {
+        cursor: pointer;
+    }
 
     /* .main-panel{
         max-width: 2000px;
@@ -410,6 +462,25 @@
         @TempData["ErrorMessage"]
     </div>
 }
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Delete Confirmation</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span>&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this record?</p>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+            <button type="button" class="btn btn-danger" id="confirmDelete">Yes, Delete</button>
+            <button type="button" class="btn btn-danger" id="deleteAll">Delete All</button>
+        </div>
+    </div>
+</div>
 
 <!-- The Modal -->
 <div id="myModal" class="modal">
