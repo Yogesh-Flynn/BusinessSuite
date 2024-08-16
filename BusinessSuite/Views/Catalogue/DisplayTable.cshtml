@@ -261,239 +261,6 @@
 
 
 
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0, 0, 0, 0.4);
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-        max-width: 600px;
-    }
-
-    .modal-header, .modal-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .close {
-        cursor: pointer;
-    }
-
-    /* .main-panel{
-        max-width: 2000px;
-        margin: 37px auto;
-        padding: 0px;
-    } */
-    .scroll-container {
-        display: flex;
-        flex-direction: column;
-        overflow-x: auto;
-    }
-
-    .table-header {
-        overflow: hidden;
-    }
-
-    .table-body {
-        overflow-y: auto;
-        overflow-x: auto;
-        max-height: 500px; /* Adjust this value as needed */
-    }
-
-        .table-header table,
-        .table-body table {
-            margin-bottom: 0;
-            white-space: nowrap;
-        }
-
-    .table-header th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background-color: #343a40;
-    }
-
-    .thead-dark th {
-        color: #343a40;
-        background-color: #343a40;
-    }
-
-    .card {
-        background-color: #F4F5F7;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        color: white; /* Adjust text color for contrast */
-    }
-
-    .card-title {
-        color: white; /* Ensure the title is readable */
-    }
-
-    .btn-danger, .btn-primary, .btn-warning {
-        border-color: white; /* Ensure buttons are visible against the background */
-    }
-
-    .form-control {
-        color: black; /* Input text color */
-    }
-
-</style>
-
-
-
-
-
-
-<!-- Include Bootstrap CSS and JavaScript -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Custom CSS -->
-
-<style>
-
-    .scroll-container {
-        max-height: 400px; /* Set your desired fixed height */
-        overflow-y: scroll;
-    }
-
-    /* Optional: To ensure the table header stays fixed while scrolling */
-    #dataTable thead {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background-color: white; /* Adjust this to match your table header background */
-    }
-
-    /* .scroll-container {
-            display: flex;
-            flex-direction: column;
-            overflow-x: auto;
-        } */
-
-    .table-header {
-        overflow: hidden;
-    }
-
-    .table-body {
-        overflow-y: auto;
-        overflow-x: auto;
-        max-height: 500px; /* Adjust this value as needed */
-    }
-
-        .table-header table,
-        .table-body table {
-            margin-bottom: 0;
-            white-space: nowrap;
-        }
-
-    .table-header th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
-        background-color: #343a40;
-    }
-
-    .thead-dark th {
-        color: black;
-        background-color: #343a40;
-    }
-
-    .card {
-        background-color: #F4F5F7;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        color: white; /* Adjust text color for contrast */
-    }
-
-    .card-title {
-        color: white; /* Ensure the title is readable */
-    }
-
-    .btn-danger, .btn-primary, .btn-warning {
-        border-color: white; /* Ensure buttons are visible against the background */
-    }
-
-    .form-control {
-        color: black; /* Input text color */
-    }
-
-    select[multiple] {
-        height: auto;
-        overflow-y: auto;
-    }
-    ///////////////////////////////////////
-    body {
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    /* The Modal (background) */
-    .modal {
-        display: none; /* Hidden by default */
-        position: fixed; /* Stay in place */
-        z-index: 1; /* Sit on top */
-        padding-top: 100px; /* Location of the box */
-        left: 0;
-        top: 0;
-        width: 100%; /* Full width */
-        height: 100%; /* Full height */
-        overflow: auto; /* Enable scroll if needed */
-        background-color: rgb(0,0,0); /* Fallback color */
-        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
-    }
-
-    /* Modal Content */
-    .modal-content {
-        background-color: #fefefe;
-        margin: auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-    }
-
-    /* The Close Button */
-    .close {
-        color: #aaaaaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-        .close:hover,
-        .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-</style>
-<!-- Include Bootstrap CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-
-<!-- Include Bootstrap JS -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-
-<!-- Include Bootstrap Multiselect CSS and JS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect@1.1.1/dist/css/bootstrap-multiselect.css">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect@1.1.1/dist/js/bootstrap-multiselect.min.js"></script>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -653,168 +420,171 @@
     </div>
 
 </div>
-@*edit columns*@
 
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues /</span> @currentTableName</h4>
 
-<!-- The Modal -->
-<div id="myEditColumnModal" class="modal">
+    <div class="col-xl-12">
+        <div class="nav-align-top mb-4">
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link active"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-top-home"
+                            aria-controls="navs-top-home"
+                            aria-selected="true">
+                        Home
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-top-profile"
+                            aria-controls="navs-top-profile"
+                            aria-selected="false">
+                        Profile
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-top-messages"
+                            aria-controls="navs-top-messages"
+                            aria-selected="false">
+                        Messages
+                    </button>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="home-tab">
+                                <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                                    <ul class="nav nav-tabs" role="tablist">
+                                        <li class="nav-item">
+                                            <button type="button" class="btn btn-success btn-rounded btn-fw nav-link active ps-0" id="myBtn">Add New</button>
+                                        </li>
+                                        <li class="nav-item">
+                                            <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id="myEditColumnBtn">Add Column</button>
+                                        </li>
+                                        <li class="nav-item">
+                                            <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id="myuploadfileBtn">Upload File</button>
+                                        </li>
+                                    </ul>
+                                    <div>
+                                        <div class="btn-wrapper">
+                                            <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                                            <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                                            <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive text-nowrap">
+                        <table class="table table-hover" id="dataTable">
+                            <thead>
+                            </thead>
+                            <tbody class="table-border-bottom-0 table-body">
+                            </tbody>
+                        </table>
+                    </div>
 
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-content rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span2 class="close2">&times;</span2>
-                </button>
-            </div>
-            <div class="col">
-                <label>
-                    <p class="card-description">
-                        Column Add
-                    </p>
-                </label>
-                <div id="the-basics">
-                    <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
-
-                        <input type="hidden" name="tableName" value="@currentTableName" />
-                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                        <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
-                        <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
-                            <option value="int">INT</option>
-                            <option value="nvarchar(100)">NVARCHAR(100)</option>
-                            <option value="datetime">DATETIME</option>
-                            <!-- Add more types as needed -->
-                            <option value="foreign_key">FOREIGN KEY</option>
-                        </select>
-                        <select name="referencedTable" class="form-control d-inline-block w-auto mb-2">
-                            <option value="" disabled selected>Select Referenced Table</option>
-                            @foreach (var tableName1 in tableNames)
-                            {
-                                <option value="@tableName1">@tableName1</option>
-                            }
-                        </select>
-                        <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" value="Id" disabled />
-                        <button type="submit" class="btn btn-primary mb-2">Add Column</button>
-                    </form>
                 </div>
-            </div>
-            <div class="col">
-                <label>
-                    <p class="card-description">
-                        Column Delete
-                    </p>
-                </label>
-                <div id="bloodhound">
-                    <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
-                        <input type="hidden" name="tableName" value="@tableName" />
+                <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
+                    <div class="col">
+                        <label>
+                            <p class="card-description">
+                                Column Add
+                            </p>
+                        </label>
+                        <div id="the-basics">
+                            <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
 
-                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                        <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                            @foreach (DataRow row in columnNames.Rows)
-                            {
-                                <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
-                            }
-                        </select>
-                        <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
-                    </form>
+                                <input type="hidden" name="tableName" value="@currentTableName" />
+                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
+                                <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
+                                <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
+                                    <option value="int">INT</option>
+                                    <option value="nvarchar(100)">NVARCHAR(100)</option>
+                                    <option value="datetime">DATETIME</option>
+                                    <!-- Add more types as needed -->
+                                    <option value="foreign_key">FOREIGN KEY</option>
+                                </select>
+                                <select name="referencedTable" class="form-control d-inline-block w-auto mb-2">
+                                    <option value="" disabled selected>Select Referenced Table</option>
+                                    @foreach (var tableName1 in tableNames)
+                                    {
+                                        <option value="@tableName1">@tableName1</option>
+                                    }
+                                </select>
+                                <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" value="Id" disabled />
+                                <button type="submit" class="btn btn-primary mb-2">Add Column</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <label>
+                            <p class="card-description">
+                                Column Delete
+                            </p>
+                        </label>
+                        <div id="bloodhound">
+                            <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
+                                <input type="hidden" name="tableName" value="@tableName" />
+
+                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
+                                <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
+                                    @foreach (DataRow row in columnNames.Rows)
+                                    {
+                                        <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
+                                    }
+                                </select>
+                                <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
-            </div>  
-        </div>
-    </div>
-    </div>
-@*uploadfile*@
-
-<!-- The Modal -->
-<div id="myuploadfileModal" class="modal">
-
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-content rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPlanModalLabel">Upload File/Download  @tableName  Template</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span3 class="close3">&times;</span3>
-                </button>
-            </div>
-            <h4 class="card-title">Upload File/Download Template</h4>
-            <div class="form-group">
-                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
+                <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
+                    <h4 class="card-title">Upload File/Download Template</h4>
                     <div class="form-group">
-                        <label for="file">Select file to upload (xlsx or csv):</label>
-                        <input type="file" name="file" class="form-control" required />
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-danger btn-icon-text">
-                            <i class="ti-upload btn-icon-prepend"></i>
-                            Upload
-                        </button>
+                        <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
+                            <div class="form-group">
+                                <label for="file">Select file to upload (xlsx or csv):</label>
+                                <input type="file" name="file" class="form-control" required />
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <button type="submit" class="btn btn-danger btn-icon-text">
+                                    <i class="ti-upload btn-icon-prepend"></i>
+                                    Upload
+                                </button>
 
+                            </div>
+                        </form>
                     </div>
-                </form>
-            </div>
-            <div class="form-group">
-                <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
                     <div class="form-group">
-                        <label hidden for="tableName">Table Name</label>
-                        <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Download Template</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-<div class="row">
-    <div class="col-sm-12">
-        <div class="home-tab">
-            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-success btn-rounded btn-fw nav-link active ps-0" id="myBtn">Add New</button>
-                    </li>
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id="myEditColumnBtn">Add Column</button>
-                    </li>
-                    <li class="nav-item">
-                        <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id="myuploadfileBtn">Upload File</button>
-                    </li>
-                </ul>
-                <div>
-                    <div class="btn-wrapper">
-                        <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
-                        <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
-                        <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
+                        <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                            <div class="form-group">
+                                <label hidden for="tableName">Table Name</label>
+                                <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
+                            </div>
+                            <button type="submit" class="btn btn-primary">Download Template</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<div class="scroll-container table-responsive">
-    <div id="scrollContainer">
-        <table id="dataTable" class="table table-hover table-striped">
-            <thead>
-            </thead>
-            <tbody class="table-body">
-            </tbody>
-        </table>
-    </div>
-</div>
 
 
 
-
-
-
-
-
-
-
-
-
-
-<!-- Include jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  

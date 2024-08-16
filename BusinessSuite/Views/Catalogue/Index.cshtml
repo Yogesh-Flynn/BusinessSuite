@@ -6,206 +6,121 @@
     ViewData["Title"] = "Catalogues";
     var dbMasterId = TempData["DbMasterId"];
 }
-<div class="col-lg-12 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Catalogues</h4>
-            <a class="btn btn-primary mb-3" asp-controller="Catalogue" asp-action="CreateTable" asp-route-szDatabaseMasterId="@dbMasterId">Create Table</a>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Created Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Catalogues)
-                        {
-                            <tr>
-                                <td>
-                                    <a asp-controller="Catalogue" asp-action="DisplayTable" asp-route-szTableName="@item.Name" asp-route-szDatabaseMasterId="@dbMasterId">
-
-                                        <label class="badge badge-danger">@item.Name</label>
-                                     </a>
-                                </td>
-                                <td>@item.CreatedDate</td>
-                                <td>
-                                    <a class="dropdown-item d-inline" asp-controller="Catalogue" asp-action="EditTable" asp-route-tableName="@item.Name">
-                                        <i class="mdi mdi-tooltip-edit text-primary me-2"></i>
-                                    </a>
-                                    <a class="dropdown-item d-inline" asp-controller="Catalogue" asp-action="DeleteTable" asp-route-tableName="@item.Name" onclick="return confirm('Are you sure you want to delete this table?');">
-                                        <i class="mdi mdi-delete text-primary me-2"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                        
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-<style>
-    body {
-        font-family: "Arial", sans-serif;
-        background-color: #f4f4f4;
-        margin: 20px;
-    }
-
-    .card {
-        background-color: #ffffff;
-        padding: 20px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .table-title {
-        margin-bottom: 20px;
-    }
-
-    .button-container {
-        margin-bottom: 20px;
-    }
-
-    button {
-        padding: 10px 15px;
-        margin-right: 10px;
-        border: none;
-        cursor: pointer;
-        color: #fff;
-    }
-
-        button.danger {
-            background-color: #d9534f;
-        }
-
-        button.primary {
-            background-color: #5bc0de;
-        }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 20px;
-    }
-
-    table, th, td {
-        border: 1px solid #ddd;
-    }
-
-    th, td {
-        padding: 8px;
-        text-align: left;
-    }
-
-    .pagination {
-        text-align: center;
-    }
-
-    .page-btn {
-        padding: 10px 20px;
-        background-color: #5bc0de;
-        color: white;
-        border: none;
-        cursor: pointer;
-        margin-right: 5px;
-    }
-
-</style>
-
-@* <div class="card">
-    <div class="table-title">
-        <h2>Simple Table</h2>
-    </div>
-    <div class="button-container">
-        <span>Action Buttons:</span>
-        <button class="danger" id="deleteSelected">Delete Selected</button>
-        <button class="primary" id="addNewData">Add New Data</button>
-    </div>
-    <div class="table-concept">
-        <table>
-            <thead>
-                <tr>
-                    <th>Select</th>
-                    <th>No</th>
-                    <th>First Header</th>
-                    <th>Second Header</th>
-                    <th>Third Header</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                @for (int i = 1; i <= 10; i++)
-                {
+@* <div class="col-lg-12 grid-margin stretch-card">
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">Catalogues</h4>
+        <a class="btn btn-primary mb-3" asp-controller="Catalogue" asp-action="CreateTable" asp-route-szDatabaseMasterId="@dbMasterId">Create Table</a>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
                     <tr>
-                        <td><input type="checkbox" /></td>
-                        <td>@i</td>
-                        <td>Item @i - 1</td>
-                        <td>Item @i - 2</td>
-                        <td>Item @i - 3</td>
+                        <th>Name</th>
+                        <th>Created Date</th>
+                        <th>Actions</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-        <div class="pagination">
-            <button class="page-btn" onclick="previousPage()">Previous</button>
-            <button class="page-btn" onclick="nextPage()">Next</button>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Catalogues)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Catalogue" asp-action="DisplayTable" asp-route-szTableName="@item.Name" asp-route-szDatabaseMasterId="@dbMasterId">
+
+                                    <label class="badge badge-danger">@item.Name</label>
+                                    </a>
+                            </td>
+                            <td>@item.CreatedDate</td>
+                            <td>
+                                <a class="dropdown-item d-inline" asp-controller="Catalogue" asp-action="EditTable" asp-route-tableName="@item.Name">
+                                    <i class="mdi mdi-tooltip-edit text-primary me-2"></i>
+                                </a>
+                                <a class="dropdown-item d-inline" asp-controller="Catalogue" asp-action="DeleteTable" asp-route-tableName="@item.Name" onclick="return confirm('Are you sure you want to delete this table?');">
+                                    <i class="mdi mdi-delete text-primary me-2"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                        
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
-<script>
-    let currentPage = 1;
-    const itemsPerPage = 10;
-    const totalItems = 50;
+</div>
+ *@
 
-    function updateTable() {
-        const tableBody = document.getElementById('tableBody');
-        tableBody.innerHTML = '';
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Basic Tables</h4>
+    <a class="btn btn-primary mb-3" asp-controller="Catalogue" asp-action="CreateTable" asp-route-szDatabaseMasterId="@dbMasterId">Create Table</a>
 
-        for (let i = (currentPage - 1) * itemsPerPage + 1; i <= currentPage * itemsPerPage && i <= totalItems; i++) {
-            const row = `
-                <tr>
-                    <td><input type="checkbox" /></td>
-                    <td>${i}</td>
-                    <td>Item ${i} - 1</td>
-                    <td>Item ${i} - 2</td>
-                    <td>Item ${i} - 3</td>
-                </tr>
-            `;
-            tableBody.innerHTML += row;
-        }
-    }
-
-    function previousPage() {
-        if (currentPage > 1) {
-            currentPage--;
-            updateTable();
-        }
-    }
-
-    function nextPage() {
-        if (currentPage * itemsPerPage < totalItems) {
-            currentPage++;
-            updateTable();
-        }
-    }
-
-    document.getElementById('deleteSelected').addEventListener('click', () => {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        checkboxes.forEach(checkbox => {
-            checkbox.closest('tr').remove();
-        });
-    });
-
-    document.getElementById('addNewData').addEventListener('click', () => {
-        totalItems++;
-        updateTable();
-    });
-
-    updateTable();
-
-
-
-</script> *@
+    <div class="card">
+        <h5 class="card-header">Table Basic</h5>
+        <div class="table-responsive text-nowrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Created Date</th>
+                        <th>Users</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="table-border-bottom-0">
+                    @foreach (var item in Model.Catalogues)
+                    {
+                        <tr>
+                            <td>
+                                <i class="fab fa-angular fa-lg text-danger me-3"></i> 
+                                <a asp-controller="Catalogue" asp-action="DisplayTable" asp-route-szTableName="@item.Name" asp-route-szDatabaseMasterId="@dbMasterId">
+                                    <strong>
+                                        @item.Name
+                                    </strong>
+                                </a>
+                            </td>
+                            <td>@item.CreatedDate</td>
+                            <td>
+                                <ul class="list-unstyled users-list m-0 avatar-group d-flex align-items-center">
+                                    <li data-bs-toggle="tooltip"
+                                        data-popup="tooltip-custom"
+                                        data-bs-placement="top"
+                                        class="avatar avatar-xs pull-up"
+                                        title="Lilian Fuller">
+                                        <img src="../assets/img/avatars/5.png" alt="Avatar" class="rounded-circle" />
+                                    </li>
+                                    <li data-bs-toggle="tooltip"
+                                        data-popup="tooltip-custom"
+                                        data-bs-placement="top"
+                                        class="avatar avatar-xs pull-up"
+                                        title="Sophia Wilkerson">
+                                        <img src="../assets/img/avatars/6.png" alt="Avatar" class="rounded-circle" />
+                                    </li>
+                                    <li data-bs-toggle="tooltip"
+                                        data-popup="tooltip-custom"
+                                        data-bs-placement="top"
+                                        class="avatar avatar-xs pull-up"
+                                        title="Christina Parker">
+                                        <img src="../assets/img/avatars/7.png" alt="Avatar" class="rounded-circle" />
+                                    </li>
+                                </ul>
+                            </td>
+                            <td><span class="badge bg-label-primary me-1">Active</span></td>
+                             <td>
+                                <div class="dropdown">
+                                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+                                        <i class="bx bx-dots-vertical-rounded"></i>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item" asp-controller="Catalogue" asp-action="EditTable" asp-route-tableName="@item.Name"><i class="bx bx-edit-alt me-1"></i> Edit</a>
+                                        <a class="dropdown-item" asp-controller="Catalogue" asp-action="DeleteTable" asp-route-tableName="@item.Name" onclick="return confirm('Are you sure you want to delete this table?');"><i class="bx bx-trash me-1"></i> Delete</a>
+                                    </div>
+                                </div>
+                            </td> 
+                        </tr>
+                    }
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+ </div>
