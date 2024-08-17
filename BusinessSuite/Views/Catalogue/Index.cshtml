@@ -51,11 +51,11 @@
  *@
 
 <div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Tables /</span> Basic Tables</h4>
-    <a class="btn btn-primary mb-3" asp-controller="Catalogue" asp-action="CreateTable" asp-route-szDatabaseMasterId="@dbMasterId">Create Table</a>
+    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues</span></h4>
+   
 
     <div class="card">
-        <h5 class="card-header">Table Basic</h5>
+        <h5 class="card-header" style="align-items:end"> <a class="btn btn-primary mb-3" asp-controller="Catalogue" asp-action="CreateTable" asp-route-szDatabaseMasterId="@dbMasterId">Create Table</a></h5>
         <div class="table-responsive text-nowrap">
             <table class="table">
                 <thead>
