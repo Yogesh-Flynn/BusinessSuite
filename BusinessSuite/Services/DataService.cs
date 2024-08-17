@@ -2,12 +2,16 @@
 using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
+using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace BusinessSuite.Services
 {
@@ -65,7 +69,7 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
         public async Task<bool> DeleteAllDataAsync(string szConnectionString, string TableName)
@@ -91,7 +95,7 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }  
         public async Task<bool> DatabaseResetAsync(string szConnectionString)
@@ -145,7 +149,7 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
         public Task<bool> DeleteModuleAsync(string ModuleName, string WebsiteName)
@@ -188,10 +192,10 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
-        public async Task<int> UploadDataAsync(string szConnectionString, string TableName, DataTable dataTable)
+        public async Task<int> UploadDataAsync(string szConnectionString, string TableName, System.Data.DataTable dataTable)
         {
             try
             {
@@ -229,15 +233,15 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
-        public async Task<DataTable> RetrieveAllColumnAsync(string szConnectionString, string TableName)
+        public async Task<System.Data.DataTable> RetrieveAllColumnAsync(string szConnectionString, string TableName)
         {
             try
             {
-                DataTable columnSchema = new DataTable();
+                System.Data.DataTable columnSchema = new System.Data.DataTable();
                 _connection = new SqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 string getColumnNamesQuery = @"
@@ -263,17 +267,17 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
-        public async Task<DataTable> RetrieveAllDataAsync(string szConnectionString, string TableName)
+        public async Task<System.Data.DataTable> RetrieveAllDataAsync(string szConnectionString, string TableName)
         {
             try
             {
                 _connection = new SqlConnection(szConnectionString);
                 await _connection.OpenAsync();
-                DataTable tableSchema = new DataTable();
+                System.Data.DataTable tableSchema = new System.Data.DataTable();
                 try
                 {
                     string createTableQuery = @$"SELECT Id,Name,
@@ -313,16 +317,16 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
-        public async Task<DataTable> RunCustomQueryAsync(string szConnectionString, string szQuery)
+        public async Task<System.Data.DataTable> RunCustomQueryAsync(string szConnectionString, string szQuery)
         {
             try
             {
                 _connection = new SqlConnection(szConnectionString);
                 await _connection.OpenAsync();
-                DataTable tableSchema = new DataTable();
+                System.Data.DataTable tableSchema = new System.Data.DataTable();
                 try
                 {
                     
@@ -349,7 +353,7 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
@@ -358,7 +362,7 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public async Task<CataloguesViewModel> RetrieveAllTableAsync(String szConnectionString)
+        public async Task<CataloguesViewModel> RetrieveAllTableAsync(System.String szConnectionString)
         {
             try
             {
@@ -403,7 +407,7 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
@@ -445,17 +449,17 @@ namespace BusinessSuite.Services
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
-        public async Task<DataTable> RetrieveAllTableReferencesAsync(string szConnectionString, string sourceTable, string targetTable)
+        public async Task<System.Data.DataTable> RetrieveAllTableReferencesAsync(string szConnectionString, string sourceTable, string targetTable)
         {
             try
             {
                 _connection = new SqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
-                DataTable columnSchemaDetail = new DataTable();
+                System.Data.DataTable columnSchemaDetail = new System.Data.DataTable();
                 string getColumnDetailsQuery = @"
                                                         -- Check if TableA has a foreign key referencing TableB
                                                         SELECT 
@@ -546,9 +550,43 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateDataAsync(string ModuleName, string TableName, Dictionary<string, string> Data)
+        public async Task<bool> UpdateDataAsync(string szConnectionString, int rowId, string TableName, Dictionary<string, string> Data)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _connection = new SqlConnection(szConnectionString);
+                await _connection.OpenAsync();
+                var updateQuery = new StringBuilder($"UPDATE {TableName} SET ");
+
+                foreach (var column in Data)
+                {
+                    updateQuery.Append($"{column.Key} = @{column.Key}, ");
+                }
+                updateQuery.Length -= 2; // Remove the last comma
+                updateQuery.Append($" WHERE Id = @Id");
+
+                using (var command = new SqlCommand(updateQuery.ToString(), _connection))
+                {
+                    foreach (var column in Data)
+                    {
+                        command.Parameters.AddWithValue($"@{column.Key}", column.Value);
+                    }
+                    command.Parameters.AddWithValue("@Id", rowId);
+
+                    await command.ExecuteNonQueryAsync();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+               await _connection.CloseAsync();
+            }
+               
         }
 
         public Task<bool> UpdateModuleAsync(string ModuleName, string WebsiteName)

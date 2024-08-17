@@ -3,6 +3,8 @@ using BusinessSuite.Interfaces;
 using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -11,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Data;
 using System.Globalization;
+using System.Text;
 
 namespace BusinessSuite.Services
 {
@@ -120,7 +123,7 @@ namespace BusinessSuite.Services
                 var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
 
 
-                var dataTable = new DataTable();
+                var DataTable = new System.Data.DataTable();
                 try
                 {
                     using (var stream = new MemoryStream())
@@ -135,22 +138,22 @@ namespace BusinessSuite.Services
                                 var worksheet = workbook.Worksheet(1);
                                 foreach (var cell in worksheet.Row(1).CellsUsed())
                                 {
-                                    dataTable.Columns.Add(cell.Value.ToString());
+                                    DataTable.Columns.Add(cell.Value.ToString());
                                 }
 
                                 foreach (var row in worksheet.RowsUsed().Skip(1))
                                 {
-                                    var dataRow = dataTable.NewRow();
-                                    for (int i = 0; i < dataTable.Columns.Count; i++)
+                                    var dataRow = DataTable.NewRow();
+                                    for (int i = 0; i < DataTable.Columns.Count; i++)
                                     {
                                         dataRow[i] = row.Cell(i + 1).Value;
                                     }
-                                    dataTable.Rows.Add(dataRow);
+                                    DataTable.Rows.Add(dataRow);
                                 }
                             }
                         }
 
-                        await _dataService.UploadDataAsync(sqlConnectionString.ConnectionString, TableName, dataTable);
+                        await _dataService.UploadDataAsync(sqlConnectionString.ConnectionString, TableName, DataTable);
 
                     }
 
@@ -172,7 +175,7 @@ namespace BusinessSuite.Services
             try
             {
                 var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
-                DataTable columnSchema = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString,TableName);
+                System.Data.DataTable columnSchema = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString,TableName);
 
 
                 Dictionary<string, string> remaingdata = new Dictionary<string, string>();
@@ -259,7 +262,7 @@ namespace BusinessSuite.Services
                     ///
                     List<string> tableNames =await _dataService.RetrieveAllTableNameAsync(sqlConnectionString.ConnectionString);
 
-                    DataTable columnSchemaDetail = new DataTable();
+                    System.Data.DataTable columnSchemaDetail = new System.Data.DataTable();
                     // Query to get all table names
 
 
@@ -331,16 +334,16 @@ namespace BusinessSuite.Services
                         WHERE 
                             c.Id = {campaignId}
                                          ";
-                       DataTable dataTable = new DataTable();
+                       System.Data.DataTable DataTable = new System.Data.DataTable();
                         //using (SqlCommand command = new SqlCommand(query, _connection))
                         //{
                         //    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         //    {
-                        //        adapter.Fill(dataTable);
+                        //        adapter.Fill(System.Data.DataTable);
                         //    }
                         //}
 
-                        foreach (DataRow row in dataTable.Rows)
+                        foreach (DataRow row in DataTable.Rows)
                         {
                             var PhoneNumber = row["PhoneNumber"].ToString();
                             var Message = row["Message"].ToString();
@@ -375,7 +378,7 @@ namespace BusinessSuite.Services
 
         }
 
-        public async Task<DataTable> RetrieveAllColumnAsync(int szDatabaseMasterId, string TableName)
+        public async Task<System.Data.DataTable> RetrieveAllColumnAsync(int szDatabaseMasterId, string TableName)
         {
             try
             {
@@ -389,7 +392,7 @@ namespace BusinessSuite.Services
             }
         }
 
-        public async Task<DataTable> RetrieveAllDataAsync(int szDatabaseMasterId, string TableName)
+        public async Task<System.Data.DataTable> RetrieveAllDataAsync(int szDatabaseMasterId, string TableName)
         {
             try
             {
@@ -416,13 +419,13 @@ namespace BusinessSuite.Services
 
 
 
-                DataTable columnSchema = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString, TableName);
+                System.Data.DataTable columnSchema = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString, TableName);
 
                 List<string> tableNames = await _dataService.RetrieveAllTableNameAsync(sqlConnectionString.ConnectionString);
 
 
-                DataTable columnSchemaDetail = new DataTable();
-                DataTable columnSchemaDetail1 = new DataTable();
+                System.Data.DataTable columnSchemaDetail = new System.Data.DataTable();
+                System.Data.DataTable columnSchemaDetail1 = new System.Data.DataTable();
 
 
 
@@ -466,7 +469,7 @@ namespace BusinessSuite.Services
 
 
 
-                DataTable columnSchema1 = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString, TableName); 
+                System.Data.DataTable columnSchema1 = await _dataService.RetrieveAllColumnAsync(sqlConnectionString.ConnectionString, TableName); 
                
 
                 Dictionary<string, string> remaingdata1 = new Dictionary<string, string>();
@@ -521,7 +524,7 @@ namespace BusinessSuite.Services
                 // Assuming connection is already initialized
 
 
-                DataTable tableSchema1 = new DataTable();
+                System.Data.DataTable tableSchema1 = new System.Data.DataTable();
 
                 var displaycols = "";
                 var displaygroupby = "";
@@ -647,7 +650,7 @@ namespace BusinessSuite.Services
                 throw ex;
             }
         }
-        private List<Dictionary<string, object>> DataTableToJson(DataTable table)
+        private List<Dictionary<string, object>> DataTableToJson(System.Data.DataTable table)
         {
             var list = new List<Dictionary<string, object>>();
             foreach (DataRow row in table.Rows)
@@ -701,7 +704,7 @@ namespace BusinessSuite.Services
 
                 var tableNames =await RetrieveAllTableNameAsync(szDatabaseMasterId);
 
-                DataTable columnSchemaDetail = new DataTable();
+                System.Data.DataTable columnSchemaDetail = new System.Data.DataTable();
 
                 //////////////////////////
                 ///
@@ -728,7 +731,7 @@ namespace BusinessSuite.Services
                         if (tablename[0].Contains(szTableName))
                         {
                             var table = tablename[1];
-                            DataTable tableSchema = await RetrieveAllDataAsync(szDatabaseMasterId, table);
+                            System.Data.DataTable tableSchema = await RetrieveAllDataAsync(szDatabaseMasterId, table);
                            
 
 
@@ -750,7 +753,7 @@ namespace BusinessSuite.Services
                     {
                         if (!referencedtable.Equals(szTableName))
                         {
-                            DataTable tableSchema= await RetrieveAllDataAsync(szDatabaseMasterId, referencedtable);                            
+                            System.Data.DataTable tableSchema= await RetrieveAllDataAsync(szDatabaseMasterId, referencedtable);                            
 
                             string namecol = "";
                             foreach (DataColumn dataColumn in tableSchema.Columns)
@@ -795,7 +798,7 @@ namespace BusinessSuite.Services
            
 
         }
-        void DeleteRowByName(DataTable table, string name)
+        void DeleteRowByName(System.Data.DataTable table, string name)
         {
             DataRow rowToDelete = null;
             foreach (DataRow row in table.Rows)
@@ -826,7 +829,7 @@ namespace BusinessSuite.Services
             }
 
         }
-        public async Task<DataTable> RetrieveAllTableReferencesAsync(int szDatabaseMasterId, string sourceTable, string targetTable)
+        public async Task<System.Data.DataTable> RetrieveAllTableReferencesAsync(int szDatabaseMasterId, string sourceTable, string targetTable)
         {
             try
             {
@@ -876,9 +879,17 @@ namespace BusinessSuite.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> UpdateDataAsync(int szDatabaseMasterId, string TableName, Dictionary<string, string> Data)
+        public async Task<bool> UpdateDataAsync(int szDatabaseMasterId,int rowid, string TableName, Dictionary<string, string> Data)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+                 return await _dataService.UpdateDataAsync(sqlConnectionString.ConnectionString,rowid, TableName,Data);
+            }catch(Exception ex)
+            {
+                throw ex;
+            }
+            
         }
 
         public Task<bool> UpdateModuleAsync(int szDatabaseMasterId, string WebsiteName)

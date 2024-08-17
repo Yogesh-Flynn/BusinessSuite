@@ -37,7 +37,7 @@ namespace BusinessSuite.Interfaces
         public Task<bool> RetrieveDataAsync(int szDatabaseMasterId, string TableName, string filter);
         public Task<DataTable> RetrieveAllDataAsync(int szDatabaseMasterId, string TableName);
         public Task<List<Dictionary<string, object>>> RetrieveAllTableDataAsync(int szDatabaseMasterId, string TableName, string szColumnName = "id", int szPageIndex = 0, int szPageSize = 10);
-        public Task<bool> UpdateDataAsync(int szDatabaseMasterId, string TableName, Dictionary<string, string> Data);
+        public Task<bool> UpdateDataAsync(int szDatabaseMasterId,int rowid, string TableName, Dictionary<string, string> Data);
         public Task<bool> DeleteDataAsync(int szDatabaseMasterId, string TableName, int DataId);
         public Task<bool> DeleteAllDataAsync(int szDatabaseMasterId, string TableName);
         //Database Reset

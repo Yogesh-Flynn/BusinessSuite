@@ -37,7 +37,7 @@ namespace BusinessSuite.Interfaces
         public Task<bool> RetrieveDataAsync(string szConnectionString, string TableName, string filter);
         public Task<DataTable> RetrieveAllDataAsync(string szConnectionString, string TableName);
         public Task<DataTable> RunCustomQueryAsync(string szConnectionString, string TableName);
-        public Task<bool> UpdateDataAsync(string szConnectionString, string TableName, Dictionary<string, string> Data);
+        public Task<bool> UpdateDataAsync(string szConnectionString, int rowid ,string TableName, Dictionary<string, string> Data);
         public Task<bool> DeleteDataAsync(string szConnectionString, string TableName, int DataId);
         public Task<bool> DeleteAllDataAsync(string szConnectionString, string TableName);
         public Task<bool> DatabaseResetAsync(string szConnectionString);

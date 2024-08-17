@@ -5,6 +5,7 @@ using BusinessSuite.Models;
 using BusinessSuite.Models.ViewModels;
 using BusinessSuite.Services;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.InkML;
 using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Office2016.Excel;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -123,39 +124,8 @@ namespace BusinessSuite.Controllers
             }
          
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, string property1, string property2)
-        {
-            if (id <= 0)
-            {
-                return NotFound();
-            }
-            string _connectionString = "";
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                var command = connection.CreateCommand();
-                command.CommandText = @"
-                    UPDATE YourTable
-                    SET Property1 = @Property1,
-                        Property2 = @Property2
-                    WHERE Id = @Id";
+      
 
-                command.Parameters.AddWithValue("@Id", id);
-                command.Parameters.AddWithValue("@Property1", property1);
-                command.Parameters.AddWithValue("@Property2", property2);
-
-                connection.Open();
-                var rowsAffected = await command.ExecuteNonQueryAsync();
-
-                if (rowsAffected == 0)
-                {
-                    return NotFound();
-                }
-            }
-
-            return RedirectToAction(nameof(Index));
-        }
         [HttpGet]
         public IActionResult CreateTable(int szDatabaseMasterId)
         {
@@ -196,7 +166,7 @@ namespace BusinessSuite.Controllers
 
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
 
         }
@@ -303,7 +273,7 @@ namespace BusinessSuite.Controllers
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
@@ -338,7 +308,7 @@ namespace BusinessSuite.Controllers
             }
             finally
             {
-                _connection.Close();
+                 await _connection.CloseAsync();
             }
         }
 
@@ -520,37 +490,34 @@ namespace BusinessSuite.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> EditData(string tableName, int rowId, Dictionary<string, string> data)
+        public async Task<IActionResult> EditData(string tableName, int rowId, Dictionary<string, string> data,int szDatabaseMasterId)
         {
+
+
             try
             {
-                var updateQuery = new StringBuilder($"UPDATE {tableName} SET ");
-
-                foreach (var column in data)
+                if (data == null || data.Values.All(string.IsNullOrEmpty))
                 {
-                    updateQuery.Append($"{column.Key} = @{column.Key}, ");
-                }
-                updateQuery.Length -= 2; // Remove the last comma
-                updateQuery.Append($" WHERE Id = @Id");
 
-                using (var command = new SqlCommand(updateQuery.ToString(), _connection))
-                {
-                    foreach (var column in data)
-                    {
-                        command.Parameters.AddWithValue($"@{column.Key}", column.Value);
-                    }
-                    command.Parameters.AddWithValue("@Id", rowId);
+                    TempData["ErrorMessage"] = "The data dictionary is empty. Please provide data to insert.";
+                    return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
 
-                    await command.ExecuteNonQueryAsync();
                 }
 
-                return RedirectToAction("DisplayTable", new { szTableName = tableName });
+                await _catalogueService.UpdateDataAsync(szDatabaseMasterId, rowId, tableName, data);
+                TempData["DbMasterId"] = szDatabaseMasterId;
+
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while editing data.");
-                return RedirectToAction("Error");
+                _logger.LogError(ex, "An error occurred while adding the data.");
+                TempData["ErrorMessage"] = "An error occurred while adding the data.";
+                return RedirectToAction("DisplayTable", new { szTableName = tableName, szDatabaseMasterId = szDatabaseMasterId });
+
             }
+           
         }
 
         [HttpPost]
