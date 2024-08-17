@@ -17,61 +17,6 @@
 
     <script>
 
-        // <li class="nav-item" >
-        //     <button type="button" class="btn btn-success btn-rounded btn-fw nav-link active ps-0" id = "myBtn" > Add New < /button>
-        //         < /li>
-        //         < li class="nav-item" >
-        //             <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id = "myEditColumnBtn" > Add Column < /button>
-        //                 < /li>
-        //                 < li class="nav-item" >
-        //                     <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id = "myuploadfileBtn" > Upload File < /button>
-        //                         < /li>
-        // // Get the modal
-        // var modal = document.getElementById("myModal");
-
-        // // Get the button that opens the modal
-        // var btn = document.getElementById("myBtn");
-
-        // // Get the <span> element that closes the modal
-        // var span1 = document.getElementsByClassName("close1")[0];
-
-        // // When the user clicks the button, open the modal
-        // btn.onclick = function () {
-        //     modal.style.display = "block";
-        // }
-
-        // // When the user clicks on <span> (x), close the modal
-        // span1.onclick = function () {
-        //     modal.style.display = "none";
-        // }
-
-        // // When the user clicks anywhere outside of the modal, close it
-        // window.onclick = function (event) {
-        //     if (event.target == modal) {
-        //         modal.style.display = "none";
-        //     }
-        // }
-
-        @* <div class="row">
-        <div class="col-sm-12">
-        <div class="home-tab">
-        <div class="d-sm-flex align-items-center justify-content-between border-bottom">
-        <ul class="nav nav-tabs" role="tablist">
-
-        </ul>
-        <div>
-        <div class="btn-wrapper">
-        <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
-        <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
-        <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div>
-        </div> *@
-
-        /////////////////////////////////
 
         var pageIndex = 0;
         var pageSize = 50000;
@@ -97,6 +42,7 @@
                     type: 'GET',
                     data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
+                        debugger
                         if (data.length > 0) {
                             var tableHeader = $('<tr>');
                             tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
@@ -264,138 +210,6 @@
     </div>
 </div>
 
-<!-- The Modal -->
-<div id="myModal" class="modal">
-
-    <!-- Modal content -->
-    <div class="modal-content">
-        <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
-            <input type="hidden" name="tableName" value="@tableName" />
-            <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span1 class="close1">&times;</span1>
-                    </button>
-                </div>
-                <input class="form-control" id="editPlanId" hidden>
-                <div class="modal-body">
-
-                    @foreach (DataRow row in columnNames.Rows)
-                    {
-                        var columnName = @row["COLUMN_NAME"].ToString();
-                        var columnType = @row["DATA_TYPE"].ToString();
-                        var columnData = @row["coldata"].ToString();
-
-                        if (columnType == "bit" || columnType == "datetimeoffset")
-                        {
-
-                        }
-                        else
-                        {
-                            if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
-                            {
-                                <!-- Skip specific columns -->
-                            }
-                            else
-                            {
-                                <div class="form-group d-inline-block w-auto">
-                                    @if (columnType == "int")
-                                    {
-                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
-                                    }
-                                    else if (columnType == "nvarchar")
-                                    {
-                                        <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
-                                    }
-                                    else if (columnType == "datetime2")
-                                    {
-                                        @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
-                        {
-                        <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
-                        }
-                        *@
-                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
-                                    }
-                                    else
-                                    {
-
-                                        var coltype = columnType;
-                                        var strsplit = columnData.Split('~');
-
-                                        foreach (var str in strsplit)
-                                        {
-                                            @if (!dropDownOptions.Contains(str))
-                                            {
-                                                dropDownOptions.Add(str);
-                                            }
-                                        }
-                                        @if (dropDownOptions.Any())
-                                        {
-                                            if (coltype.Equals("oneselect"))
-                                            {
-                                                <div class="form-group d-inline-block w-auto">
-                                                    <select name="data[@columnName]" class="form-control">
-                                                        @foreach (var option in dropDownOptions)
-                                                        {
-                                                            if (!option.Equals(""))
-                                                            {
-                                                                string[] strsply = option.Split('-');
-                                                                <option value="@strsply[1]">@strsply[0]</option>
-                                                            }
-                                                        }
-                                                    </select>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="form-group">
-                                                    <label for="itemSearch" class="control-label">Search Items</label>
-                                                    <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
-                                                </div>
-
-                                                <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
-                                                    <div id="itemsContainer">
-                                                        @foreach (var option in dropDownOptions)
-                                                        {
-                                                            if (!option.Equals(""))
-                                                            {
-                                                                string[] strsply = option.Split('-');
-
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
-                                                                    <label class="form-check-label">@strsply[0]</label>
-                                                                </div>
-                                                            }
-
-                                                        }
-                                                    </div>
-                                                </div>
-
-                                                <div id="hiddenFieldsContainer"></div>
-                                            }
-
-                                        }
-
-
-
-                                        dropDownOptions.Clear();
-                                    }
-                                </div>
-                            }
-                        }
-                    }
-
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-</div>
 
 <div class="container-xxl flex-grow-1 container-p-y">
     <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues /</span> @currentTableName</h4>
@@ -412,6 +226,17 @@
                             aria-controls="navs-top-home"
                             aria-selected="true">
                         @tableName Data
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link"
+                            role="tab"
+                            data-bs-toggle="tab"
+                            data-bs-target="#navs-add-data"
+                            aria-controls="navs-add-data"
+                            aria-selected="false">
+                        Add Data
                     </button>
                 </li>
                 <li class="nav-item">
@@ -448,6 +273,134 @@
                             </tbody>
                         </table>
                     </div>
+
+                </div> 
+                <div class="tab-pane fade" id="navs-add-data" role="tabpanel">
+
+                    <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
+                        <input type="hidden" name="tableName" value="@tableName" />
+                        <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
+                        <div class="modal-content rounded-0">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span1 class="close1">&times;</span1>
+                                </button>
+                            </div>
+                            <input class="form-control" id="editPlanId" hidden>
+                            <div class="modal-body">
+
+                                @foreach (DataRow row in columnNames.Rows)
+                                {
+                                    var columnName = @row["COLUMN_NAME"].ToString();
+                                    var columnType = @row["DATA_TYPE"].ToString();
+                                    var columnData = @row["coldata"].ToString();
+
+                                    if (columnType == "bit" || columnType == "datetimeoffset")
+                                    {
+
+                                    }
+                                    else
+                                    {
+                                        if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
+                                        {
+                                            <!-- Skip specific columns -->
+                                        }
+                                        else
+                                        {
+                                            <div class="form-group d-inline-block w-auto">
+                                                @if (columnType == "int")
+                                                {
+                                                    <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
+                                                }
+                                                else if (columnType == "nvarchar")
+                                                {
+                                                    <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
+                                                }
+                                                else if (columnType == "datetime2")
+                                                {
+                                                    @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                                    {
+                                    <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                                    }
+                                    *@
+                                                    <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
+                                                }
+                                                else
+                                                {
+
+                                                    var coltype = columnType;
+                                                    var strsplit = columnData.Split('~');
+
+                                                    foreach (var str in strsplit)
+                                                    {
+                                                        @if (!dropDownOptions.Contains(str))
+                                                        {
+                                                            dropDownOptions.Add(str);
+                                                        }
+                                                    }
+                                                    @if (dropDownOptions.Any())
+                                                    {
+                                                        if (coltype.Equals("oneselect"))
+                                                        {
+                                                            <div class="form-group d-inline-block w-auto">
+                                                                <select name="data[@columnName]" class="form-control">
+                                                                    @foreach (var option in dropDownOptions)
+                                                                    {
+                                                                        if (!option.Equals(""))
+                                                                        {
+                                                                            string[] strsply = option.Split('-');
+                                                                            <option value="@strsply[1]">@strsply[0]</option>
+                                                                        }
+                                                                    }
+                                                                </select>
+                                                            </div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="form-group">
+                                                                <label for="itemSearch" class="control-label">Search Items</label>
+                                                                <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
+                                                            </div>
+
+                                                            <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
+                                                                <div id="itemsContainer">
+                                                                    @foreach (var option in dropDownOptions)
+                                                                    {
+                                                                        if (!option.Equals(""))
+                                                                        {
+                                                                            string[] strsply = option.Split('-');
+
+                                                                            <div class="form-check">
+                                                                                <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
+                                                                                <label class="form-check-label">@strsply[0]</label>
+                                                                            </div>
+                                                                        }
+
+                                                                    }
+                                                                </div>
+                                                            </div>
+
+                                                            <div id="hiddenFieldsContainer"></div>
+                                                        }
+
+                                                    }
+
+
+
+                                                    dropDownOptions.Clear();
+                                                }
+                                            </div>
+                                        }
+                                    }
+                                }
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                            </div>
+                        </div>
+                    </form>
 
                 </div>
                 <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
