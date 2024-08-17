@@ -81,6 +81,21 @@ namespace BusinessSuite.Services
                 throw ex;
             }
         }
+        public async Task<bool> DatabaseResetAsync(int szDatabaseMasterId)
+        {
+            try
+            {
+                var sqlConnectionString = await _dbContext.DatabaseMasters.Where(i => i.Id == szDatabaseMasterId).FirstAsync();
+
+
+                await _dataService.DatabaseResetAsync(sqlConnectionString.ConnectionString);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
 
         public Task<bool> DeleteModuleAsync(int szDatabaseMasterId, string WebsiteName)
         {
@@ -619,7 +634,7 @@ namespace BusinessSuite.Services
                                             {TableName} m
                                             {leftjoin} {displaygroupby}) AS SubQuery 
                                             WHERE 
-                                                RowNum > ({szPageIndex} * {szPageSize} AND RowNum <= (({szPageIndex} + 1) * {szPageSize})";
+                                                RowNum > ({szPageIndex} * {szPageSize}) AND RowNum <= (({szPageIndex} + 1) * {szPageSize})";
                 }
                 tableSchema1 = await _dataService.RunCustomQueryAsync(sqlConnectionString.ConnectionString, createTableQuery1);
                 return DataTableToJson(tableSchema1);

@@ -16,6 +16,9 @@ namespace BusinessSuite.Controllers
             _ApplicationDbContext = applicationDbContext;
             _configuration = configuration;
         }
+
+
+      
         public async Task<IActionResult> Index(int websiteid)
         {
             var websitedata= await _ApplicationDbContext.Websites.Where(i=>i.Id == websiteid).FirstOrDefaultAsync();

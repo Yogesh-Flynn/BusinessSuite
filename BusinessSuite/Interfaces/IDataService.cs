@@ -40,5 +40,6 @@ namespace BusinessSuite.Interfaces
         public Task<bool> UpdateDataAsync(string szConnectionString, string TableName, Dictionary<string, string> Data);
         public Task<bool> DeleteDataAsync(string szConnectionString, string TableName, int DataId);
         public Task<bool> DeleteAllDataAsync(string szConnectionString, string TableName);
+        public Task<bool> DatabaseResetAsync(string szConnectionString);
     }
 }

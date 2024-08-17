@@ -93,6 +93,60 @@ namespace BusinessSuite.Services
             {
                 _connection.Close();
             }
+        }  
+        public async Task<bool> DatabaseResetAsync(string szConnectionString)
+        {
+            try
+            {
+                //_connection = new SqlConnection(szConnectionString);
+                //await _connection.OpenAsync();
+
+                //string insertDataQuery = $"DELETE FROM {TableName}";
+
+                //using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                //{
+                //    var insertedId = await command.ExecuteScalarAsync();
+
+
+                //    return true; // Assuming you want to return the inserted ID from your method
+                //}
+
+
+                using (var connection = new SqlConnection(szConnectionString))
+                {
+                    await connection.OpenAsync();
+
+                    using (var command = connection.CreateCommand())
+                    {
+                        // SQL command to drop all tables
+                        command.CommandText = @"
+                            DECLARE @sql NVARCHAR(MAX) = N'';
+                            SELECT @sql += 'DROP TABLE [' + SCHEMA_NAME(schema_id) + '].[' + name + '];'
+                            FROM sys.tables;
+                            EXEC sp_executesql @sql;
+                        ";
+                        await command.ExecuteNonQueryAsync();
+
+                        // Add any custom logic to recreate tables or schema here
+                        // Alternatively, run your migrations if EF Core is still being used
+                        command.CommandText = "EXEC sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL';";
+                        await command.ExecuteNonQueryAsync();
+                    }
+                }
+
+
+                return true;
+
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                _connection.Close();
+            }
         }
         public Task<bool> DeleteModuleAsync(string ModuleName, string WebsiteName)
         {

@@ -36,6 +36,60 @@
                 $('input:checkbox').not(this).prop('checked', this.checked);
             });
 
+            // function fetchData() {
+            //     $.ajax({
+            //         url: '@Url.Action("GetTableData", "Catalogue")',
+            //         type: 'GET',
+            //         data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+            //         success: function (data) {
+            //             debugger
+            //             if (data.length > 0) {
+            //                 var tableHeader = $('<tr>');
+            //                 tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+
+            //                 $.each(data[0], function (key, value) {
+            //                     $('<th>').text(key).appendTo(tableHeader);
+            //                 });
+
+            //                 $('<th>').text('Actions').appendTo(tableHeader);
+
+            //                 $('#dataTable thead').empty().append(tableHeader);
+
+            //                 var tableBody = $('#dataTable tbody');
+            //                 $.each(data, function (index, item) {
+            //                     var row = $('<tr>').appendTo(tableBody);
+            //                     $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
+
+            //                     $.each(item, function (key, value) {
+            //                         $('<td>').text(value).appendTo(row);
+            //                     });
+
+            //                     var actions = $('<td>');
+            //                     $('<button>')
+            //                         .text('Edit')
+            //                         .addClass('btn btn-primary edit-btn')
+            //                         .attr('data-id', item.Id)
+            //                         .appendTo(actions);
+            //                     $('<button>')
+            //                         .text('Delete')
+            //                         .addClass('btn btn-danger delete-btn')
+            //                         .attr('data-id', item.Id)
+            //                         .appendTo(actions);
+            //                     row.append(actions);
+            //                 });
+
+            //                 // Re-bind the select-all checkbox after new data is loaded
+            //                 $('#select-all').on('click', function () {
+            //                     $('input:checkbox').not(this).prop('checked', this.checked);
+            //                 });
+
+            //                 bindActions();
+            //             }else{
+                           
+            //             }
+            //         }
+            //     });
+            // }
             function fetchData() {
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
@@ -43,19 +97,31 @@
                     data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
                         debugger
-                        if (data.length > 0) {
-                            var tableHeader = $('<tr>');
-                            tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+                        var tableHeader = $('#dataTable thead');
+                        var tableBody = $('#dataTable tbody');
 
+                        // Ensure the table structure is defined before manipulating
+                        if (tableHeader.length === 0 || tableBody.length === 0) {
+                            console.error("Table structure is missing. Ensure the <thead> and <tbody> exist in the HTML.");
+                            return;
+                        }
+
+                        // tableHeader.empty(); // Clear any existing header
+                        // tableBody.empty(); // Clear any existing body
+
+                        if (data.length > 0) {
+                            var headerRow = $('<tr>');
+                            headerRow.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+
+                            // Create table headers based on keys
                             $.each(data[0], function (key, value) {
-                                $('<th>').text(key).appendTo(tableHeader);
+                                $('<th>').text(key).appendTo(headerRow);
                             });
 
-                            $('<th>').text('Actions').appendTo(tableHeader);
+                            $('<th>').text('Actions').appendTo(headerRow);
 
-                            $('#dataTable thead').empty().append(tableHeader);
+                            tableHeader.append(headerRow);
 
-                            var tableBody = $('#dataTable tbody');
                             $.each(data, function (index, item) {
                                 var row = $('<tr>').appendTo(tableBody);
                                 $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
@@ -84,7 +150,19 @@
                             });
 
                             bindActions();
+                        } else {
+                            // Display a "No data available" message
+                            var noDataRow = $('<tr>');
+                            $('<td>')
+                                .attr('colspan', tableHeader.find('th').length || 1)
+                                .addClass('text-center')
+                                .text('No data available')
+                                .appendTo(noDataRow);
+                            tableBody.append(noDataRow);
                         }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("An error occurred while fetching data: " + error);
                     }
                 });
             }
@@ -280,14 +358,7 @@
                     <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
                         <input type="hidden" name="tableName" value="@tableName" />
                         <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
-                        <div class="modal-content rounded-0">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span1 class="close1">&times;</span1>
-                                </button>
-                            </div>
-                            <input class="form-control" id="editPlanId" hidden>
+                        <input class="form-control" id="editPlanId" hidden>
                             <div class="modal-body">
 
                                 @foreach (DataRow row in columnNames.Rows)
@@ -399,7 +470,6 @@
                             <div class="modal-footer">
                                 <button type="submit" class="btn btn-primary">Save</button>
                             </div>
-                        </div>
                     </form>
 
                 </div>
@@ -489,6 +559,12 @@
     </div>
 </div>
 
+<style>
+    #navs-top-home .table-responsive {
+        max-height: 500px;
+        overflow-y: auto;
+    }
 
+</style>
 
   

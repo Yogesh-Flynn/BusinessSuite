@@ -43,6 +43,24 @@ namespace BusinessSuite.Controllers
             _catalogueService = catalogueService;
             
         }
+        public async Task<IActionResult> ResetDatabase(int szDatabaseMasterId)
+        {
+            try
+            {
+                await _catalogueService.DatabaseResetAsync(szDatabaseMasterId);
+
+                ViewBag.Message = "Database reset successfully!";
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Message = $"Error resetting database: {ex.Message}";
+            }
+
+            return View();
+        }
+
+
+
         public async Task<IActionResult> Index(int szDatabaseMasterId)
         {
             try
@@ -105,7 +123,39 @@ namespace BusinessSuite.Controllers
             }
          
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, string property1, string property2)
+        {
+            if (id <= 0)
+            {
+                return NotFound();
+            }
+            string _connectionString = "";
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                var command = connection.CreateCommand();
+                command.CommandText = @"
+                    UPDATE YourTable
+                    SET Property1 = @Property1,
+                        Property2 = @Property2
+                    WHERE Id = @Id";
 
+                command.Parameters.AddWithValue("@Id", id);
+                command.Parameters.AddWithValue("@Property1", property1);
+                command.Parameters.AddWithValue("@Property2", property2);
+
+                connection.Open();
+                var rowsAffected = await command.ExecuteNonQueryAsync();
+
+                if (rowsAffected == 0)
+                {
+                    return NotFound();
+                }
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
         [HttpGet]
         public IActionResult CreateTable(int szDatabaseMasterId)
         {
