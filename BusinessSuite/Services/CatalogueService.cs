@@ -321,6 +321,7 @@ namespace BusinessSuite.Services
                             c.Id AS CampaignId,
 					        c.ScheduledDate as ScheduledDate,
                             m.Message as Message,
+                            m.Image as Image,
                             p0.PhoneNumber as PhoneNumber,
                             p0.Name AS CustomerName,
                             ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
@@ -348,6 +349,7 @@ namespace BusinessSuite.Services
                             var Message = row["Message"].ToString();
                             var ScheduledDate = row["ScheduledDate"].ToString();
                             string scheduledDateString = row["ScheduledDate"].ToString();
+                            string Image = row["Image"].ToString();
                             DateTime scheduledDate;
 
                             if (DateTime.TryParse(scheduledDateString, out scheduledDate))
@@ -355,7 +357,7 @@ namespace BusinessSuite.Services
                                 // scheduledDate now contains the parsed date
                                 Console.WriteLine("Parsed Date: " + scheduledDate);
                             }
-                             BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
+                             BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message,Image, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
                         }
                         //BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber, request.MessageText, request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
 

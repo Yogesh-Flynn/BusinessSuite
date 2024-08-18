@@ -464,7 +464,7 @@
                         var columnName = @row["COLUMN_NAME"].ToString();
                         var columnType = @row["DATA_TYPE"].ToString();
                         var columnData = @row["coldata"].ToString();
-
+        
                         if (columnType == "bit" || columnType == "datetimeoffset")
                         {
 
@@ -481,6 +481,11 @@
                                     @if (columnType == "int")
                                     {
                                         <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
+                                    }
+                                    else if (columnName == "Image")
+                                    {
+                                     <input type="file" id="imageInput" name="image">
+
                                     }
                                     else if (columnType == "varbinary")
                                     {
