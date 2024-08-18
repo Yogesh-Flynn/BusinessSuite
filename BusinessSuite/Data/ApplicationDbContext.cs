@@ -68,8 +68,6 @@ namespace BusinessSuite.Data
 
 
             modelBuilder.Entity<Campaigns_Marketings>()
-          .HasKey(mc => mc.Id); // Primary Key
-            modelBuilder.Entity<Campaigns_Marketings>()
                 .HasKey(cc => new { cc.CampaignsId, cc.MarketingsId });
 
             modelBuilder.Entity<Campaigns_Marketings>()
