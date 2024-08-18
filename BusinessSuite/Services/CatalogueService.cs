@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Drawing.Spreadsheet;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Hangfire;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -21,11 +22,14 @@ namespace BusinessSuite.Services
     {
         private readonly IDataService _dataService;
 
+        private readonly MyJobService _jobService;
         private readonly ApplicationDbContext _dbContext;
-        public CatalogueService(IDataService dataService,ApplicationDbContext dbContext) 
+        public CatalogueService(IDataService dataService, MyJobService jobService, ApplicationDbContext dbContext) 
         {
             _dataService = dataService;
             _dbContext = dbContext;
+
+            _jobService = jobService;
         }
 
 
@@ -312,8 +316,6 @@ namespace BusinessSuite.Services
                     ///
                     if (TableName.Equals("Campaigns"))
                     {
-
-
                         string query = @$"SELECT 
                             m.Id AS MarketingId,
                             c.Id AS CampaignId,
@@ -335,14 +337,10 @@ namespace BusinessSuite.Services
                         WHERE 
                             c.Id = {campaignId}
                                          ";
-                       System.Data.DataTable DataTable = new System.Data.DataTable();
-                        //using (SqlCommand command = new SqlCommand(query, _connection))
-                        //{
-                        //    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                        //    {
-                        //        adapter.Fill(System.Data.DataTable);
-                        //    }
-                        //}
+                        System.Data.DataTable DataTable = new System.Data.DataTable();
+
+                        DataTable = await _dataService.RunCustomQueryAsync(sqlConnectionString.ConnectionString, query);
+                       
 
                         foreach (DataRow row in DataTable.Rows)
                         {
@@ -357,7 +355,7 @@ namespace BusinessSuite.Services
                                 // scheduledDate now contains the parsed date
                                 Console.WriteLine("Parsed Date: " + scheduledDate);
                             }
-                            // BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
+                             BackgroundJob.Schedule(() => _jobService.StoreDataAsync(PhoneNumber, Message, "Pending", DateTime.Now), scheduledDate - DateTime.Now);
                         }
                         //BackgroundJob.Schedule(() => _jobService.StoreDataAsync(request.PhoneNumber, request.MessageText, request.Status, DateTime.Now), request.ScheduleTime - DateTime.Now);
 
@@ -739,7 +737,7 @@ namespace BusinessSuite.Services
                             String data = "";
                             foreach (DataRow item in tableSchema.Rows)
                             {
-                                data = data + '~' + item["Name"].ToString() + "-" + item["Id"].ToString();
+                                data = data + '!' + item["Name"].ToString() + "~" + item["Id"].ToString();
                             }
                             if (!data.Equals(""))
                             {
@@ -768,7 +766,7 @@ namespace BusinessSuite.Services
                             String data = "";
                             foreach (DataRow item in tableSchema.Rows)
                             {
-                                data = data + '~' + item[namecol].ToString() + "-" + item["Id"].ToString();
+                                data = data + '!' + item[namecol].ToString() + "~" + item["Id"].ToString();
                             }
                             if (!data.Equals(""))
                             {

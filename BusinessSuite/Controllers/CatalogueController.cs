@@ -30,14 +30,12 @@ namespace BusinessSuite.Controllers
         private readonly ICatalogueService _catalogueService;
 
 
-        private readonly MyJobService _jobService;
         private readonly ApplicationDbContext _dbContext;
         private readonly ILogger<HomeController> _logger;
         private readonly IConfiguration _configuration;
         private  SqlConnection _connection;
         public CatalogueController(ICatalogueService catalogueService,MyJobService jobService,ILogger<HomeController> logger, IConfiguration configuration,ApplicationDbContext dbContext)
         {
-            _jobService = jobService;
             _logger = logger;
             _configuration = configuration;
             _dbContext = dbContext;
