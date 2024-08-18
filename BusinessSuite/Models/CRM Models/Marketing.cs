@@ -20,9 +20,7 @@ namespace BusinessSuite.Models
 
         public ICollection<Campaigns_Marketings> Campaigns_Marketing { get; set; }
         // Property to store image as binary data
-        public byte[] Image { get; set; }
+        public string Image { get; set; }
 
-        // Optional: Property to store image content type (e.g., "image/jpeg")
-        public string ImageContentType { get; set; }
     }
 }
