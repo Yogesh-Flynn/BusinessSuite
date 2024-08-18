@@ -43,58 +43,7 @@
             }
         }
 
-        /////////////////////////////////// Get the modal
-        var myEditColumnModalmodal = document.getElementById("myEditColumnModal");
-
-        // Get the button that opens the modal
-        var myEditColumnBtnbtn = document.getElementById("myEditColumnBtn");
-
-        // Get the <span> element that closes the modal
-        var span2 = document.getElementsByClassName("close2")[0];
-
-        // When the user clicks the button, open the modal
-        myEditColumnBtnbtn.onclick = function () {
-            myEditColumnModalmodal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span2.onclick = function () {
-            myEditColumnModalmodal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == myEditColumnModalmodal) {
-                myEditColumnModalmodal.style.display = "none";
-            }
-        }
-
-        /////////////////////////////////// Get the modal
-        var myuploadfileModal = document.getElementById("myuploadfileModal");
-
-        // Get the button that opens the modal
-        var myuploadfileBtn = document.getElementById("myuploadfileBtn");
-
-        // Get the <span> element that closes the modal
-        var span3 = document.getElementsByClassName("close3")[0];
-
-        // When the user clicks the button, open the modal
-        myuploadfileBtn.onclick = function () {
-            myuploadfileModal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span3.onclick = function () {
-            myuploadfileModal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function (event) {
-            if (event.target == myuploadfileModal) {
-                myuploadfileModal.style.display = "none";
-            }
-        }
-
+       
         /////////////////////////////////
 
         $(document).ready(function () {
@@ -534,132 +483,8 @@
     </div>
 
 </div>
-@*edit columns*@
 
 
-<!-- The Modal -->
-<div id="myEditColumnModal" class="modal">
-
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-content rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span2 class="close2">&times;</span2>
-                </button>
-            </div>
-            <div class="col">
-                <label>
-                    <p class="card-description">
-                        Column Add
-                    </p>
-                </label>
-                <div id="the-basics">
-                    <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
-
-                        <input type="hidden" name="tableName" value="@currentTableName" />
-                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                        <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
-                        <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
-                            <option value="int">INT</option>
-                            <option value="nvarchar(100)">NVARCHAR(100)</option>
-                            <option value="datetime">DATETIME</option>
-                            <!-- Add more types as needed -->
-                            <option value="foreign_key">FOREIGN KEY</option>
-                        </select>
-                        <select name="referencedTable" class="form-control d-inline-block w-auto mb-2">
-                            <option value="" disabled selected>Select Referenced Table</option>
-                            @foreach (var tableName1 in tableNames)
-                            {
-                                <option value="@tableName1">@tableName1</option>
-                            }
-                        </select>
-                        <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" value="Id" disabled />
-                        <button type="submit" class="btn btn-primary mb-2">Add Column</button>
-                    </form>
-                </div>
-            </div>
-            <div class="col">
-                <label>
-                    <p class="card-description">
-                        Column Delete
-                    </p>
-                </label>
-                <div id="bloodhound">
-                    <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
-                        <input type="hidden" name="tableName" value="@tableName" />
-
-                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                        <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                            @foreach (DataRow row in columnNames.Rows)
-                            {
-                                <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
-                            }
-                        </select>
-                        <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-@*uploadfile*@
-
-<!-- The Modal -->
-<div id="myuploadfileModal" class="modal">
-
-    <!-- Modal content -->
-    <div class="modal-content">
-        <div class="modal-content rounded-0">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editPlanModalLabel">Upload File/Download  @tableName  Template</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span3 class="close3">&times;</span3>
-                </button>
-            </div>
-            <h4 class="card-title">Upload File/Download Template</h4>
-            <div class="form-group">
-                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
-                    <div class="form-group">
-                        <label for="file">Select file to upload (xlsx or csv):</label>
-                        <input type="file" name="file" class="form-control" required />
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-danger btn-icon-text">
-                            <i class="ti-upload btn-icon-prepend"></i>
-                            Upload
-                        </button>
-
-                    </div>
-                </form>
-            </div>
-            <div class="form-group">
-                <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
-                    <div class="form-group">
-                        <label hidden for="tableName">Table Name</label>
-                        <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
-                    </div>
-                    <button type="submit" class="btn btn-primary">Download Template</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-                        //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -687,9 +512,7 @@
     </div>
 </div>
 
-<!-- Default Modal -->
-<div class="col-lg-4 col-md-6">
-    <div class="mt-3">
+
         <!-- Modal -->
         <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog" role="document">
@@ -834,8 +657,6 @@
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
 
 
@@ -856,7 +677,7 @@
                         @tableName Data
                     </button>
                 </li>
-                <li class="nav-item">
+               @*  <li class="nav-item">
                     <button type="button"
                             class="nav-link"
                             role="tab"
@@ -866,7 +687,7 @@
                             aria-selected="false">
                         Add Data
                     </button>
-                </li>
+                </li> *@
                 <li class="nav-item">
                     <button type="button"
                             class="nav-link"
@@ -900,12 +721,12 @@
                                         <li class="nav-item">
                                             <button type="button" class="btn btn-success btn-rounded btn-fw nav-link active ps-0" id="myBtn">Add New</button>
                                         </li>
-                                        <li class="nav-item">
-                                            <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id="myEditColumnBtn">Add Column</button>
-                                        </li>
-                                        <li class="nav-item">
-                                            <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id="myuploadfileBtn">Upload File</button>
-                                        </li>
+                                    @* <li class="nav-item">
+                                        <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id="myEditColumnBtn">Add Column</button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id="myuploadfileBtn">Upload File</button>
+                                    </li> *@
                                     </ul>
                                     <div>
                                         <div class="btn-wrapper">
@@ -1141,5 +962,3 @@
     }
 
 </style>
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
