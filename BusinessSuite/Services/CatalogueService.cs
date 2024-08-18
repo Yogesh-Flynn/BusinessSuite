@@ -278,7 +278,8 @@ namespace BusinessSuite.Services
                     }
                     foreach (var item in tableNames)
                     {
-                        columnSchemaDetail.Merge(await RetrieveAllTableReferencesAsync(szDatabaseMasterId, entry.Item1, TableName));
+                        columnSchemaDetail.Merge(await RetrieveAllTableReferencesAsync(szDatabaseMasterId, item, TableName));
+                        //columnSchemaDetail.Merge(await RetrieveAllTableReferencesAsync(szDatabaseMasterId, entry.Item1, TableName));
                        
                     }
 

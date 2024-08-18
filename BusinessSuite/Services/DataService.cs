@@ -174,16 +174,28 @@ namespace BusinessSuite.Services
                 _connection = new SqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
-                string insertDataQuery = $@"
+                string insertDataQuery = $@"";
+               
+                {
+                     insertDataQuery = $@"
                 INSERT INTO {TableName} ({Columns}, CreatedDate) 
                 VALUES ({ColumnValues}, '{DateTime.Now}');
                 SELECT SCOPE_IDENTITY();";
+                }
+
                 using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();
-                   
-                    
-                    return int.Parse(insertedId.ToString()); // Assuming you want to return the inserted ID from your method
+
+
+
+                    // Check if insertedId is null and return 0 if it is
+                    if (insertedId == null || insertedId == DBNull.Value)
+                    {
+                        return 0;
+                    }
+
+                    return int.Parse(insertedId.ToString());
                 }
             }
             catch(Exception ex)

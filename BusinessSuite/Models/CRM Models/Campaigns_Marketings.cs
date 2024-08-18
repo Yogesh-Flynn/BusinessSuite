@@ -11,5 +11,7 @@ namespace BusinessSuite.Models
 
         public int MarketingsId { get; set; }
         public Marketing Marketing { get; set; }
+
+        public DateTime CreatedDate { get; set; } = DateTime.Now;
     }
 }

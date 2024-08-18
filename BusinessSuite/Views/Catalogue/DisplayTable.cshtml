@@ -17,265 +17,182 @@
 
     <script>
 
+        // Get the modal
+        var modal = document.getElementById("myModal");
 
-        var pageIndex = 0;
-        var pageSize = 50000;
-        var tableName = '@tableName';
-        var dbmasterid = @dbmasterid;
+        // Get the button that opens the modal
+        var btn = document.getElementById("myBtn");
+
+        // Get the <span> element that closes the modal
+        var span1 = document.getElementsByClassName("close1")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span1.onclick = function () {
+            modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        /////////////////////////////////// Get the modal
+        var myEditColumnModalmodal = document.getElementById("myEditColumnModal");
+
+        // Get the button that opens the modal
+        var myEditColumnBtnbtn = document.getElementById("myEditColumnBtn");
+
+        // Get the <span> element that closes the modal
+        var span2 = document.getElementsByClassName("close2")[0];
+
+        // When the user clicks the button, open the modal
+        myEditColumnBtnbtn.onclick = function () {
+            myEditColumnModalmodal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span2.onclick = function () {
+            myEditColumnModalmodal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == myEditColumnModalmodal) {
+                myEditColumnModalmodal.style.display = "none";
+            }
+        }
+
+        /////////////////////////////////// Get the modal
+        var myuploadfileModal = document.getElementById("myuploadfileModal");
+
+        // Get the button that opens the modal
+        var myuploadfileBtn = document.getElementById("myuploadfileBtn");
+
+        // Get the <span> element that closes the modal
+        var span3 = document.getElementsByClassName("close3")[0];
+
+        // When the user clicks the button, open the modal
+        myuploadfileBtn.onclick = function () {
+            myuploadfileModal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span3.onclick = function () {
+            myuploadfileModal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+            if (event.target == myuploadfileModal) {
+                myuploadfileModal.style.display = "none";
+            }
+        }
+
+        /////////////////////////////////
 
         $(document).ready(function () {
+            var pageIndex = 0;
+            var pageSize = 50;
+            var tableName = '@ViewData["TableName"]';
+            var dbmasterid = @dbmasterid;
             fetchData();
 
+
             $('.scroll-container').on('scroll', function () {
+                // Handle the scroll event
                 console.log('Table is being scrolled');
+                // You can add your custom logic here
+
                 pageIndex++;
                 fetchData();
             });
-
-            $('#select-all').on('click', function () {
-                $('input:checkbox').not(this).prop('checked', this.checked);
-            });
-
-            // function fetchData() {
-            //     $.ajax({
-            //         url: '@Url.Action("GetTableData", "Catalogue")',
-            //         type: 'GET',
-            //         data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
-            //         success: function (data) {
-            //             debugger
-            //             if (data.length > 0) {
-            //                 var tableHeader = $('<tr>');
-            //                 tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
-
-            //                 $.each(data[0], function (key, value) {
-            //                     $('<th>').text(key).appendTo(tableHeader);
-            //                 });
-
-            //                 $('<th>').text('Actions').appendTo(tableHeader);
-
-            //                 $('#dataTable thead').empty().append(tableHeader);
-
-            //                 var tableBody = $('#dataTable tbody');
-            //                 $.each(data, function (index, item) {
-            //                     var row = $('<tr>').appendTo(tableBody);
-            //                     $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
-
-            //                     $.each(item, function (key, value) {
-            //                         $('<td>').text(value).appendTo(row);
-            //                     });
-
-            //                     var actions = $('<td>');
-            //                     $('<button>')
-            //                         .text('Edit')
-            //                         .addClass('btn btn-primary edit-btn')
-            //                         .attr('data-id', item.Id)
-            //                         .appendTo(actions);
-            //                     $('<button>')
-            //                         .text('Delete')
-            //                         .addClass('btn btn-danger delete-btn')
-            //                         .attr('data-id', item.Id)
-            //                         .appendTo(actions);
-            //                     row.append(actions);
-            //                 });
-
-            //                 // Re-bind the select-all checkbox after new data is loaded
-            //                 $('#select-all').on('click', function () {
-            //                     $('input:checkbox').not(this).prop('checked', this.checked);
-            //                 });
-
-            //                 bindActions();
-            //             }else{
-                           
-            //             }
-            //         }
-            //     });
-            // }
             function fetchData() {
+                debugger
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
                     type: 'GET',
                     data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
                         debugger
-                        var tableHeader = $('#dataTable thead');
-                        var tableBody = $('#dataTable tbody');
-
-                        // Ensure the table structure is defined before manipulating
-                        if (tableHeader.length === 0 || tableBody.length === 0) {
-                            console.error("Table structure is missing. Ensure the <thead> and <tbody> exist in the HTML.");
-                            return;
-                        }
-
-                        // tableHeader.empty(); // Clear any existing header
-                        // tableBody.empty(); // Clear any existing body
-
                         if (data.length > 0) {
-                            var headerRow = $('<tr>');
-                            headerRow.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+                            debugger
+                            var tableHeader = $('<tr>');
+                            $.each(data[0], function (key, value) {
+                                $('<th>').text(key).appendTo(tableHeader);
+                            });
 
-                            $('<th>').text('Actions').appendTo(headerRow);
-                            tableHeader.append(headerRow);
+                            $('#dataTable thead').empty().append(tableHeader);
 
+                            var tableBody = $('#dataTable tbody');
                             $.each(data, function (index, item) {
                                 var row = $('<tr>').appendTo(tableBody);
-                                $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
-
                                 $.each(item, function (key, value) {
                                     $('<td>').text(value).appendTo(row);
                                 });
-
-                                var actions = $('<td>');
-                                var editButton = $('<button>')
-                                    .text('Edit')
-                                    .addClass('btn btn-primary edit-btn')
-                                    .attr({
-                                        'data-id': item.Id,
-                                        'type': 'button',
-                                        'data-bs-toggle': 'modal',
-                                        'data-bs-target': '#basicModal'
-                                    });
-
-                                // Add dynamic data attributes for each key in the item
-                                $.each(item, function (key, value) {
-                                    editButton.attr('data-' + key.toLowerCase(), value);
-                                });
-
-                                editButton.appendTo(actions);
-
-                                $('<button>')
-                                    .text('Delete')
-                                    .addClass('btn btn-danger delete-btn')
-                                    .attr('data-id', item.Id)
-                                    .appendTo(actions);
-
-                                row.append(actions);
-                            });
-                            // Re-bind the select-all checkbox after new data is loaded
-                            $('#select-all').on('click', function () {
-                                $('input:checkbox').not(this).prop('checked', this.checked);
                             });
 
-                            bindActions();
-                        } else {
-                            // Display a "No data available" message
-                            var noDataRow = $('<tr>');
-                            $('<td>')
-                                .attr('colspan', tableHeader.find('th').length || 1)
-                                .addClass('text-center')
-                                .text('No data available')
-                                .appendTo(noDataRow);
-                            tableBody.append(noDataRow);
+
                         }
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("An error occurred while fetching data: " + error);
                     }
                 });
             }
-            // Handle the Edit button click event
-            $(document).on('click', '.edit-btn', function () {
+        });
+
+
+
+        document.getElementById('catalogueForm').addEventListener('submit', function (event) {
+            debugger
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            var container = document.getElementById('hiddenFieldsContainer');
+            container.innerHTML = ''; // Clear any existing hidden fields
+
+            checkboxes.forEach(function (checkbox) {
                 debugger
-                var itemId = $(this).data('id');
-                $('#basicModal').find('input[name="rowId"]').val(itemId);
+                var name = checkbox.getAttribute('data-name');
+                var id = checkbox.getAttribute('data-id');
 
-                // Populate modal fields dynamically based on data attributes
-                $.each(this.attributes, function () {
-                    if (this.name.startsWith('data-') && this.name !== 'data-id' && this.name !== 'data-bs-toggle' && this.name !== 'data-bs-target') {
-                        var key = this.name.substring(5); // Remove 'data-' prefix
-                        var value = this.value;
-                      
-                        $('#basicModal').find('input[name="data[' + key + ']"]').val(value);
-                        
-                    }
-                });
-
-                // Show the modal
-                $('#basicModal').modal('show');
+                var inputName = document.createElement('input');
+                inputName.type = 'hidden';
+                inputName.name = 'data[' + name + ']';
+                inputName.value = id;
+                container.appendChild(inputName);
             });
-            function bindActions() {
-               
+        });
 
-                $('.delete-btn').off('click').on('click', function () {
+        $(document).ready(function () {
+            $('#itemSearch').on('input', function () {
+                var searchValue = $(this).val().toLowerCase();
+                $('#itemsContainer .form-check').filter(function () {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+                });
+            });
+
+            $('#catalogueForm').on('submit', function (event) {
+                debugger
+                var checkboxes = $('#itemsContainer input[type="checkbox"]:checked');
+                var container = $('#hiddenFieldsContainer');
+                container.empty(); // Clear any existing hidden fields
+
+                checkboxes.each(function () {
+                    var name = $(this).data('name');
                     var id = $(this).data('id');
-                    if (confirm('Are you sure you want to delete this item?')) {
-                        $.ajax({
-                            url: '@Url.Action("DeleteData", "Catalogue")',
-                            type: 'POST',
-                            data: { id: id, tableName: tableName, szDatabaseMasterId: dbmasterid },
-                            success: function (response) {
-                                alert('Item deleted successfully');
-                                location.reload();
-                            }
-                        });
-                    }
+
+                    var inputName = $('<input>').attr({
+                        type: 'hidden',
+                        name: 'data[' + name + ']',
+                        value: id
+                    });
+                    container.append(inputName);
                 });
-            }
+            });
         });
-
-        var deleteId = null;
-        var tableName = '@ViewData["TableName"]';
-        var dbmasterid = @dbmasterid;
-
-        // Show Delete Confirmation Modal
-        $(document).on('click', '.delete-btn', function () {
-            deleteId = $(this).data('id');
-            $('#deleteModal').show();
-        });
-
-        // Handle "Yes" Button Click for Single Record Deletion
-        $('#confirmDelete').click(function () {
-            if (deleteId !== null) {
-                $.ajax({
-                    url: '@Url.Action("Delete", "Catalogue")',
-                    type: 'POST',
-                    data: { id: deleteId, tableName: tableName, szDatabaseMasterId: dbmasterid },
-                    success: function (response) {
-                        if (response.success) {
-                            alert('Record deleted successfully');
-                            location.reload();
-                        } else {
-                            alert('An error occurred: ' + response.message);
-                        }
-                        $('#deleteModal').hide();
-                    },
-                    error: function () {
-                        alert('An error occurred while deleting the record');
-                        $('#deleteModal').hide();
-                    }
-                });
-            }
-        });
-
-        // Handle "Delete All" Button Click
-        $('#deleteAll').click(function () {
-            if (confirm('Are you sure you want to delete all records? This action cannot be undone.')) {
-                $.ajax({
-                    url: '@Url.Action("DeleteAll", "Catalogue")',
-                    type: 'POST',
-                    data: { tableName: tableName, szDatabaseMasterId: dbmasterid },
-                    success: function (response) {
-                        if (response.success) {
-                            alert('All records deleted successfully');
-                            location.reload();
-                        } else {
-                            alert('An error occurred: ' + response.message);
-                        }
-                        $('#deleteModal').hide();
-                    },
-                    error: function () {
-                        alert('An error occurred while deleting all records');
-                        $('#deleteModal').hide();
-                    }
-                });
-            }
-        });
-
-        // Handle Modal Close
-        $('.close, .btn-secondary').click(function () {
-            $('#deleteModal').hide();
-        });
-
-      
     </script>
 }
 
@@ -283,6 +200,210 @@
 
 
 
+<style>
+
+    /* .main-panel{
+                max-width: 2000px;
+                margin: 37px auto;
+                padding: 0px;
+            } */
+    .scroll-container {
+        display: flex;
+        flex-direction: column;
+        overflow-x: auto;
+    }
+
+    .table-header {
+        overflow: hidden;
+    }
+
+    .table-body {
+        overflow-y: auto;
+        overflow-x: auto;
+        max-height: 500px; /* Adjust this value as needed */
+    }
+
+        .table-header table,
+        .table-body table {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+    .table-header th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: #343a40;
+    }
+
+    .thead-dark th {
+        color: #343a40;
+        background-color: #343a40;
+    }
+
+    .card {
+        background-color: #F4F5F7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white; /* Adjust text color for contrast */
+    }
+
+    .card-title {
+        color: white; /* Ensure the title is readable */
+    }
+
+    .btn-danger, .btn-primary, .btn-warning {
+        border-color: white; /* Ensure buttons are visible against the background */
+    }
+
+    .form-control {
+        color: black; /* Input text color */
+    }
+
+</style>
+
+
+
+
+
+
+<!-- Include Bootstrap CSS and JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Custom CSS -->
+
+<style>
+
+    .scroll-container {
+        max-height: 400px; /* Set your desired fixed height */
+        overflow-y: scroll;
+    }
+
+    /* Optional: To ensure the table header stays fixed while scrolling */
+    #dataTable thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: white; /* Adjust this to match your table header background */
+    }
+
+    /* .scroll-container {
+                    display: flex;
+                    flex-direction: column;
+                    overflow-x: auto;
+                } */
+
+    .table-header {
+        overflow: hidden;
+    }
+
+    .table-body {
+        overflow-y: auto;
+        overflow-x: auto;
+        max-height: 500px; /* Adjust this value as needed */
+    }
+
+        .table-header table,
+        .table-body table {
+            margin-bottom: 0;
+            white-space: nowrap;
+        }
+
+    .table-header th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background-color: #343a40;
+    }
+
+    .thead-dark th {
+        color: black;
+        background-color: #343a40;
+    }
+
+    .card {
+        background-color: #F4F5F7;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        color: white; /* Adjust text color for contrast */
+    }
+
+    .card-title {
+        color: white; /* Ensure the title is readable */
+    }
+
+    .btn-danger, .btn-primary, .btn-warning {
+        border-color: white; /* Ensure buttons are visible against the background */
+    }
+
+    .form-control {
+        color: black; /* Input text color */
+    }
+
+    select[multiple] {
+        height: auto;
+        overflow-y: auto;
+    }
+
+    ///////////////////////////////////////
+    body {
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* The Modal (background) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+    }
+
+    /* The Close Button */
+    .close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>
+<!-- Include Bootstrap CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<!-- Include Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<!-- Include Bootstrap Multiselect CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-multiselect@1.1.1/dist/css/bootstrap-multiselect.css">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-multiselect@1.1.1/dist/js/bootstrap-multiselect.min.js"></script>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -290,454 +411,287 @@
         @TempData["ErrorMessage"]
     </div>
 }
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="modal">
+
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
     <div class="modal-content">
-        <div class="modal-header">
-            <h5 class="modal-title">Delete Confirmation</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span>&times;</span>
-            </button>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to delete this record?</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-            <button type="button" class="btn btn-danger" id="confirmDelete">Yes, Delete</button>
-            <button type="button" class="btn btn-danger" id="deleteAll">Delete All</button>
-        </div>
-    </div>
-</div>
+        <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
+            <input type="hidden" name="tableName" value="@tableName" />
+            <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
+            <div class="modal-content rounded-0">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span1 class="close1">&times;</span1>
+                    </button>
+                </div>
+                <input class="form-control" id="editPlanId" hidden>
+                <div class="modal-body">
 
-<!-- Default Modal -->
-<div class="col-lg-4 col-md-6">
-    <div class="mt-3">
-        <!-- Modal -->
-        <div class="modal fade" id="basicModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel1">Modal title</h5>
-                        <button type="button"
-                                class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form asp-controller="Catalogue" asp-action="EditData" method="post" id="catalogueForm">
-                            <input type="hidden" name="tableName" value="@tableName" />
-                            <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
-                            <input class="form-control" id="editPlanId" hidden>
-                            <div class="modal-body">
+                    @foreach (DataRow row in columnNames.Rows)
+                    {
+                        var columnName = @row["COLUMN_NAME"].ToString();
+                        var columnType = @row["DATA_TYPE"].ToString();
+                        var columnData = @row["coldata"].ToString();
 
-                                @foreach (DataRow row in columnNames.Rows)
-                                {
-                                    var columnName = @row["COLUMN_NAME"].ToString().ToLower();
-                                    var columnType = @row["DATA_TYPE"].ToString();
-                                    var columnData = @row["coldata"].ToString();
-                                   
-                                    if (@row["COLUMN_NAME"].ToString().Equals("Id"))
+                        if (columnType == "bit" || columnType == "datetimeoffset")
+                        {
+
+                        }
+                        else
+                        {
+                            if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
+                            {
+                                <!-- Skip specific columns -->
+                            }
+                            else
+                            {
+                                <div class="form-group d-inline-block w-auto">
+                                    @if (columnType == "int")
                                     {
-                                        <input type="hidden" name="rowId" />
+                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
                                     }
-                                    
-                                    if (columnType == "bit" || columnType == "datetimeoffset")
+                                    else if (columnType == "nvarchar")
                                     {
-
+                                        <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
+                                    }
+                                    else if (columnType == "datetime2")
+                                    {
+                                        @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
+                        {
+                        <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
+                        }
+                        *@
+                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
                                     }
                                     else
                                     {
-                                        if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
+
+                                        var coltype = columnType;
+                                        var strsplit = columnData.Split('~');
+
+                                        foreach (var str in strsplit)
                                         {
-                                            <!-- Skip specific columns -->
+                                            @if (!dropDownOptions.Contains(str))
+                                            {
+                                                dropDownOptions.Add(str);
+                                            }
                                         }
-                                        else
+                                        @if (dropDownOptions.Any())
                                         {
-                                            <br />
-
-                                            <label>@row["COLUMN_NAME"].ToString()</label>
-                                            <div class="form-group d-inline-block w-auto">
-                                                @if (columnType == "int")
-                                                {
-                                                    <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
-                                                }
-                                                else if (columnType == "nvarchar")
-                                                {
-                                                    <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
-                                                }
-                                                else if (columnType == "datetime2")
-                                                {
-                                                    @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
-                                    {
-                                    <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
-                                    }
-                                    *@
-                                                    <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
-                                                }
-                                                else
-                                                {
-
-                                                    var coltype = columnType;
-                                                    var strsplit = columnData.Split('~');
-
-                                                    foreach (var str in strsplit)
-                                                    {
-                                                        @if (!dropDownOptions.Contains(str))
+                                            if (coltype.Equals("oneselect"))
+                                            {
+                                                <div class="form-group d-inline-block w-auto">
+                                                    <select name="data[@columnName]" class="form-control">
+                                                        @foreach (var option in dropDownOptions)
                                                         {
-                                                            dropDownOptions.Add(str);
+                                                            if (!option.Equals(""))
+                                                            {
+                                                                string[] strsply = option.Split('-');
+                                                                <option value="@strsply[1]">@strsply[0]</option>
+                                                            }
                                                         }
-                                                    }
-                                                    @if (dropDownOptions.Any())
-                                                    {
-                                                        if (coltype.Equals("oneselect"))
+                                                    </select>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="form-group">
+                                                    <label for="itemSearch" class="control-label">Search Items</label>
+                                                    <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
+                                                </div>
+
+                                                <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
+                                                    <div id="itemsContainer">
+                                                        @foreach (var option in dropDownOptions)
                                                         {
-                                                            <div class="form-group d-inline-block w-auto">
-                                                                <select name="data[@columnName]" class="form-control">
-                                                                    @foreach (var option in dropDownOptions)
-                                                                    {
-                                                                        if (!option.Equals(""))
-                                                                        {
-                                                                            string[] strsply = option.Split('-');
-                                                                            <option value="@strsply[1]">@strsply[0]</option>
-                                                                        }
-                                                                    }
-                                                                </select>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="form-group">
-                                                                <label for="itemSearch" class="control-label">Search Items</label>
-                                                                <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
-                                                            </div>
+                                                            if (!option.Equals(""))
+                                                            {
+                                                                string[] strsply = option.Split('-');
 
-                                                            <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
-                                                                <div id="itemsContainer">
-                                                                    @foreach (var option in dropDownOptions)
-                                                                    {
-                                                                        if (!option.Equals(""))
-                                                                        {
-                                                                            string[] strsply = option.Split('-');
-
-                                                                            <div class="form-check">
-                                                                                <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
-                                                                                <label class="form-check-label">@strsply[0]</label>
-                                                                            </div>
-                                                                        }
-
-                                                                    }
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
+                                                                    <label class="form-check-label">@strsply[0]</label>
                                                                 </div>
-                                                            </div>
+                                                            }
 
-                                                            <div id="hiddenFieldsContainer"></div>
                                                         }
+                                                    </div>
+                                                </div>
 
-                                                    }
+                                                <div id="hiddenFieldsContainer"></div>
+                                            }
 
-
-
-                                                    dropDownOptions.Clear();
-                                                }
-                                            </div>
                                         }
-                                    }
-                                }
 
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                                    Close
-                                </button>
-                                <button type="submit" class="btn btn-primary">Save changes</button>
-                            </div>
-                        </form>
-                    </div>
-                  
+
+
+                                        dropDownOptions.Clear();
+                                    }
+                                </div>
+                            }
+                        }
+                    }
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save</button>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
+
 </div>
+@*edit columns*@
 
 
+<!-- The Modal -->
+<div id="myEditColumnModal" class="modal">
 
-<div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues /</span> @currentTableName</h4>
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-content rounded-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span2 class="close2">&times;</span2>
+                </button>
+            </div>
+            <div class="col">
+                <label>
+                    <p class="card-description">
+                        Column Add
+                    </p>
+                </label>
+                <div id="the-basics">
+                    <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
 
-    <div class="col-xl-12">
-        <div class="nav-align-top mb-4">
-            <ul class="nav nav-tabs" role="tablist">
-                <li class="nav-item">
-                    <button type="button"
-                            class="nav-link active"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-top-home"
-                            aria-controls="navs-top-home"
-                            aria-selected="true">
-                        @tableName Data
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button type="button"
-                            class="nav-link"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-add-data"
-                            aria-controls="navs-add-data"
-                            aria-selected="false">
-                        Add Data
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button type="button"
-                            class="nav-link"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-top-profile"
-                            aria-controls="navs-top-profile"
-                            aria-selected="false">
-                        Edit Columns
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button type="button"
-                            class="nav-link"
-                            role="tab"
-                            data-bs-toggle="tab"
-                            data-bs-target="#navs-top-messages"
-                            aria-controls="navs-top-messages"
-                            aria-selected="false">
-                        Upload Data
-                    </button>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
-                    
-                    <div class="table-responsive text-nowrap">
-                        <table class="table table-hover" id="dataTable">
-                            <thead>
-                            </thead>
-                            <tbody class="table-border-bottom-0 table-body">
-                            </tbody>
-                        </table>
-                    </div>
-
-                </div> 
-                <div class="tab-pane fade" id="navs-add-data" role="tabpanel">
-
-                    <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm">
-                        <input type="hidden" name="tableName" value="@tableName" />
-                        <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
-                        <input class="form-control" id="editPlanId" hidden>
-                            <div class="modal-body">
-
-                                @foreach (DataRow row in columnNames.Rows)
-                                {
-                                    var columnName = @row["COLUMN_NAME"].ToString();
-                                    var columnType = @row["DATA_TYPE"].ToString();
-                                    var columnData = @row["coldata"].ToString();
-
-                                    if (columnType == "bit" || columnType == "datetimeoffset")
-                                    {
-
-                                    }
-                                    else
-                                    {
-                                        if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
-                                        {
-                                            <!-- Skip specific columns -->
-                                        }
-                                        else
-                                        {
-                                            <div class="form-group d-inline-block w-auto">
-                                                @if (columnType == "int")
-                                                {
-                                                    <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
-                                                }
-                                                else if (columnType == "nvarchar")
-                                                {
-                                                    <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
-                                                }
-                                                else if (columnType == "datetime2")
-                                                {
-                                                    @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
-                                    {
-                                    <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
-                                    }
-                                    *@
-                                                    <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
-                                                }
-                                                else
-                                                {
-
-                                                    var coltype = columnType;
-                                                    var strsplit = columnData.Split('~');
-
-                                                    foreach (var str in strsplit)
-                                                    {
-                                                        @if (!dropDownOptions.Contains(str))
-                                                        {
-                                                            dropDownOptions.Add(str);
-                                                        }
-                                                    }
-                                                    @if (dropDownOptions.Any())
-                                                    {
-                                                        if (coltype.Equals("oneselect"))
-                                                        {
-                                                            <div class="form-group d-inline-block w-auto">
-                                                                <select name="data[@columnName]" class="form-control">
-                                                                    @foreach (var option in dropDownOptions)
-                                                                    {
-                                                                        if (!option.Equals(""))
-                                                                        {
-                                                                            string[] strsply = option.Split('-');
-                                                                            <option value="@strsply[1]">@strsply[0]</option>
-                                                                        }
-                                                                    }
-                                                                </select>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="form-group">
-                                                                <label for="itemSearch" class="control-label">Search Items</label>
-                                                                <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
-                                                            </div>
-
-                                                            <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
-                                                                <div id="itemsContainer">
-                                                                    @foreach (var option in dropDownOptions)
-                                                                    {
-                                                                        if (!option.Equals(""))
-                                                                        {
-                                                                            string[] strsply = option.Split('-');
-
-                                                                            <div class="form-check">
-                                                                                <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
-                                                                                <label class="form-check-label">@strsply[0]</label>
-                                                                            </div>
-                                                                        }
-
-                                                                    }
-                                                                </div>
-                                                            </div>
-
-                                                            <div id="hiddenFieldsContainer"></div>
-                                                        }
-
-                                                    }
-
-
-
-                                                    dropDownOptions.Clear();
-                                                }
-                                            </div>
-                                        }
-                                    }
-                                }
-
-                            </div>
-                            <div class="modal-footer">
-                                <button type="submit" class="btn btn-primary">Save</button>
-                            </div>
+                        <input type="hidden" name="tableName" value="@currentTableName" />
+                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
+                        <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
+                        <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
+                            <option value="int">INT</option>
+                            <option value="nvarchar(100)">NVARCHAR(100)</option>
+                            <option value="datetime">DATETIME</option>
+                            <!-- Add more types as needed -->
+                            <option value="foreign_key">FOREIGN KEY</option>
+                        </select>
+                        <select name="referencedTable" class="form-control d-inline-block w-auto mb-2">
+                            <option value="" disabled selected>Select Referenced Table</option>
+                            @foreach (var tableName1 in tableNames)
+                            {
+                                <option value="@tableName1">@tableName1</option>
+                            }
+                        </select>
+                        <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" value="Id" disabled />
+                        <button type="submit" class="btn btn-primary mb-2">Add Column</button>
                     </form>
-
                 </div>
-                <div class="tab-pane fade" id="navs-top-profile" role="tabpanel">
-                    <div class="col">
-                        <label>
-                            <p class="card-description">
-                                Column Add
-                            </p>
-                        </label>
-                        <div id="the-basics">
-                            <form asp-controller="Catalogue" asp-action="AddColumn" method="post" class="d-inline">
+            </div>
+            <div class="col">
+                <label>
+                    <p class="card-description">
+                        Column Delete
+                    </p>
+                </label>
+                <div id="bloodhound">
+                    <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
+                        <input type="hidden" name="tableName" value="@tableName" />
 
-                                <input type="hidden" name="tableName" value="@currentTableName" />
-                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                                <input type="text" name="columnName" placeholder="New Column Name" class="form-control d-inline-block w-auto mb-2" required />
-                                <select name="columnType" class="form-control d-inline-block w-auto mb-2" required>
-                                    <option value="int">INT</option>
-                                    <option value="nvarchar(100)">NVARCHAR(100)</option>
-                                    <option value="datetime">DATETIME</option>
-                                    <!-- Add more types as needed -->
-                                    <option value="foreign_key">FOREIGN KEY</option>
-                                </select>
-                                <select name="referencedTable" class="form-control d-inline-block w-auto mb-2">
-                                    <option value="" disabled selected>Select Referenced Table</option>
-                                    @foreach (var tableName1 in tableNames)
-                                    {
-                                        <option value="@tableName1">@tableName1</option>
-                                    }
-                                </select>
-                                <input type="text" name="referencedColumn" placeholder="Referenced Column" class="form-control d-inline-block w-auto mb-2" value="Id" disabled />
-                                <button type="submit" class="btn btn-primary mb-2">Add Column</button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <label>
-                            <p class="card-description">
-                                Column Delete
-                            </p>
-                        </label>
-                        <div id="bloodhound">
-                            <form asp-controller="Catalogue" asp-action="DeleteColumn" method="post" class="d-inline">
-                                <input type="hidden" name="tableName" value="@tableName" />
-
-                                <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
-                                <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
-                                    @foreach (DataRow row in columnNames.Rows)
-                                    {
-                                        <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
-                                    }
-                                </select>
-                                <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
-                            </form>
-                        </div>
-                    </div>
+                        <input type="hidden" name="szDatabaseMasterId" value="@TempData["DbMasterId"]" />
+                        <select name="columnName" class="form-control d-inline-block w-auto mb-2" required>
+                            @foreach (DataRow row in columnNames.Rows)
+                            {
+                                <option value="@row["COLUMN_NAME"].ToString()">@row["COLUMN_NAME"].ToString()</option>
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-danger mb-2">Delete Column</button>
+                    </form>
                 </div>
-                <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
-                    <h4 class="card-title">Upload File/Download Template</h4>
-                    <div class="form-group">
-                        <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
-                            <div class="form-group">
-                                <label for="file">Select file to upload (xlsx or csv):</label>
-                                <input type="file" name="file" class="form-control" required />
-                            </div>
-                            <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-danger btn-icon-text">
-                                    <i class="ti-upload btn-icon-prepend"></i>
-                                    Upload
-                                </button>
+            </div>
+        </div>
+    </div>
+</div>
+@*uploadfile*@
 
-                            </div>
-                        </form>
-                    </div>
+<!-- The Modal -->
+<div id="myuploadfileModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+        <div class="modal-content rounded-0">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPlanModalLabel">Upload File/Download  @tableName  Template</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span3 class="close3">&times;</span3>
+                </button>
+            </div>
+            <h4 class="card-title">Upload File/Download Template</h4>
+            <div class="form-group">
+                <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
                     <div class="form-group">
-                        <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
-                            <div class="form-group">
-                                <label hidden for="tableName">Table Name</label>
-                                <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
-                            </div>
-                            <button type="submit" class="btn btn-primary">Download Template</button>
-                        </form>
+                        <label for="file">Select file to upload (xlsx or csv):</label>
+                        <input type="file" name="file" class="form-control" required />
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="submit" class="btn btn-danger btn-icon-text">
+                            <i class="ti-upload btn-icon-prepend"></i>
+                            Upload
+                        </button>
+
+                    </div>
+                </form>
+            </div>
+            <div class="form-group">
+                <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
+                    <div class="form-group">
+                        <label hidden for="tableName">Table Name</label>
+                        <input type="text" value="@tableName" class="form-control" id="tableName" name="tableName" required hidden />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Download Template</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="home-tab">
+            <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-success btn-rounded btn-fw nav-link active ps-0" id="myBtn">Add New</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-danger btn-rounded btn-fw nav-link active ps-0" id="myEditColumnBtn">Add Column</button>
+                    </li>
+                    <li class="nav-item">
+                        <button type="button" class="btn btn-warning btn-rounded btn-fw nav-link active ps-0" id="myuploadfileBtn">Upload File</button>
+                    </li>
+                </ul>
+                <div>
+                    <div class="btn-wrapper">
+                        <a href="#" class="btn btn-otline-dark align-items-center"><i class="icon-share"></i> Share</a>
+                        <a href="#" class="btn btn-otline-dark"><i class="icon-printer"></i> Print</a>
+                        <a href="#" class="btn btn-primary text-white me-0"><i class="icon-download"></i> Export</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="scroll-container table-responsive">
+    <div id="scrollContainer">
+        <table id="dataTable" class="table table-hover table-striped">
+            <thead>
+            </thead>
+            <tbody class="table-body">
+            </tbody>
+        </table>
+    </div>
+</div>
 
-<style>
-    #navs-top-home .table-responsive {
-        max-height: 500px;
-        overflow-y: auto;
-    }
-
-</style>
-
-  

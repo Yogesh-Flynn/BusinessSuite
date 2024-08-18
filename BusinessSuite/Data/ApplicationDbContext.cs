@@ -52,7 +52,7 @@ namespace BusinessSuite.Data
 
             base.OnModelCreating(modelBuilder);
 
-
+          
             modelBuilder.Entity<Marketing_Customers>()
                 .HasKey(cc => new { cc.MarketingsId, cc.CustomersId });
 
@@ -65,8 +65,10 @@ namespace BusinessSuite.Data
                 .HasOne(cc => cc.Customer)
                 .WithMany(c => c.Marketing_Customers)
                 .HasForeignKey(cc => cc.CustomersId);
-            
-            
+
+
+            modelBuilder.Entity<Campaigns_Marketings>()
+          .HasKey(mc => mc.Id); // Primary Key
             modelBuilder.Entity<Campaigns_Marketings>()
                 .HasKey(cc => new { cc.CampaignsId, cc.MarketingsId });
 
