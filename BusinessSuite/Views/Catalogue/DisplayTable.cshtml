@@ -155,7 +155,6 @@
         });
 
 
-
         document.getElementById('catalogueForm').addEventListener('submit', function (event) {
             debugger
             var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
@@ -173,18 +172,76 @@
                 inputName.value = id;
                 container.appendChild(inputName);
             });
+
+            // Handle image conversion to Base64 and add to hidden field
+            var imageInput = document.getElementById('imageInput'); // Assuming you have an input with id="imageInput"
+            if (imageInput && imageInput.files.length > 0) {
+                var file = imageInput.files[0];
+                var reader = new FileReader();
+
+                reader.onloadend = function () {
+                    var base64String = reader.result.split(',')[1]; // Get Base64 part only
+
+                    var imageField = document.createElement('input');
+                    imageField.type = 'hidden';
+                    imageField.name = 'data[Image]'; // The key for the image in your dictionary
+                    imageField.value = base64String;
+                    container.appendChild(imageField);
+                };
+
+                reader.readAsDataURL(file);
+            }
+        });
+
+       ////////////////
+        document.getElementById('catalogueForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the form from submitting immediately
+
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            var container = document.getElementById('hiddenFieldsContainer');
+            container.innerHTML = ''; // Clear any existing hidden fields
+
+            checkboxes.forEach(function (checkbox) {
+                var name = checkbox.getAttribute('data-name');
+                var id = checkbox.getAttribute('data-id');
+
+                var inputName = document.createElement('input');
+                inputName.type = 'hidden';
+                inputName.name = 'data[' + name + ']';
+                inputName.value = id;
+                container.appendChild(inputName);
+            });
+
+            // Handle image conversion to Base64 and add to hidden field
+            var imageInput = document.getElementById('imageInput'); // Assuming you have an input with id="imageInput"
+            if (imageInput && imageInput.files.length > 0) {
+                var file = imageInput.files[0];
+                var reader = new FileReader();
+
+                reader.onloadend = function () {
+                    var base64String = reader.result.split(',')[1]; // Get Base64 part only
+
+                    var imageField = document.createElement('input');
+                    imageField.type = 'hidden';
+                    imageField.name = 'data[Image]'; // The key for the image in your dictionary
+                    imageField.value = base64String;
+                    container.appendChild(imageField);
+
+                    // Now submit the form
+                    document.getElementById('catalogueForm').submit();
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                // If no image, just submit the form immediately
+                document.getElementById('catalogueForm').submit();
+            }
         });
 
         $(document).ready(function () {
-            $('#itemSearch').on('input', function () {
-                var searchValue = $(this).val().toLowerCase();
-                $('#itemsContainer .form-check').filter(function () {
-                    $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
-                });
-            });
-
             $('#catalogueForm').on('submit', function (event) {
-                debugger
+                event.preventDefault(); // Prevent the form from submitting immediately
+
                 var checkboxes = $('#itemsContainer input[type="checkbox"]:checked');
                 var container = $('#hiddenFieldsContainer');
                 container.empty(); // Clear any existing hidden fields
@@ -200,10 +257,43 @@
                     });
                     container.append(inputName);
                 });
+
+                // Handle image conversion to Base64 and add to hidden field
+                var imageInput = $('#imageInput')[0]; // Assuming you have an input with id="imageInput"
+                if (imageInput && imageInput.files.length > 0) {
+                    var file = imageInput.files[0];
+                    var reader = new FileReader();
+
+                    reader.onloadend = function () {
+                        var base64String = reader.result.split(',')[1]; // Get Base64 part only
+
+                        var imageField = $('<input>').attr({
+                            type: 'hidden',
+                            name: 'data[Image]', // The key for the image in your dictionary
+                            value: base64String
+                        });
+                        container.append(imageField);
+
+                        // Now submit the form
+                        $('#catalogueForm').off('submit').submit(); // Remove the handler and submit
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    // If no image, just submit the form immediately
+                    $('#catalogueForm').off('submit').submit(); // Remove the handler and submit
+                }
             });
         });
 
+       ///////////////
 
+        $('#itemSearch').on('input', function () {
+            var searchValue = $(this).val().toLowerCase();
+            $('#itemsContainer .form-check').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(searchValue) > -1);
+            });
+        });
         // Handle the Edit button click event
         $(document).on('click', '.edit-btn', function () {
             debugger
@@ -391,6 +481,10 @@
                                     @if (columnType == "int")
                                     {
                                         <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
+                                    }
+                                    else if (columnType == "varbinary")
+                                    {
+                                        <input type="file" id="imageInput" name="image">
                                     }
                                     else if (columnType == "nvarchar")
                                     {
