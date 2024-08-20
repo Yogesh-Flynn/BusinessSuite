@@ -1,5 +1,6 @@
 ﻿@model System.Data.DataTable
 @using System.Data
+@using BusinessSuite.Models.Master_Models.enums
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var tableName = ViewBag.TableName as string;
@@ -10,6 +11,8 @@
 
     var dropDownOptions = new List<string>();
     var dbmasterid = @TempData["DbMasterId"];
+
+    
 }
 
 @section Scripts {
@@ -154,65 +157,36 @@
             }
         });
 
-
         document.getElementById('catalogueForm').addEventListener('submit', function (event) {
+            event.preventDefault(); // Prevent the default form submission
             debugger
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            // Get all checked checkboxes for TransitCarrier
+            var checkboxes1 = document.querySelectorAll('#transitCarrierContainer input[type="checkbox"]:checked');
             var container = document.getElementById('hiddenFieldsContainer');
             container.innerHTML = ''; // Clear any existing hidden fields
 
-            checkboxes.forEach(function (checkbox) {
-                debugger
+            checkboxes1.forEach(function (checkbox) {
+                var input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'data[' + name + '][]'; // Ensure this matches your field name
+                input.value = checkbox.value;
+                container.appendChild(input);
+            });
+
+            // Handle other checkboxes similarly if required
+            var otherCheckboxes = document.querySelectorAll('#itemsContainer input[type="checkbox"]:checked');
+            otherCheckboxes.forEach(function (checkbox) {
                 var name = checkbox.getAttribute('data-name');
                 var id = checkbox.getAttribute('data-id');
 
                 var inputName = document.createElement('input');
                 inputName.type = 'hidden';
-                inputName.name = 'data[' + name + ']';
+                inputName.name = 'data[' + name + '][]'; // Make sure you handle multiple values as an array
                 inputName.value = id;
                 container.appendChild(inputName);
             });
 
-            // Handle image conversion to Base64 and add to hidden field
-            var imageInput = document.getElementById('imageInput'); // Assuming you have an input with id="imageInput"
-            if (imageInput && imageInput.files.length > 0) {
-                var file = imageInput.files[0];
-                var reader = new FileReader();
-
-                reader.onloadend = function () {
-                    var base64String = reader.result.split(',')[1]; // Get Base64 part only
-
-                    var imageField = document.createElement('input');
-                    imageField.type = 'hidden';
-                    imageField.name = 'data[Image]'; // The key for the image in your dictionary
-                    imageField.value = base64String;
-                    container.appendChild(imageField);
-                };
-
-                reader.readAsDataURL(file);
-            }
-        });
-
-       ////////////////
-        document.getElementById('catalogueForm').addEventListener('submit', function (event) {
-            event.preventDefault(); // Prevent the form from submitting immediately
-
-            var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            var container = document.getElementById('hiddenFieldsContainer');
-            container.innerHTML = ''; // Clear any existing hidden fields
-
-            checkboxes.forEach(function (checkbox) {
-                var name = checkbox.getAttribute('data-name');
-                var id = checkbox.getAttribute('data-id');
-
-                var inputName = document.createElement('input');
-                inputName.type = 'hidden';
-                inputName.name = 'data[' + name + ']';
-                inputName.value = id;
-                container.appendChild(inputName);
-            });
-
-            // Handle image conversion to Base64 and add to hidden field
+            // Handle image conversion to Base64 and add to hidden field (if applicable)
             var imageInput = document.getElementById('imageInput'); // Assuming you have an input with id="imageInput"
             if (imageInput && imageInput.files.length > 0) {
                 var file = imageInput.files[0];
@@ -238,54 +212,7 @@
             }
         });
 
-        $(document).ready(function () {
-            $('#catalogueForm').on('submit', function (event) {
-                event.preventDefault(); // Prevent the form from submitting immediately
-
-                var checkboxes = $('#itemsContainer input[type="checkbox"]:checked');
-                var container = $('#hiddenFieldsContainer');
-                container.empty(); // Clear any existing hidden fields
-
-                checkboxes.each(function () {
-                    var name = $(this).data('name');
-                    var id = $(this).data('id');
-
-                    var inputName = $('<input>').attr({
-                        type: 'hidden',
-                        name: 'data[' + name + ']',
-                        value: id
-                    });
-                    container.append(inputName);
-                });
-
-                // Handle image conversion to Base64 and add to hidden field
-                var imageInput = $('#imageInput')[0]; // Assuming you have an input with id="imageInput"
-                if (imageInput && imageInput.files.length > 0) {
-                    var file = imageInput.files[0];
-                    var reader = new FileReader();
-
-                    reader.onloadend = function () {
-                        var base64String = reader.result.split(',')[1]; // Get Base64 part only
-
-                        var imageField = $('<input>').attr({
-                            type: 'hidden',
-                            name: 'data[Image]', // The key for the image in your dictionary
-                            value: base64String
-                        });
-                        container.append(imageField);
-
-                        // Now submit the form
-                        $('#catalogueForm').off('submit').submit(); // Remove the handler and submit
-                    };
-
-                    reader.readAsDataURL(file);
-                } else {
-                    // If no image, just submit the form immediately
-                    $('#catalogueForm').off('submit').submit(); // Remove the handler and submit
-                }
-            });
-        });
-
+           
        ///////////////
 
         $('#itemSearch').on('input', function () {
@@ -478,14 +405,41 @@
                             else
                             {
                                 <div class="form-group d-inline-block w-auto">
-                                    @if (columnType == "int")
+                                    @if (columnName == "TransitCarrier")
                                     {
-                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
+                                        @if (columnName == "TransitCarrier")
+                                        {
+                                            <div id="transitCarrierContainer" class="form-group">
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" id="whatsappApi" name="data[whatsappApi~TransitCarrier]" value="WhatsappApi">
+                                                    <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" id="whatsappCloudApi" name="data[WhatsappCloudApi~TransitCarrier]" value="WhatsappCloudApi">
+                                                    <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" id="email" name="data[Email~TransitCarrier]" value="Email">
+                                                    <label class="form-check-label" for="email">Email</label>
+                                                </div>
+                                                <div class="form-check">
+                                                    <input type="checkbox" class="form-check-input" id="sms" name="data[SMS~TransitCarrier]" value="SMS">
+                                                    <label class="form-check-label" for="sms">SMS</label>
+                                                </div>
+                                            </div>
+                                        }
+
                                     }
+
+
                                     else if (columnName == "Image")
                                     {
                                      <input type="file" id="imageInput" name="image">
 
+                                    }
+                                    else if (columnType == "int")
+                                    {
+                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
                                     }
                                     else if (columnType == "varbinary")
                                     {

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using BusinessSuite.Models.Master_Models.enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace BusinessSuite.Models
 {
@@ -9,9 +10,14 @@ namespace BusinessSuite.Models
         public string PhoneNumber { get; set; }
         public string MessageText { get; set; }
         public string? Image { get; set; }
+
+        // Use the enum instead of string
+        public TransitCarrierType TransitCarrier { get; set; }
+
         public DateTime ScheduleTime { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         public string Status { get; set; }
-        public bool IsDeleted { get; set; }=false;
+        public bool IsDeleted { get; set; } = false;
     }
+
 }
