@@ -65,49 +65,158 @@
                 pageIndex++;
                 fetchData();
             });
+            
+
+            // function fetchData() {
+            //     $.ajax({
+            //         url: '@Url.Action("GetTableData", "Catalogue")',
+            //         type: 'GET',
+            //         data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
+            //         success: function (data) {
+            //             debugger
+            //             var tableHeader = $('#dataTable thead');
+            //             var tableBody = $('#dataTable tbody');
+
+            //             // Ensure the table structure is defined before manipulating
+            //             if (tableHeader.length === 0 || tableBody.length === 0) {
+            //                 console.error("Table structure is missing. Ensure the <thead> and <tbody> exist in the HTML.");
+            //                 return;
+            //             }
+
+            //             // tableHeader.empty(); // Clear any existing header
+            //             // tableBody.empty(); // Clear any existing body
+
+            //             if (data.length > 0) {
+
+            //                 var tableHeader = $('<tr>');
+            //                 tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+
+            //                 $.each(data[0], function (key, value) {
+            //                     $('<th>').text(key).appendTo(tableHeader);
+            //                 });
+
+            //                 $('<th>').text('Actions').appendTo(tableHeader);
+
+            //                 $('#dataTable thead').empty().append(tableHeader);
+
+            //                 $.each(data, function (index, item) {
+            //                     var row = $('<tr>').appendTo(tableBody);
+            //                     $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
+
+            //                     $.each(item, function (key, value) {
+            //                         // Check if the column is "Image"
+            //                         if (key === 'Image' && value) {
+            //                             // Convert the Base64 string to an image element
+            //                             var imgElement = $('<img>').attr('src', 'data:image/jpeg;base64,' + value).css({
+            //                                 'width': '100px',
+            //                                 'height': '100px'
+            //                             });
+            //                             $('<td>').append(imgElement).appendTo(row);
+            //                         } else {
+            //                             $('<td>').text(value).appendTo(row);
+            //                         }
+            //                     });
+
+            //                     var actions = $('<td>');
+            //                     var editButton = $('<button>')
+            //                         .text('Edit')
+            //                         .addClass('btn btn-primary edit-btn')
+            //                         .attr({
+            //                             'data-id': item.Id,
+            //                             'type': 'button',
+            //                             'data-bs-toggle': 'modal',
+            //                             'data-bs-target': '#basicModal'
+            //                         });
+
+            //                     // Add dynamic data attributes for each key in the item
+            //                     $.each(item, function (key, value) {
+            //                         editButton.attr('data-' + key.toLowerCase(), value);
+            //                     });
+
+            //                     editButton.appendTo(actions);
+
+            //                     $('<button>')
+            //                         .text('Delete')
+            //                         .addClass('btn btn-danger delete-btn')
+            //                         .attr('data-id', item.Id)
+            //                         .appendTo(actions);
+
+            //                     row.append(actions);
+            //                 });
+
+            //                 // Re-bind the select-all checkbox after new data is loaded
+            //                 $('#select-all').on('click', function () {
+            //                     $('input:checkbox').not(this).prop('checked', this.checked);
+            //                 });
+
+            //                 bindActions();
+            //             } else {
+            //                 // Display a "No data available" message
+            //                 var noDataRow = $('<tr>');
+            //                 $('<td>')
+            //                     .attr('colspan', tableHeader.find('th').length || 1)
+            //                     .addClass('text-center')
+            //                     .text('No data available')
+            //                     .appendTo(noDataRow);
+            //                 tableBody.append(noDataRow);
+            //             }
+            //         },
+            //         error: function (xhr, status, error) {
+            //             console.error("An error occurred while fetching data: " + error);
+            //         }
+            //     });
+            // }
+
             function fetchData() {
                 $.ajax({
                     url: '@Url.Action("GetTableData", "Catalogue")',
                     type: 'GET',
                     data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
-                        debugger
                         var tableHeader = $('#dataTable thead');
                         var tableBody = $('#dataTable tbody');
 
-                        // Ensure the table structure is defined before manipulating
                         if (tableHeader.length === 0 || tableBody.length === 0) {
                             console.error("Table structure is missing. Ensure the <thead> and <tbody> exist in the HTML.");
                             return;
                         }
 
-                        // tableHeader.empty(); // Clear any existing header
-                        // tableBody.empty(); // Clear any existing body
-
                         if (data.length > 0) {
-
                             var tableHeader = $('<tr>');
-                            tableHeader.append('<th><input type="checkbox" id="select-all"/></th>'); // Select All Checkbox
+                            tableHeader.append('<th><input type="checkbox" id="select-all"/></th>');
 
                             $.each(data[0], function (key, value) {
-                                $('<th>').text(key).appendTo(tableHeader);
+                                $('<th>').text(key).addClass('fixed-column-width').appendTo(tableHeader);
                             });
 
-                            $('<th>').text('Actions').appendTo(tableHeader);
+                            $('<th>').text('Actions').addClass('fixed-column-width').appendTo(tableHeader);
 
                             $('#dataTable thead').empty().append(tableHeader);
 
-
-
                             $.each(data, function (index, item) {
                                 var row = $('<tr>').appendTo(tableBody);
-                                $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>').appendTo(row); // Row Select Checkbox
+                                $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>')
+                                    .addClass('fixed-column-width')
+                                    .appendTo(row);
 
                                 $.each(item, function (key, value) {
-                                    $('<td>').text(value).appendTo(row);
+                                    var cell = $('<td>').addClass('fixed-column-width');
+                                    if (key === 'Image' && value) {
+                                        var imgElement = $('<img>').attr('src', 'data:image/jpeg;base64,' + value).css({
+                                            'width': '100px',
+                                            'height': '100px'
+                                        });
+                                        cell.append(imgElement);
+                                    } else if (key === 'LargeStringColumnName' && value.length > 200) {
+                                        // For large strings, apply additional class for wrapping
+                                        cell.addClass('large-string').text(value);
+                                    } else {
+                                        cell.text(value);
+                                    }
+                                    row.append(cell);
                                 });
 
-                                var actions = $('<td>');
+                                var actions = $('<td>').addClass('fixed-column-width');
                                 var editButton = $('<button>')
                                     .text('Edit')
                                     .addClass('btn btn-primary edit-btn')
@@ -118,29 +227,27 @@
                                         'data-bs-target': '#basicModal'
                                     });
 
-                                // Add dynamic data attributes for each key in the item
                                 $.each(item, function (key, value) {
                                     editButton.attr('data-' + key.toLowerCase(), value);
                                 });
 
-                                editButton.appendTo(actions);
-
-                                $('<button>')
-                                    .text('Delete')
-                                    .addClass('btn btn-danger delete-btn')
-                                    .attr('data-id', item.Id)
-                                    .appendTo(actions);
+                                actions.append(editButton);
+                                actions.append(
+                                    $('<button>')
+                                        .text('Delete')
+                                        .addClass('btn btn-danger delete-btn')
+                                        .attr('data-id', item.Id)
+                                );
 
                                 row.append(actions);
                             });
-                            // Re-bind the select-all checkbox after new data is loaded
+
                             $('#select-all').on('click', function () {
                                 $('input:checkbox').not(this).prop('checked', this.checked);
                             });
 
                             bindActions();
                         } else {
-                            // Display a "No data available" message
                             var noDataRow = $('<tr>');
                             $('<td>')
                                 .attr('colspan', tableHeader.find('th').length || 1)
@@ -155,6 +262,8 @@
                     }
                 });
             }
+
+
         });
 
         document.getElementById('catalogueForm').addEventListener('submit', function (event) {
@@ -347,7 +456,25 @@
 
 
 
+<style>
+    .fixed-column-width {
+        width: 300px;
+        max-width: 300px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        overflow: hidden;
+    }
 
+    .large-string {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        overflow: hidden;
+    }
+
+
+</style>
 
 
 
