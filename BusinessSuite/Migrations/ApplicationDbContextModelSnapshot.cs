@@ -280,8 +280,9 @@ namespace BusinessSuite.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TransitCarrier")
-                        .HasColumnType("int");
+                    b.Property<string>("TransitCarrier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

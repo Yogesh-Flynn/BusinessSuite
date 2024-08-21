@@ -115,11 +115,9 @@ namespace BusinessSuite.Migrations.CRMDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Message")
@@ -130,11 +128,12 @@ namespace BusinessSuite.Migrations.CRMDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductsId")
+                    b.Property<int?>("ProductsId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TransitCarrier")
-                        .HasColumnType("int");
+                    b.Property<string>("TransitCarrier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -193,8 +192,9 @@ namespace BusinessSuite.Migrations.CRMDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TransitCarrier")
-                        .HasColumnType("int");
+                    b.Property<string>("TransitCarrier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -292,8 +292,7 @@ namespace BusinessSuite.Migrations.CRMDb
                     b.HasOne("BusinessSuite.Models.Products", "Products")
                         .WithMany("Marketings")
                         .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Products");
                 });

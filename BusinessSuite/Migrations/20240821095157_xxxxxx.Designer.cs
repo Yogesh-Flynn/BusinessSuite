@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240817080543_xxxxxx")]
+    [Migration("20240821095157_xxxxxx")]
     partial class xxxxxx
     {
         /// <inheritdoc />
@@ -280,6 +280,10 @@ namespace BusinessSuite.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransitCarrier")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

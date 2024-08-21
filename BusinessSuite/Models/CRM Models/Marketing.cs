@@ -9,22 +9,22 @@ namespace BusinessSuite.Models
         [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public string Message { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;
 
         [ForeignKey("Products")]
-        public int ProductsId { get; set; }
+        public int? ProductsId { get; set; }
         public Products Products { get; set; }
 
         public ICollection<Marketing_Customers> Marketings_Customers { get; set; }
         public ICollection<Campaigns_Marketings> Campaigns_Marketing { get; set; }
 
         // Property to store image as binary data
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         // Enum property to restrict to specific values
-        public TransitCarrierType TransitCarrier { get; set; }
+        public string TransitCarrier { get; set; }
     }
 
 }

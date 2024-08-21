@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BusinessSuite.Migrations.CRMDb
 {
     [DbContext(typeof(CRMDbContext))]
-    [Migration("20240818062854_xxxxxx")]
+    [Migration("20240821095358_xxxxxx")]
     partial class xxxxxx
     {
         /// <inheritdoc />
@@ -58,9 +58,6 @@ namespace BusinessSuite.Migrations.CRMDb
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.HasKey("CampaignsId", "MarketingsId");
 
@@ -121,7 +118,9 @@ namespace BusinessSuite.Migrations.CRMDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
-                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Message")
@@ -132,8 +131,12 @@ namespace BusinessSuite.Migrations.CRMDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ProductsId")
+                    b.Property<int?>("ProductsId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TransitCarrier")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -152,9 +155,6 @@ namespace BusinessSuite.Migrations.CRMDb
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Id")
-                        .HasColumnType("int");
 
                     b.HasKey("MarketingsId", "CustomersId");
 
@@ -192,6 +192,10 @@ namespace BusinessSuite.Migrations.CRMDb
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TransitCarrier")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -291,8 +295,7 @@ namespace BusinessSuite.Migrations.CRMDb
                     b.HasOne("BusinessSuite.Models.Products", "Products")
                         .WithMany("Marketings")
                         .HasForeignKey("ProductsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Products");
                 });

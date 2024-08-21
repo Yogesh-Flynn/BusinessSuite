@@ -12,7 +12,7 @@ namespace BusinessSuite.Models
         public string? Image { get; set; }
 
         // Use the enum instead of string
-        public TransitCarrierType TransitCarrier { get; set; }
+        public string TransitCarrier { get; set; }
 
         public DateTime ScheduleTime { get; set; }
         public DateTime CreatedDate { get; set; } = DateTime.Now;

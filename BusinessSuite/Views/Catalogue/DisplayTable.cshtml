@@ -161,17 +161,17 @@
             event.preventDefault(); // Prevent the default form submission
             debugger
             // Get all checked checkboxes for TransitCarrier
-            var checkboxes1 = document.querySelectorAll('#transitCarrierContainer input[type="checkbox"]:checked');
+            // var checkboxes1 = document.querySelectorAll('#transitCarrierContainer input[type="checkbox"]:checked');
             var container = document.getElementById('hiddenFieldsContainer');
-            container.innerHTML = ''; // Clear any existing hidden fields
+            // container.innerHTML = ''; // Clear any existing hidden fields
 
-            checkboxes1.forEach(function (checkbox) {
-                var input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = 'data[' + name + '][]'; // Ensure this matches your field name
-                input.value = checkbox.value;
-                container.appendChild(input);
-            });
+            // checkboxes1.forEach(function (checkbox) {
+            //     var input = document.createElement('input');
+            //     input.type = 'hidden';
+            //     input.name = 'data[' + name + '][]'; // Ensure this matches your field name
+            //     input.value = checkbox.value;
+            //     container.appendChild(input);
+            // });
 
             // Handle other checkboxes similarly if required
             var otherCheckboxes = document.querySelectorAll('#itemsContainer input[type="checkbox"]:checked');
@@ -612,7 +612,33 @@
 
                                             <label>@row["COLUMN_NAME"].ToString()</label>
                                             <div class="form-group d-inline-block w-auto">
-                                                @if (columnType == "int")
+
+                                            @if (columnName == "TransitCarrier"||columnName == "transitcarrier")
+                                            {
+                                            @if (columnName == "TransitCarrier" || columnName == "transitcarrier")
+                                                {
+                                                    <div id="transitCarrierContainer" class="form-group">
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input" id="whatsappApi" name="data[whatsappApi~TransitCarrier]" value="WhatsappApi">
+                                                            <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input" id="whatsappCloudApi" name="data[WhatsappCloudApi~TransitCarrier]" value="WhatsappCloudApi">
+                                                            <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input" id="email" name="data[Email~TransitCarrier]" value="Email">
+                                                            <label class="form-check-label" for="email">Email</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input type="checkbox" class="form-check-input" id="sms" name="data[SMS~TransitCarrier]" value="SMS">
+                                                            <label class="form-check-label" for="sms">SMS</label>
+                                                        </div>
+                                                    </div>
+                                                }
+
+                                            }
+                                            else if (columnType == "int")
                                                 {
                                                     <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
                                                 }

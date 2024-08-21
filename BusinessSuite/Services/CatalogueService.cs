@@ -191,8 +191,15 @@ namespace BusinessSuite.Services
                     {
                         if (data.ContainsKey(columnName))
                         {
-                            remaingdata.Add(columnName, data[columnName]);
-                            data.Remove(columnName);
+                            if (data[columnName] != null)
+                            {
+                                remaingdata.Add(columnName, data[columnName]);
+                                data.Remove(columnName);
+                            }
+                            else
+                            {
+                                data.Remove(columnName);
+                            }
                         }
                         else
                         {
@@ -217,10 +224,12 @@ namespace BusinessSuite.Services
                 {
                     string sztablename = item.Key.ToString();
                     string[] table = sztablename.Split('~');
+                    if (table.Length > 1)
+                    {
+                        values1.Add((table[1], item.Value));
 
-                    values1.Add((table[1], item.Value));
+                    }
                 }
-
 
                 Dictionary<string, string> insertedData = new Dictionary<string, string>();
                 string columns = string.Join(", ", remaingdata.Keys);
@@ -530,7 +539,11 @@ namespace BusinessSuite.Services
                 ///
                 // Assuming connection is already initialized
 
-
+                string maintablecols = "";
+                foreach (var item in two)
+                {
+                    maintablecols += "m." + item+",";
+                }
                 System.Data.DataTable tableSchema1 = new System.Data.DataTable();
 
                 var displaycols = "";
@@ -543,14 +556,15 @@ namespace BusinessSuite.Services
                         if (thirdtable[0].Contains(item))
                         {
 
-                            displaycols += $"m.Id,m.Name,STRING_AGG(p{cnt}.Name, ', ') AS {item},";
-                            displaygroupby += $"GROUP BY m.Id, m.Name,";
+                            displaycols += $"{maintablecols}STRING_AGG(p{cnt}.Name, ', ') AS {item},";
+                            displaygroupby += $"GROUP BY {maintablecols}";
+                            maintablecols += "p1.Name";
 
                         }
                         else
                         {
                             displaycols += $"p{cnt}.Name AS {item}Name,";
-                            displaygroupby += $"p{cnt}.Name";
+                            displaygroupby += $"{maintablecols}";
                         }
                     }
                     else
@@ -581,7 +595,7 @@ namespace BusinessSuite.Services
         Products p1 ON m.ProductId = p1.Id
     GROUP BY 
         m.Id, m.Name, m.Description, m.ProductId, p1.Name*/
-
+               
                 foreach (var item in nonMatching)
                 {
                     if (thirdtable.Count == 0)
@@ -622,6 +636,7 @@ namespace BusinessSuite.Services
                     // Remove the comma from the end
                     displaygroupby = displaygroupby.TrimEnd(',');
                 }
+              
 
                 if (displaygroupby.Equals(""))
                 {
@@ -639,7 +654,7 @@ namespace BusinessSuite.Services
                 else
                 {
                     createTableQuery1 = @$"
-                                            SELECT * FROM (SELECT {displaycols} ROW_NUMBER() OVER (ORDER BY m.Id) AS RowNum 
+                                            SELECT * FROM (SELECT {displaycols} ROW_NUMBER() OVER (ORDER BY {maintablecols} ) AS RowNum 
                                             FROM 
                                             {TableName} m
                                             {leftjoin} {displaygroupby}) AS SubQuery 
