@@ -14,9 +14,9 @@ namespace BusinessSuite.Services
             _logger = logger;
         }
 
-        public async Task StoreDataAsync(string PhoneNumber,string MessageText,String Image,string status, DateTime createdAt)
+        public async Task StoreDataAsync(string PhoneNumber,string TransitCarrier, string MessageText,String Image,string status, DateTime createdAt)
         {
-            var data = new Message { PhoneNumber = PhoneNumber,MessageText=MessageText,Image=Image, ScheduleTime = createdAt,Status="Pending",IsDeleted=false};
+            var data = new Message { TransitCarrier= TransitCarrier, PhoneNumber = PhoneNumber,MessageText=MessageText,Image=Image, ScheduleTime = createdAt,Status="Pending",IsDeleted=false};
 
             _context.Messages.Add(data);
             await _context.SaveChangesAsync();
