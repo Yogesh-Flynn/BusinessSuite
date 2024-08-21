@@ -636,27 +636,50 @@
 
                                             @if (columnName == "TransitCarrier"||columnName == "transitcarrier")
                                             {
-                                            @if (columnName == "TransitCarrier" || columnName == "transitcarrier")
-                                                {
-                                                    <div id="transitCarrierContainer" class="form-group">
-                                                        <div class="form-check">
-                                                            <input type="checkbox" class="form-check-input" id="whatsappApi" name="data[whatsappApi~TransitCarrier]" value="WhatsappApi">
-                                                            <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input type="checkbox" class="form-check-input" id="whatsappCloudApi" name="data[WhatsappCloudApi~TransitCarrier]" value="WhatsappCloudApi">
-                                                            <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input type="checkbox" class="form-check-input" id="email" name="data[Email~TransitCarrier]" value="Email">
-                                                            <label class="form-check-label" for="email">Email</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input type="checkbox" class="form-check-input" id="sms" name="data[SMS~TransitCarrier]" value="SMS">
-                                                            <label class="form-check-label" for="sms">SMS</label>
-                                                        </div>
+
+                                            @if (columnName == "TransitCarrier")
+                                            {
+                                                <div id="transitCarrierContainer" class="form-group">
+                                                    <input type="hidden" id="transitCarrierHiddenInput" name="data[TransitCarrier]" />
+
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappApi" value="WhatsappApi">
+                                                        <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
                                                     </div>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappCloudApi" value="WhatsappCloudApi">
+                                                        <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="email" value="Email">
+                                                        <label class="form-check-label" for="email">Email</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="sms" value="SMS">
+                                                        <label class="form-check-label" for="sms">SMS</label>
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <script>
+                                                // Function to update the hidden input with selected values
+                                                function updateTransitCarrierHiddenInput() {
+                                                    var selectedValues = [];
+                                                    document.querySelectorAll('.transitCarrierCheckbox:checked').forEach(function (checkbox) {
+                                                        selectedValues.push(checkbox.value);
+                                                    });
+                                                    document.getElementById('transitCarrierHiddenInput').value = selectedValues.join(',');
                                                 }
+
+                                                // Attach event listener to all checkboxes
+                                                document.querySelectorAll('.transitCarrierCheckbox').forEach(function (checkbox) {
+                                                    checkbox.addEventListener('change', updateTransitCarrierHiddenInput);
+                                                });
+
+                                                // Initialize the hidden input in case some checkboxes are pre-selected
+                                                updateTransitCarrierHiddenInput();
+                                            </script>
+
 
                                             }
                                             else if (columnType == "int")
