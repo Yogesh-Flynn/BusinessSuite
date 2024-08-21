@@ -555,12 +555,16 @@ namespace BusinessSuite.Services
                 {
                     if (thirdtable.Count == 1)
                     {
+                        if(cnt==1)
+                        {
+                            maintablecols += "p1.Name,";
+                        }
                         if (thirdtable[0].Contains(item))
                         {
 
                             displaycols += $"{maintablecols}STRING_AGG(p{cnt}.Name, ', ') AS {item},";
                             displaygroupby += $"GROUP BY {maintablecols}";
-                            maintablecols += "p1.Name";
+                            
 
                         }
                         else
@@ -638,7 +642,7 @@ namespace BusinessSuite.Services
                     // Remove the comma from the end
                     displaygroupby = displaygroupby.TrimEnd(',');
                 }
-              
+                maintablecols= maintablecols.Substring(0, maintablecols.Length - 1);
 
                 if (displaygroupby.Equals(""))
                 {
