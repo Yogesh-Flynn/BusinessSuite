@@ -477,6 +477,7 @@
                                             {
                                                 <div class="form-group d-inline-block w-auto">
                                                     <select name="data[@columnName]" class="form-control">
+                                                        <option value="">--Select--</option>
                                                         @foreach (var option in dropDownOptions)
                                                         {
                                                             if (!option.Equals(""))
@@ -647,6 +648,7 @@
                                                 {
                                                     <div class="form-group d-inline-block w-auto">
                                                         <select name="data[@columnName]" class="form-control">
+                                                            <option value="">--Select--</option>
                                                             @foreach (var option in dropDownOptions)
                                                             {
                                                                 if (!option.Equals(""))
@@ -767,7 +769,7 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
 
-                     <div style="height: 300px;">
+                     <div style="height: 350px;">
                         <button type="button" class="btn btn-success btn-rounded btn-fw" id="myBtn">Add New</button>
 
                         @* <div class="table-responsive text-nowrap">
@@ -779,7 +781,7 @@
                             </table>
                         </div> *@
 
-                        <div class="table-responsive text-nowrap" style="max-height: 300px; overflow-y: auto;">
+                        <div class="table-responsive text-nowrap" style="max-height: 350px; overflow-y: auto;">
                             <table class="table table-hover" id="dataTable">
                                 <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                                     <!-- Table headers go here -->
@@ -865,6 +867,7 @@
                                                     {
                                                         <div class="form-group d-inline-block w-auto">
                                                             <select name="data[@columnName]" class="form-control">
+                                                                <option value="">--Select--</option>
                                                                 @foreach (var option in dropDownOptions)
                                                                 {
                                                                     if (!option.Equals(""))
@@ -1010,7 +1013,7 @@
 
 <style>
     #navs-top-home .table-responsive {
-        max-height: 300px;
+        max-height: 500px;
         overflow-y: auto;
     }
 

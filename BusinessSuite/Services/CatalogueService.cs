@@ -187,20 +187,26 @@ namespace BusinessSuite.Services
                 foreach (DataRow row in columnSchema.Rows)
                 {
                     var columnName = row["COLUMN_NAME"].ToString();
-                    if (data.ContainsKey(columnName))
+                    try
                     {
-                        remaingdata.Add(columnName, data[columnName]);
-                        data.Remove(columnName);
-                    }
-                    else
-                    {
-                        if (!columnName.Equals("Id") && !columnName.Equals("CreatedDate"))
+                        if (data.ContainsKey(columnName))
                         {
                             remaingdata.Add(columnName, data[columnName]);
-
-
                             data.Remove(columnName);
                         }
+                        else
+                        {
+                            if (!columnName.Equals("Id") && !columnName.Equals("CreatedDate"))
+                            {
+                                remaingdata.Add(columnName, data[columnName]);
+
+
+                                data.Remove(columnName);
+                            }
+
+                        }
+                    }catch(Exception ex)
+                    {
 
                     }
                 }
