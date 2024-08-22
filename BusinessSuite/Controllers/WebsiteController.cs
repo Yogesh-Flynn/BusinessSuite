@@ -2,8 +2,8 @@
 using BusinessSuite.Models.Master_Models;
 using DocumentFormat.OpenXml.InkML;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data.SqlClient;
 
 namespace BusinessSuite.Controllers
 {

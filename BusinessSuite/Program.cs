@@ -3,6 +3,7 @@ using BusinessSuite.Interfaces;
 using BusinessSuite.Services;
 using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using Hangfire;
+using Hangfire.MySql;
 using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -11,15 +12,27 @@ using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 
 
+//// Add services to the container.
+//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+//builder.Services.AddDbContext<ApplicationDbContext>(options =>
+//    options.UseSqlServer(connectionString));
+//builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+//builder.Services.AddDbContext<CRMDbContext>(options =>
+//          options.UseSqlServer(builder.Configuration.GetConnectionString("CRMDBCONN")));
+
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 33)))); // Adjust MySQL version as needed
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDbContext<CRMDbContext>(options =>
-          options.UseSqlServer(builder.Configuration.GetConnectionString("CRMDBCONN")));
-
+    options.UseMySql(builder.Configuration.GetConnectionString("CRMDBCONN"),
+    new MySqlServerVersion(new Version(8, 0, 33)))); // Adjust MySQL version as needed
 
 
 
@@ -35,22 +48,25 @@ builder.Services.AddDefaultIdentity<IdentityUser>().AddDefaultTokenProviders()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
-
 // Configure Hangfire
 builder.Services.AddHangfire(configuration => configuration
     .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
     .UseSimpleAssemblyNameTypeSerializer()
     .UseRecommendedSerializerSettings()
-    .UseSqlServerStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+    .UseStorage(new MySqlStorage(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlStorageOptions
     {
-        CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-        SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-        QueuePollInterval = TimeSpan.Zero,
-        UseRecommendedIsolationLevel = true,
-        DisableGlobalLocks = true
-    }));
+        TablesPrefix = "Hangfire", // Optional: Use a table prefix if needed
+        QueuePollInterval = TimeSpan.FromSeconds(15), // Set your preferred poll interval
+        TransactionIsolationLevel = (System.Transactions.IsolationLevel?)System.Data.IsolationLevel.ReadCommitted, // Set transaction isolation level
+        JobExpirationCheckInterval = TimeSpan.FromHours(1), // Set the interval for expired job checks
+        CountersAggregateInterval = TimeSpan.FromMinutes(5), // Aggregation interval for counters
+        PrepareSchemaIfNecessary = true, // Automatically create the schema if necessary
+        DashboardJobListLimit = 5000, // Job list limit for the Hangfire Dashboard
+    })));
 
+// Add Hangfire server
 builder.Services.AddHangfireServer();
+
 // Add services to the container.
 builder.Services.AddControllers().AddNewtonsoftJson();
 
