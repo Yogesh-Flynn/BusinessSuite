@@ -809,7 +809,7 @@ namespace BusinessSuite.Data
                 {
                     Name = "CRM",
                     CreatedDate = DateTime.Now,
-                    ConnectionString = "Server=DESKTOP-NOQE41E;Database=CRM;Integrated Security=false;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true;user=Development;password=Yogesh@964374",
+                    ConnectionString = "Server=DESKTOP-NOQE41E;Database=CRMDB;Integrated Security=false;TrustServerCertificate=True;MultipleActiveResultSets=true;user=Development;password=Development",
                     IsDeleted = false,
                     WebsiteId=websiteid,
 
