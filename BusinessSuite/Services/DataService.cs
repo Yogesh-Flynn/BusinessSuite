@@ -8,6 +8,7 @@ using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using DocumentFormat.OpenXml.Spreadsheet;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using MySqlConnector;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
@@ -17,7 +18,7 @@ namespace BusinessSuite.Services
 {
     public class DataService : IDataService
     {
-        private SqlConnection _connection;
+        private MySqlConnection _connection;
         public DataService() { 
             
         }
@@ -50,12 +51,12 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
                 string insertDataQuery = $"DELETE FROM {TableName} WHERE Id = {DataId}";
 
-                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();
 
@@ -76,12 +77,12 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
                 string insertDataQuery = $"DELETE FROM {TableName}";
 
-                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();
 
@@ -102,12 +103,12 @@ namespace BusinessSuite.Services
         {
             try
             {
-                //_connection = new SqlConnection(szConnectionString);
+                //_connection = new MySqlConnection(szConnectionString);
                 //await _connection.OpenAsync();
 
                 //string insertDataQuery = $"DELETE FROM {TableName}";
 
-                //using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                //using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
                 //{
                 //    var insertedId = await command.ExecuteScalarAsync();
 
@@ -116,7 +117,7 @@ namespace BusinessSuite.Services
                 //}
 
 
-                using (var connection = new SqlConnection(szConnectionString))
+                using (var connection = new MySqlConnection(szConnectionString))
                 {
                     await connection.OpenAsync();
 
@@ -171,7 +172,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
                 string insertDataQuery = $@"";
@@ -183,7 +184,7 @@ namespace BusinessSuite.Services
                 SELECT SCOPE_IDENTITY();";
                 }
 
-                using (SqlCommand command = new SqlCommand(insertDataQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
                 {
                     var insertedId = await command.ExecuteScalarAsync();
 
@@ -211,7 +212,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
                 foreach (DataRow row in dataTable.Rows)
@@ -222,7 +223,7 @@ namespace BusinessSuite.Services
                     var insertCommandText = $"INSERT INTO {TableName} ({columnNames},CreatedDate) VALUES ({parameters},'{DateTime.Now}')";
 
 
-                    using (var command = new SqlCommand(insertCommandText, _connection))
+                    using (var command = new MySqlCommand(insertCommandText, _connection))
                     {
                         foreach (DataColumn column in dataTable.Columns)
                         {
@@ -230,7 +231,7 @@ namespace BusinessSuite.Services
                         }
 
                         // Using SqlDataAdapter to execute the command
-                        using (var adapter = new SqlDataAdapter())
+                        using (var adapter = new MySqlDataAdapter())
                         {
                             adapter.InsertCommand = command;
                             await command.ExecuteNonQueryAsync();
@@ -254,7 +255,7 @@ namespace BusinessSuite.Services
             try
             {
                 System.Data.DataTable columnSchema = new System.Data.DataTable();
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 string getColumnNamesQuery = @"
                     SELECT COLUMN_NAME, DATA_TYPE
@@ -262,10 +263,10 @@ namespace BusinessSuite.Services
                     WHERE TABLE_NAME = @TableName
                     ORDER BY ORDINAL_POSITION";
 
-                using (SqlCommand command = new SqlCommand(getColumnNamesQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(getColumnNamesQuery, _connection))
                 {
                     command.Parameters.AddWithValue("@TableName", TableName);
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                     {
                         adapter.Fill(columnSchema);
                     }
@@ -287,7 +288,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 System.Data.DataTable tableSchema = new System.Data.DataTable();
                 try
@@ -296,10 +297,10 @@ namespace BusinessSuite.Services
                                        ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
                                        FROM {TableName}";
 
-                    using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                    using (MySqlCommand command = new MySqlCommand(createTableQuery, _connection))
                     {
 
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                         {
                             adapter.Fill(tableSchema);
                         }
@@ -311,10 +312,10 @@ namespace BusinessSuite.Services
                                        ROW_NUMBER() OVER (ORDER BY Id) AS RowNum 
                                        FROM {TableName}";
 
-                    using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                    using (MySqlCommand command = new MySqlCommand(createTableQuery, _connection))
                     {
 
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                         {
                             adapter.Fill(tableSchema);
                         }
@@ -336,17 +337,17 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 System.Data.DataTable tableSchema = new System.Data.DataTable();
                 try
                 {
                     
 
-                    using (SqlCommand command = new SqlCommand(szQuery, _connection))
+                    using (MySqlCommand command = new MySqlCommand(szQuery, _connection))
                     {
 
-                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                         {
                             adapter.Fill(tableSchema);
                         }
@@ -378,34 +379,64 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
-                // Use a concise way to create the query
-                string createTableQuery = "SELECT * FROM sys.tables";
+                //// Use a concise way to create the query
+                ////string createTableQuery = "SELECT * FROM sys.tables";
+                //string createTableQuery = "SELECT TABLE_NAME,CREATE_TIME FROM `tables` WHERE TABLE_TYPE='BASE TABLE'";
 
-                // Create a list directly without the need for a DataTable
+                //// Create a list directly without the need for a DataTable
+                //List<Catalogues> tableNames = new List<Catalogues>();
+
+                //// Use a using statement for MySqlCommand and SqlDataAdapter to ensure proper resource disposal
+                //using (MySqlCommand command = new MySqlCommand(createTableQuery, _connection))
+                //{
+                //    // Use ExecuteReaderAsync to execute the command asynchronously
+                //    using (MySqlDataReader reader =await command.ExecuteReaderAsync())
+                //    {
+                //        while (await reader.ReadAsync())
+                //        {
+                //            // Use reader.GetString to get the table name directly
+                //            string tableName = reader.GetString(0);
+                //            DateTime datecreated = reader.GetDateTime(7);
+                //            Catalogues catalogues = new Catalogues();
+                //            catalogues.Name = tableName;
+                //            catalogues.CreatedDate = datecreated;
+                //            tableNames.Add(catalogues);
+                //        }
+                //    }
+                //}
+                string createTableQuery = @"
+    SELECT TABLE_NAME, CREATE_TIME 
+    FROM information_schema.tables 
+    WHERE TABLE_TYPE = 'BASE TABLE'";
+
                 List<Catalogues> tableNames = new List<Catalogues>();
 
-                // Use a using statement for SqlCommand and SqlDataAdapter to ensure proper resource disposal
-                using (SqlCommand command = new SqlCommand(createTableQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(createTableQuery, _connection))
                 {
                     // Use ExecuteReaderAsync to execute the command asynchronously
-                    using (SqlDataReader reader =await command.ExecuteReaderAsync())
+                    using (MySqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            // Use reader.GetString to get the table name directly
-                            string tableName = reader.GetString(0);
-                            DateTime datecreated = reader.GetDateTime(7);
-                            Catalogues catalogues = new Catalogues();
-                            catalogues.Name = tableName;
-                            catalogues.CreatedDate = datecreated;
+                            // Read table name and creation time from the result set
+                            string tableName = reader.GetString("TABLE_NAME");
+                            DateTime dateCreated = reader.GetDateTime("CREATE_TIME");
+
+                            // Create a new Catalogues object and set its properties
+                            Catalogues catalogues = new Catalogues
+                            {
+                                Name = tableName,
+                                CreatedDate = dateCreated
+                            };
+
+                            // Add the Catalogues object to the list
                             tableNames.Add(catalogues);
                         }
                     }
                 }
-
                 // Use object initializer syntax for TableNameViewModel
                 var tableNameViewModel = new CataloguesViewModel
                 {
@@ -427,7 +458,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 List<string> tableNames = new List<string>();
                 string getTableNamesQuery = @"SELECT TABLE_NAME
@@ -439,13 +470,13 @@ namespace BusinessSuite.Services
 
 
                 // Fetch all table names
-                using (SqlCommand command = new SqlCommand(getTableNamesQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(getTableNamesQuery, _connection))
                 {
                     if (_connection.State != ConnectionState.Open)
                     {
                         await _connection.OpenAsync();
                     }
-                    using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                    using (MySqlDataReader reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
@@ -468,7 +499,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
                 System.Data.DataTable columnSchemaDetail = new System.Data.DataTable();
@@ -506,11 +537,11 @@ namespace BusinessSuite.Services
                                                         WHERE 
                                                             FKCU.TABLE_NAME = @TableB
                                                             AND PKCU.TABLE_NAME = @TableA;";
-                using (SqlCommand command = new SqlCommand(getColumnDetailsQuery, _connection))
+                using (MySqlCommand command = new MySqlCommand(getColumnDetailsQuery, _connection))
                 {
                     command.Parameters.AddWithValue("@TableA", sourceTable);
                     command.Parameters.AddWithValue("@TableB", targetTable);
-                    using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                    using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
                     {
                         adapter.Fill(columnSchemaDetail);
                     }
@@ -566,7 +597,7 @@ namespace BusinessSuite.Services
         {
             try
             {
-                _connection = new SqlConnection(szConnectionString);
+                _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
                 var updateQuery = new StringBuilder($"UPDATE {TableName} SET ");
 
@@ -577,7 +608,7 @@ namespace BusinessSuite.Services
                 updateQuery.Length -= 2; // Remove the last comma
                 updateQuery.Append($" WHERE Id = @Id");
 
-                using (var command = new SqlCommand(updateQuery.ToString(), _connection))
+                using (var command = new MySqlCommand(updateQuery.ToString(), _connection))
                 {
                     foreach (var column in Data)
                     {
