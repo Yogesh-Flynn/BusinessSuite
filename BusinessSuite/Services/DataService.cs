@@ -175,20 +175,41 @@ namespace BusinessSuite.Services
                 _connection = new MySqlConnection(szConnectionString);
                 await _connection.OpenAsync();
 
-                string insertDataQuery = $@"";
-               
-                {
-                     insertDataQuery = $@"
-                INSERT INTO {TableName} ({Columns}, CreatedDate) 
-                VALUES ({ColumnValues}, '{DateTime.Now}');
-                SELECT SCOPE_IDENTITY();";
-                }
+                //string insertDataQuery = $@"";
 
+                //{
+                //     insertDataQuery = $@"
+                //INSERT INTO {TableName} ({Columns}, CreatedDate) 
+                //VALUES ({ColumnValues}, '{DateTime.Now}');
+                //SELECT SCOPE_IDENTITY();";
+                //}
+
+                //using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
+                //{
+                //    var insertedId = await command.ExecuteScalarAsync();
+
+
+
+                //    // Check if insertedId is null and return 0 if it is
+                //    if (insertedId == null || insertedId == DBNull.Value)
+                //    {
+                //        return 0;
+                //    }
+
+                //    return int.Parse(insertedId.ToString());
+                //}
+
+                // Prepare the SQL query with the correct function for MySQL
+                string insertDataQuery = $@"
+    INSERT INTO {TableName} ({Columns}, CreatedDate) 
+    VALUES ({ColumnValues}, '{DateTime.Now}');
+    SELECT LAST_INSERT_ID();";
+
+                // Use MySqlCommand to execute the query
                 using (MySqlCommand command = new MySqlCommand(insertDataQuery, _connection))
                 {
+                    // Execute the command and get the last inserted ID
                     var insertedId = await command.ExecuteScalarAsync();
-
-
 
                     // Check if insertedId is null and return 0 if it is
                     if (insertedId == null || insertedId == DBNull.Value)
@@ -196,10 +217,11 @@ namespace BusinessSuite.Services
                         return 0;
                     }
 
-                    return int.Parse(insertedId.ToString());
+                    return Convert.ToInt32(insertedId);
                 }
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw ex;
             }
@@ -408,9 +430,9 @@ namespace BusinessSuite.Services
                 //    }
                 //}
                 string createTableQuery = @"
-    SELECT TABLE_NAME, CREATE_TIME 
-    FROM information_schema.tables 
-    WHERE TABLE_TYPE = 'BASE TABLE'";
+                                            SELECT TABLE_NAME, CREATE_TIME 
+                                            FROM information_schema.tables 
+                                            WHERE TABLE_TYPE = 'BASE TABLE'";
 
                 List<Catalogues> tableNames = new List<Catalogues>();
 
