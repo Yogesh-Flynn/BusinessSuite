@@ -65,10 +65,11 @@
     {
         catalogs = _dbcontext.TableMasters.Where(i => i.DatabaseMasterId == dbMaster.Id).ToList();
     }
+ 
 }
 
 <ul class="navbar-nav">
-    @if (SignInManager.IsSignedIn(User))
+    @if (SignInManager.IsSignedIn(User) && currentAction != "DisplayTable" )
     {
         <nav class="layout-navbar container-xxl navbar navbar-expand-xl navbar-detached align-items-center bg-navbar-theme"
              id="layout-navbar">
