@@ -582,8 +582,12 @@
 
                                     else if (columnName == "Image")
                                     {
-                                     <input type="file" id="imageInput" name="image">
+                                    // <input type="file" id="imageInput" name="image">
 
+                                        <div class="mb-3">
+                                            <label for="formFile" class="form-label">@columnName</label>
+                                            <input class="form-control" type="file" id="imageInput" name="image" />
+                                        </div>
                                     }
                                     else if (columnType == "int")
                                     {
@@ -591,11 +595,23 @@
                                     }
                                     else if (columnType == "varbinary")
                                     {
-                                        <input type="file" id="imageInput" name="image">
+                                        //<input type="file" id="imageInput" name="image">
+                                        <div class="mb-3">
+                                            <label for="formFile" class="form-label">Default file input example</label>
+                                            <input class="form-control" type="file" id="imageInput" name="image" />
+                                        </div>
                                     }
                                     else if (columnType == "nvarchar")
                                     {
-                                        <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
+                                        <div class="form-floating">
+                                            <input type="text"
+                                                   class="form-control"
+                                                   id="floatingInput"
+                                                   placeholder="@columnName"
+                                                   name="data[@columnName]" />
+                                            <label for="floatingInput">@columnName</label>
+                                        </div>
+                                       @*  <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." /> *@
                                     }
                                     else if (columnType == "datetime2")
                                     {
