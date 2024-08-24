@@ -173,6 +173,7 @@
                     type: 'GET',
                     data: { szDatabaseMasterId: dbmasterid, szTableName: tableName, szPageIndex: pageIndex, szPageSize: pageSize },
                     success: function (data) {
+                        debugger
                         var tableHeader = $('#dataTable thead');
                         var tableBody = $('#dataTable tbody');
 
@@ -185,38 +186,45 @@
                             var tableHeader = $('<tr>');
                             tableHeader.append('<th><input type="checkbox" id="select-all"/></th>');
 
+                            // $.each(data[0], function (key, value) {
+                            //     $('<th>').text(key).appendTo(tableHeader);
+                            // });
+
+                            // $('<th>').text('Actions').appendTo(tableHeader); 
+                            
+                            
                             $.each(data[0], function (key, value) {
-                                $('<th>').text(key).addClass('fixed-column-width').appendTo(tableHeader);
+                                $('<th>').text(key).appendTo(tableHeader);
                             });
 
-                            $('<th>').text('Actions').addClass('fixed-column-width').appendTo(tableHeader);
+                            $('<th>').text('Actions').appendTo(tableHeader);
 
                             $('#dataTable thead').empty().append(tableHeader);
 
                             $.each(data, function (index, item) {
                                 var row = $('<tr>').appendTo(tableBody);
                                 $('<td>').append('<input type="checkbox" class="select-checkbox" data-id="' + item.Id + '"/>')
-                                    .addClass('fixed-column-width')
+                                    
                                     .appendTo(row);
 
                                 $.each(item, function (key, value) {
-                                    var cell = $('<td>').addClass('fixed-column-width');
+                                    var cell = $('<td>');
                                     if (key === 'Image' && value) {
                                         var imgElement = $('<img>').attr('src', 'data:image/jpeg;base64,' + value).css({
                                             'width': '100px',
                                             'height': '100px'
                                         });
                                         cell.append(imgElement);
-                                    } else if (key === 'LargeStringColumnName' && value.length > 200) {
-                                        // For large strings, apply additional class for wrapping
-                                        cell.addClass('large-string').text(value);
+                                    } else if (typeof value === 'string' && value.length > 100) {
+                                        // For long strings, break the text after every 100 characters
+                                        cell.html(breakLongText(value, 50));
                                     } else {
                                         cell.text(value);
                                     }
                                     row.append(cell);
                                 });
 
-                                var actions = $('<td>').addClass('fixed-column-width');
+                                var actions = $('<td>');
                                 var editButton = $('<button>')
                                     .text('Edit')
                                     .addClass('btn btn-primary edit-btn')
@@ -263,9 +271,36 @@
                 });
             }
 
+            // Function to break the text into chunks of a specified length
+            function breakLongText(text, maxLineLength) {
+                var result = '';
+                var line = '';
+
+                // Split the text into words
+                var words = text.split(' ');
+
+                for (var i = 0; i < words.length; i++) {
+                    var word = words[i];
+
+                    // Check if adding the next word would exceed the maximum line length
+                    if (line.length + word.length + 1 > maxLineLength) {
+                        result += line + '<br>';  // Add the current line and a line break
+                        line = word;  // Start a new line with the current word
+                    } else {
+                        line += (line.length > 0 ? ' ' : '') + word;  // Add the word to the current line
+                    }
+                }
+
+                result += line;  // Add the last line (if any)
+
+                return result;
+            }
+
+
+
 
         });
-
+        
         document.getElementById('catalogueForm').addEventListener('submit', function (event) {
             event.preventDefault(); // Prevent the default form submission
             debugger
@@ -458,8 +493,8 @@
 
 <style>
     .fixed-column-width {
-        width: 300px;
-        max-width: 300px;
+    /* width: 300px;
+    max-width: 300px; */
         word-wrap: break-word;
         overflow-wrap: break-word;
         white-space: normal;
@@ -928,9 +963,8 @@
 
 
 
-<div class="container-xxl flex-grow-1 container-p-y">
-    <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues /</span> @currentTableName</h4>
-
+  @*   <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalogues /</span> @currentTableName</h4>
+ *@
     <div class="col-xl-12">
         <div class="nav-align-top mb-4">
             <ul class="nav nav-tabs" role="tablist">
@@ -982,17 +1016,26 @@
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
 
-                     <div style="height: 350px;">
-                        <button type="button" class="btn btn-success btn-rounded btn-fw" id="myBtn">Add New</button>
 
-                        @* <div class="table-responsive text-nowrap">
-                            <table class="table table-hover" id="dataTable">
-                                <thead>
+             
+                        <h5 class="card-header">
+                            <button type="button" class="btn btn-success btn-rounded btn-fw" id="myBtn">Add New</button>
+                        </h5>
+
+                        <div class="table-responsive text-nowrap" style="max-height: 450px; overflow-y: auto;">
+                        <table class="table table-hover table-bordered" id="dataTable" style="font-size: 15px;">
+                                <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
+                                    <!-- Table headers go here -->
+                                    <tr>
+                                    </tr>
                                 </thead>
                                 <tbody class="table-border-bottom-0 table-body">
                                 </tbody>
                             </table>
-                        </div> *@
+                        </div>
+                    <!--/ Responsive Table -->
+                    @*  <div style="height: 350px;">
+                        <button type="button" class="btn btn-success btn-rounded btn-fw" id="myBtn">Add New</button>
 
                         <div class="table-responsive text-nowrap" style="max-height: 350px; overflow-y: auto;">
                             <table class="table table-hover" id="dataTable">
@@ -1007,9 +1050,9 @@
                                 </tbody>
                             </table>
                         </div>
-                    </div>
+                    </div> *@
 
-
+                  
  
                    
 
@@ -1195,19 +1238,44 @@
                 <div class="tab-pane fade" id="navs-top-messages" role="tabpanel">
                     <h4 class="card-title">Upload File/Download Template</h4>
                     <div class="form-group">
-                        <form asp-controller="Catalogue" asp-action="UploadFile" asp-route-tablename="@tableName" asp-route-szDatabaseMasterId="@dbmasterid" enctype="multipart/form-data" method="post">
+                        <form asp-controller="Catalogue"
+                              asp-action="UploadFile"
+                              asp-route-tablename="@tableName"
+                              asp-route-szDatabaseMasterId="@dbmasterid"
+                              enctype="multipart/form-data"
+                              method="post"
+                              onsubmit="showSpinner();">
+
                             <div class="form-group">
                                 <label for="file">Select file to upload (xlsx or csv):</label>
                                 <input type="file" name="file" class="form-control" required />
                             </div>
+
                             <div class="d-flex justify-content-between">
-                                <button type="submit" class="btn btn-danger btn-icon-text">
+                                <button type="submit" id="uploadButton" class="btn btn-danger btn-icon-text">
                                     <i class="ti-upload btn-icon-prepend"></i>
                                     Upload
                                 </button>
+                            </div>
 
+                            <!-- Spinner: initially hidden -->
+                            <div id="loadingSpinner" class="text-center mt-3" style="display: none;">
+                                <div class="spinner-border spinner-border-lg text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
                         </form>
+
+                        <script>
+                            function showSpinner() {
+                                // Show the spinner
+                                document.getElementById('loadingSpinner').style.display = 'block';
+
+                                // Disable the submit button to prevent multiple submissions
+                                document.getElementById('uploadButton').disabled = true;
+                            }
+                        </script>
+
                     </div>
                     <div class="form-group">
                         <form method="get" asp-controller="Catalogue" asp-action="DownloadTemplate">
@@ -1222,7 +1290,6 @@
             </div>
         </div>
     </div>
-</div>
 
 <style>
     #navs-top-home .table-responsive {
