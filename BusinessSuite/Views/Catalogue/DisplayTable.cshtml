@@ -57,15 +57,19 @@
             fetchData();
 
 
-            $('.scroll-container').on('scroll', function () {
-                // Handle the scroll event
-                console.log('Table is being scrolled');
-                // You can add your custom logic here
+            $('.table-responsive').on('scroll', function () {
+                var container = $(this);
+                var contentHeight = container[0].scrollHeight;
+                var scrollTop = container.scrollTop();
+                var containerHeight = container.height();
 
-                pageIndex++;
-                fetchData();
+                // Check if the user has scrolled to the bottom
+                if (scrollTop + containerHeight >= contentHeight - 10) {
+                    // If near the bottom, fetch more data
+                    pageIndex++;
+                    fetchData();
+                }
             });
-            
 
             // function fetchData() {
             //     $.ajax({
@@ -771,7 +775,7 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel1">Modal title</h5>
+                        <h5 class="modal-title" id="exampleModalLabel1">Edit Data</h5>
                         <button type="button"
                                 class="btn-close"
                                 data-bs-dismiss="modal"
