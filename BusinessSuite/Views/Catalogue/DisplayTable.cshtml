@@ -51,7 +51,7 @@
 
         $(document).ready(function () {
             var pageIndex = 0;
-            var pageSize = 50;
+            var pageSize = 5000;
             var tableName = '@ViewData["TableName"]';
             var dbmasterid = @dbmasterid;
             fetchData();
@@ -260,13 +260,16 @@
 
                             bindActions();
                         } else {
-                            var noDataRow = $('<tr>');
-                            $('<td>')
-                                .attr('colspan', tableHeader.find('th').length || 1)
-                                .addClass('text-center')
-                                .text('No data available')
-                                .appendTo(noDataRow);
-                            tableBody.append(noDataRow);
+                            // Check if the table body has any rows
+                            if (tableBody.find('tr').length === 0) {
+                                var noDataRow = $('<tr>');
+                                $('<td>')
+                                    .attr('colspan', tableHeader.find('th').length || 1)
+                                    .addClass('text-center')
+                                    .text('No data available')
+                                    .appendTo(noDataRow);
+                                tableBody.append(noDataRow);
+                            }
                         }
                     },
                     error: function (xhr, status, error) {

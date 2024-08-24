@@ -95,14 +95,7 @@
 
                 <ul class="navbar-nav flex-row align-items-center ms-auto">
                     <!-- Place this tag where you want the button to render. -->
-                    <li class="nav-item lh-1 me-3">
-                        <a class="github-button"
-                           href="https://github.com/themeselection/sneat-html-admin-template-free"
-                           data-icon="octicon-star"
-                           data-size="large"
-                           data-show-count="true"
-                           aria-label="Star themeselection/sneat-html-admin-template-free on GitHub">Star</a>
-                    </li>
+                   
 
                     <!-- User -->
                     <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -155,11 +148,18 @@
                                 <div class="dropdown-divider"></div>
                             </li>
                             <li>
-                                <a class="dropdown-item" href="auth-login-basic.html">
+                                <a class="dropdown-item" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
                                     <i class="bx bx-power-off me-2"></i>
                                     <span class="align-middle">Log Out</span>
                                 </a>
                             </li>
+
+
+                            <form id="logout-form" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" style="display: none;">
+                                @* If you are using anti-forgery tokens, add the following line *@
+                                @Html.AntiForgeryToken()
+                            </form>
+
                         </ul>
                     </li>
                     <!--/ User -->
