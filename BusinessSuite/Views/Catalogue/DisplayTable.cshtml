@@ -58,13 +58,23 @@
 
 
             $('.scroll-container').on('scroll', function () {
-                // Handle the scroll event
-                console.log('Table is being scrolled');
-                // You can add your custom logic here
+                debugger
+                // Check if the user has scrolled to the bottom
+                var $this = $(this);
+                var scrollHeight = $this[0].scrollHeight;
+                var scrollTop = $this.scrollTop();
+                var containerHeight = $this.outerHeight();
 
-                pageIndex++;
-                fetchData();
+                // If the scroll position plus the container height is equal to the scroll height,
+                // the user has reached the bottom of the container
+                if (scrollTop + containerHeight >= scrollHeight) {
+                    console.log('Reached the end of the table');
+                    debugger;
+                    pageIndex++;
+                    fetchData();
+                }
             });
+
 
 
             // function fetchData() {
@@ -956,12 +966,20 @@
                         Upload Data
                     </button>
                 </li>
+                <li class="nav-item">
+                    <button type="button"
+                            class="nav-link"
+                            id="myBtn"
+                            aria-selected="false">
+                         Add New
+                    </button>
+
+                </li>
             </ul>
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="navs-top-home" role="tabpanel">
 
                     <div style="height: 500px;">
-                        <button type="button" class="btn btn-success btn-rounded btn-fw" id="myBtn">Add New</button>
 
                         @* <div class="table-responsive text-nowrap">
                         <table class="table table-hover" id="dataTable">
@@ -972,7 +990,20 @@
                         </table>
                         </div> *@
 
-                            <div class="table-responsive text-nowrap" style="max-height: 500px; overflow: auto;">
+                            <div class="table-responsive text-nowrap scroll-container" style="max-height: 525px; overflow: auto;">
+                                <table class="table table-hover table-bordered" id="dataTable" style="font-size: 15px; width: 100%;">
+                                    <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
+                                        <!-- Table headers go here -->
+                                    </thead>
+                                    <tbody class="table-border-bottom-0 table-body">
+                                        <!-- Table rows go here -->
+                                        <!-- Add more rows as needed -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                           @*  <div class="table-responsive text-nowrap" style="max-height: 525px; overflow: auto;">
                                 <table class="table table-hover table-bordered" id="dataTable" style="font-size: 15px; width: 100%;">
                                     <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
                                         <!-- Table headers go here -->
@@ -983,7 +1014,7 @@
                                         <!-- Add more rows as needed -->
                                     </tbody>
                                 </table>
-                            </div>
+                            </div> *@
                     </div>
 
 
