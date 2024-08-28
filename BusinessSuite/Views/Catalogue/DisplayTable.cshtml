@@ -27,15 +27,16 @@
         var btn = document.getElementById("myBtn");
 
         // Get the <span> element that closes the modal
-        var span1 = document.getElementsByClassName("close1")[0];
+        var span = document.getElementsByClassName("close")[0];
 
         // When the user clicks the button, open the modal
         btn.onclick = function () {
+            debugger
             modal.style.display = "block";
         }
 
         // When the user clicks on <span> (x), close the modal
-        span1.onclick = function () {
+        span.onclick = function () {
             modal.style.display = "none";
         }
 
@@ -504,196 +505,217 @@
     </div>
 }
 
+<style>
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1050;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+        background-color: #fff;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+        border-radius: 8px;
+    }
+
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+</style>
+
 <!-- The Modal -->
-<div id="myModal" class="modal">
+<div id="myModal" class="modal" style="display:none">
 
     <!-- Modal content -->
     <div class="modal-content">
         <form asp-controller="Catalogue" asp-action="AddData" method="post" id="catalogueForm" enctype="multipart/form-data">
             <input type="hidden" name="tableName" value="@tableName" />
             <input type="hidden" name="szDatabaseMasterId" value="@dbmasterid" />
-            <div class="modal-content rounded-0">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editPlanModalLabel">Add @tableName data</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span1 class="close1">&times;</span1>
-                    </button>
-                </div>
-                <input class="form-control" id="editPlanId" hidden>
-                <div class="modal-body">
 
-                    @foreach (DataRow row in columnNames.Rows)
+            <div class="modal-header">
+                <h5 class="modal-title">Add @tableName data</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                @foreach (DataRow row in columnNames.Rows)
+                {
+                    var columnName = @row["COLUMN_NAME"].ToString();
+                    var columnType = @row["DATA_TYPE"].ToString();
+                    var columnData = @row["coldata"].ToString();
+
+                    if (columnType == "bit" || columnType == "datetimeoffset")
                     {
-                        var columnName = @row["COLUMN_NAME"].ToString();
-                        var columnType = @row["DATA_TYPE"].ToString();
-                        var columnData = @row["coldata"].ToString();
-
-                        if (columnType == "bit" || columnType == "datetimeoffset")
+                        <!-- Handle specific column types if needed -->
+                    }
+                    else
+                    {
+                        if (columnName == "CreatedDate" || columnName == "Id" || columnName == "id")
                         {
-
+                            <!-- Skip specific columns -->
                         }
                         else
                         {
-                            if (@row["COLUMN_NAME"].ToString().Equals("CreatedDate") || @row["COLUMN_NAME"].ToString().Equals("Id") || @row["COLUMN_NAME"].ToString().Equals("id"))
-                            {
-                                <!-- Skip specific columns -->
-                            }
-                            else
-                            {
-                                <div class="form-group d-inline-block w-auto">
-                                    @if (columnName == "TransitCarrier")
-                                    {
-                                        @if (columnName == "TransitCarrier")
-                                        {
-                                            <div id="transitCarrierContainer" class="form-group">
-                                                <input type="hidden" id="transitCarrierHiddenInput" name="data[TransitCarrier]" />
+                            <div class="form-group d-inline-block w-auto">
+                                @if (columnName == "TransitCarrier")
+                                {
+                                    <div id="transitCarrierContainer" class="form-group">
+                                        <input type="hidden" id="transitCarrierHiddenInput" name="data[TransitCarrier]" />
 
-                                                <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappApi" value="WhatsappApi">
-                                                    <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappCloudApi" value="WhatsappCloudApi">
-                                                    <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="email" value="Email">
-                                                    <label class="form-check-label" for="email">Email</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="sms" value="SMS">
-                                                    <label class="form-check-label" for="sms">SMS</label>
-                                                </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappApi" value="WhatsappApi">
+                                            <label class="form-check-label" for="whatsappApi">Whatsapp API</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="whatsappCloudApi" value="WhatsappCloudApi">
+                                            <label class="form-check-label" for="whatsappCloudApi">Whatsapp Cloud API</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="email" value="Email">
+                                            <label class="form-check-label" for="email">Email</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="checkbox" class="form-check-input transitCarrierCheckbox" id="sms" value="SMS">
+                                            <label class="form-check-label" for="sms">SMS</label>
+                                        </div>
+                                    </div>
+
+                                    <script>
+                                        // Function to update the hidden input with selected values
+                                        function updateTransitCarrierHiddenInput() {
+                                            var selectedValues = [];
+                                            document.querySelectorAll('.transitCarrierCheckbox:checked').forEach(function (checkbox) {
+                                                selectedValues.push(checkbox.value);
+                                            });
+                                            document.getElementById('transitCarrierHiddenInput').value = selectedValues.join(',');
+                                        }
+
+                                        // Attach event listener to all checkboxes
+                                        document.querySelectorAll('.transitCarrierCheckbox').forEach(function (checkbox) {
+                                            checkbox.addEventListener('change', updateTransitCarrierHiddenInput);
+                                        });
+
+                                        // Initialize the hidden input in case some checkboxes are pre-selected
+                                        updateTransitCarrierHiddenInput();
+                                    </script>
+
+                                }
+                                else if (columnName == "Image")
+                                {
+                                    <input type="file" id="imageInput" name="image">
+                                }
+                                else if (columnType == "int")
+                                {
+                                    <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" />
+                                }
+                                else if (columnType == "varbinary")
+                                {
+                                    <input type="file" id="imageInput" name="image">
+                                }
+                                else if (columnType == "nvarchar")
+                                {
+                                    <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" />
+                                }
+                                else if (columnType == "datetime2")
+                                {
+                                    <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
+                                }
+                                else
+                                {
+                                    var coltype = columnType;
+                                    var strsplit = columnData.Split('!');
+
+                                    foreach (var str in strsplit)
+                                    {
+                                        if (!dropDownOptions.Contains(str))
+                                        {
+                                            dropDownOptions.Add(str);
+                                        }
+                                    }
+
+                                    if (dropDownOptions.Any())
+                                    {
+                                        if (coltype.Equals("oneselect"))
+                                        {
+                                            <div class="form-group d-inline-block w-auto">
+                                                <select name="data[@columnName]" class="form-control">
+                                                    <option value="">--Select--</option>
+                                                    @foreach (var option in dropDownOptions)
+                                                    {
+                                                        if (!option.Equals(""))
+                                                        {
+                                                            string[] strsply = option.Split('~');
+                                                            <option value="@strsply[1]">@strsply[0]</option>
+                                                        }
+                                                    }
+                                                </select>
                                             </div>
                                         }
-
-                                        <script>
-                                            // Function to update the hidden input with selected values
-                                            function updateTransitCarrierHiddenInput() {
-                                                var selectedValues = [];
-                                                document.querySelectorAll('.transitCarrierCheckbox:checked').forEach(function (checkbox) {
-                                                    selectedValues.push(checkbox.value);
-                                                });
-                                                document.getElementById('transitCarrierHiddenInput').value = selectedValues.join(',');
-                                            }
-
-                                            // Attach event listener to all checkboxes
-                                            document.querySelectorAll('.transitCarrierCheckbox').forEach(function (checkbox) {
-                                                checkbox.addEventListener('change', updateTransitCarrierHiddenInput);
-                                            });
-
-                                            // Initialize the hidden input in case some checkboxes are pre-selected
-                                            updateTransitCarrierHiddenInput();
-                                        </script>
-
-                                    }
-
-
-                                    else if (columnName == "Image")
-                                    {
-                                        <input type="file" id="imageInput" name="image">
-
-                                    }
-                                    else if (columnType == "int")
-                                    {
-                                        <input type="number" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required *@ />
-                                    }
-                                    else if (columnType == "varbinary")
-                                    {
-                                        <input type="file" id="imageInput" name="image">
-                                    }
-                                    else if (columnType == "nvarchar")
-                                    {
-                                        <input type="text" name="data[@columnName]" placeholder="@columnName" class="form-control" @* required pattern=".*\S.*" title="This field cannot be empty or contain only spaces." *@ />
-                                    }
-                                    else if (columnType == "datetime2")
-                                    {
-                                        @*  else if (@row["COLUMN_NAME"].ToString().Contains("scheduleTime"))
-                        {
-                        <input type="hidden" name="data[@row["COLUMN_NAME"].ToString()]" value="@DateTime.Now" />
-                        }
-                        *@
-                                        <input type="datetime-local" name="data[@columnName]" placeholder="@columnName" class="form-control" value="@DateTime.Now" required />
-                                    }
-                                    else
-                                    {
-
-                                        var coltype = columnType;
-                                        var strsplit = columnData.Split('!');
-
-                                        foreach (var str in strsplit)
+                                        else
                                         {
-                                            @if (!dropDownOptions.Contains(str))
-                                            {
-                                                dropDownOptions.Add(str);
-                                            }
-                                        }
-                                        @if (dropDownOptions.Any())
-                                        {
-                                            if (coltype.Equals("oneselect"))
-                                            {
-                                                <div class="form-group d-inline-block w-auto">
-                                                    <select name="data[@columnName]" class="form-control">
-                                                        <option value="">--Select--</option>
-                                                        @foreach (var option in dropDownOptions)
+                                            <div class="form-group">
+                                                <label for="itemSearch" class="control-label">Search Items</label>
+                                                <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
+                                            </div>
+
+                                            <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
+                                                <div id="itemsContainer">
+                                                    @foreach (var option in dropDownOptions)
+                                                    {
+                                                        if (!option.Equals(""))
                                                         {
-                                                            if (!option.Equals(""))
-                                                            {
-                                                                string[] strsply = option.Split('~');
-                                                                <option value="@strsply[1]">@strsply[0]</option>
-                                                            }
+                                                            string[] strsply = option.Split('~');
+
+                                                            <div class="form-check">
+                                                                <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
+                                                                <label class="form-check-label">@strsply[0]</label>
+                                                            </div>
                                                         }
-                                                    </select>
+                                                    }
                                                 </div>
-                                            }
-                                            else
-                                            {
-                                                <div class="form-group">
-                                                    <label for="itemSearch" class="control-label">Search Items</label>
-                                                    <input type="text" id="itemSearch" class="form-control" placeholder="Search items..." />
-                                                </div>
+                                            </div>
 
-                                                <div class="form-group" style="max-height: 400px; overflow-y: scroll;">
-                                                    <div id="itemsContainer">
-                                                        @foreach (var option in dropDownOptions)
-                                                        {
-                                                            if (!option.Equals(""))
-                                                            {
-                                                                string[] strsply = option.Split('~');
-
-                                                                <div class="form-check">
-                                                                    <input type="checkbox" class="form-check-input" data-name="@strsply[0]~@columnName" data-id="@strsply[1]" />
-                                                                    <label class="form-check-label">@strsply[0]</label>
-                                                                </div>
-                                                            }
-
-                                                        }
-                                                    </div>
-                                                </div>
-
-                                                <div id="hiddenFieldsContainer"></div>
-                                            }
-
+                                            <div id="hiddenFieldsContainer"></div>
                                         }
-
-
-
-                                        dropDownOptions.Clear();
                                     }
-                                </div>
-                            }
+
+                                    dropDownOptions.Clear();
+                                }
+                            </div>
                         }
                     }
+                }
+            </div>
 
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save</button>
-                </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
         </form>
     </div>
 
 </div>
+
 
 
 
@@ -704,7 +726,7 @@
     </div>
 }
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="modal">
+<div id="deleteModal" class="modal" style="display:none">
     <div class="modal-content">
         <div class="modal-header">
             <h5 class="modal-title">Delete Confirmation</h5>
