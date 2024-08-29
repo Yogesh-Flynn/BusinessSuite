@@ -93,6 +93,10 @@ namespace BusinessSuite.Areas.Identity.Pages.Account
             [Required]
             [Display(Name = "LastName")]
             public string LastName { get; set; }
+            
+            [Required]
+            [Display(Name = "PhoneNumber")]
+            public string PhoneNumber { get; set; }
 
             [Required]
             public string? Role {  get; set; }
@@ -154,7 +158,7 @@ namespace BusinessSuite.Areas.Identity.Pages.Account
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 user.FirstName=Input.FirstName;
                 user.LastName=Input.LastName;
-
+                user.PhoneNumber = Input.PhoneNumber;
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
