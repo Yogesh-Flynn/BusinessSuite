@@ -172,12 +172,7 @@
                 <li class="menu-header small text-uppercase">
                     <span class="menu-header-text">Users</span>
                 </li>
-                <li class="menu-item @(currentController == "Catalogue" && currentAction == "Index" ? "active" : "")">
-                    <a asp-controller="User" asp-action="GetUsers"  class="menu-link">
-                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
-                        <div data-i18n="Account Settings">Users</div>
-                    </a>
-                </li>
+              
                 
                 <li class="menu-item @(currentController == "Catalogue" && currentAction == "Index" ? "active" : "")">
                     <a asp-controller="User" asp-action="Index"  class="menu-link">
@@ -185,9 +180,17 @@
                         <div data-i18n="Account Settings">Users</div>
                     </a>
                 </li>
+                
+                
+                <li class="menu-item @(currentController == "Catalogue" && currentAction == "Index" ? "active" : "")">
+                    <a asp-action="Register" asp-controller="Account" class="menu-link">
+                        <i class="menu-icon tf-icons bx bx-dock-top"></i>
+                        <div data-i18n="Account Settings">Add User</div>
+                    </a>
+                </li>
             }
 
-
+         
           
     </aside>
 

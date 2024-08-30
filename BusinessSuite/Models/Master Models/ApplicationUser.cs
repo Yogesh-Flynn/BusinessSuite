@@ -7,6 +7,7 @@ namespace BusinessSuite.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
+        public string ProfilePhotoBase64 { get; set; }
         public string CompanyId { get; set; }
         public Company Company { get; set; }
     }

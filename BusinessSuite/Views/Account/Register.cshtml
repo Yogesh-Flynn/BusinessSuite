@@ -1,0 +1,77 @@
+﻿@using BusinessSuite.Models.ViewModels
+@model RegisterViewModel
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold py-3 mb-4">
+        <span class="text-muted fw-light">Account Settings /</span> Create Account
+    </h4>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <h5 class="card-header">Profile Details</h5>
+                <hr class="my-0" />
+                <div class="card-body">
+                    <form id="registerForm" asp-action="Register" method="post" enctype="multipart/form-data">
+                        <div class="row">
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="FirstName" class="form-label">First Name</label>
+                                <input asp-for="FirstName" class="form-control" id="firstName" autofocus />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="LastName" class="form-label">Last Name</label>
+                                <input asp-for="LastName" class="form-control" id="lastName" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="Email" class="form-label">E-mail</label>
+                                <input asp-for="Email" class="form-control" id="email" type="text" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label">Phone Number</label>
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text">IN (+91)</span>
+                                    <input asp-for="PhoneNumber" class="form-control" id="phoneNumber" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="Password" class="form-label">Password</label>
+                                <input asp-for="Password" class="form-control" type="password" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+                                <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="CompanyName" class="form-label">Organization</label>
+                                <input asp-for="CompanyName" class="form-control" id="organization" />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label" for="Role">Role</label>
+                                <select asp-for="Role" asp-items="@(new SelectList(Model.RoleList, "Value", "Text"))" class="select2 form-select">
+                                    <option value="">Select</option>
+                                </select>
+                                <span asp-validation-for="Role" class="text-danger"></span>
+                            </div>
+                            <div class="mb-3 col-md-6">
+                                <label asp-for="ProfilePhoto" class="form-label">Profile Photo</label>
+                                <input asp-for="ProfilePhoto" type="file" class="form-control" />
+                                <span asp-validation-for="ProfilePhoto" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <button type="submit" class="btn btn-primary me-2">Save changes</button>
+                            <button type="reset" class="btn btn-outline-secondary">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
